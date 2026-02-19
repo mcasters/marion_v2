@@ -1,0 +1,316 @@
+:root {
+  /*
+   * Typography
+   * ======================================================================== */
+
+  --font-family-serif: var(--font-serif-garamond); /* declared in rooLayout*/
+  --font-family-serif-caps: var(--font-serif-cormorant-caps); /* declared in rooLayout*/
+  --font-family-sans: Tahoma;
+
+  /*
+  * Font size
+  * ======================================================================== */
+  --font-size-title: 32px;
+  --font-size-nav1: 19px;
+  --font-size-nav2: 17px;
+  --font-size: 17px;
+  --font-size-min: 15px;
+
+  /*
+   * Layout
+   * ======================================================================== */
+
+  --admin-nav-height: 90px;
+  /*
+  WARNING before to change : These two are also in constants JS (Layout)
+   */
+  --line-height: 6px;
+  --nav-1-height: 31px;
+  --nav-2-height: 55px;
+
+  /*
+   * Colors
+   * ======================================================================== */
+
+  --color-light: #dcdcdc;
+  --color-medium: #c4c3c3;
+  --color-dark: #818181;
+  --color-xdark: #333;
+
+  --link-color-xdark: #8a2101;
+  --link-color-dark: #be2d01;
+  --link-color-light: #e57c52;
+  --link-color-xlight: #e0bb89;
+
+
+  --overlayer: hsla(5, 15%, 5%, 0.3);
+  /*
+  common home and other pages
+   */
+
+  --background-color-auth-status: var(--color-light);
+  --color-auth-status: var(--color-xdark);
+  --color-border-auth-status: var(--color-xdark);
+}
+
+/*
+ * Global
+ */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-family: var(--font-family-serif);
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size);
+}
+
+body {
+  line-height: 1.7;
+}
+
+html,
+body {
+  max-width: 100vw;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.separate {
+  padding: 3em 0;
+}
+
+.smallSeparate {
+  padding: 1.5em 0;
+}
+
+/*
+ * Link
+ */
+
+.iconButton {
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.buttonLink {
+  display: inline;
+  margin: 0;
+  background: none;
+  box-shadow: none;
+  border: none;
+  width: inherit;
+  line-height: inherit;
+}
+
+a,
+.buttonLink {
+  font-size: var(--font-size);
+  text-decoration: none;
+  transition: color 0.6s ease;
+}
+
+.icon, .homeIcon {
+  transition: fill 0.6s ease;
+}
+
+.iconButton:disabled,
+.icon:disabled {
+  opacity: 0.3;
+  cursor: unset;
+}
+
+button::selection,
+img::selection,
+label::selection,
+ul::selection,
+li::selection {
+  user-select: none;
+  background: transparent;
+  color: initial;
+}
+
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ * https://github.com/h5bp/html5-boilerplate/issues/440
+ */
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+  vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset s.
+ */
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+figure {
+  margin: 0 !important;
+}
+
+/*
+ * Forms
+ */
+
+button,
+.button {
+  cursor: pointer;
+}
+
+input,
+button,
+.button,
+select,
+textarea,
+label, .label {
+  font-family: var(--font-family-serif);
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-min);
+}
+
+label {
+  display: block;
+  text-align: left;
+  font-family: var(--font-family-serif-caps);
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+
+textarea,
+.labelCheckbox,
+input:not([type="file"], [type="checkbox"]),
+select {
+  width: 100%;
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  border-radius: unset;
+  user-select: text;
+  padding: 5px;
+  margin: 0 0 1em;
+}
+
+.area {
+  background-color: white;
+  border: 1px solid #d9d9d9;
+}
+
+input,
+.checkboxLabel,
+select {
+  height: 40px;
+  line-height: 40px;
+}
+
+textarea {
+  line-height: 1.5;
+  resize: vertical;
+}
+
+input[type="checkbox"] {
+  height: unset;
+  margin-right: 8px;
+}
+
+.adminButton {
+  font-family: var(--font-family-serif);
+  min-width: 200px;
+  min-height: 40px;
+  box-shadow: inset 0 0.8em 1em 0 #efefef;
+  border: 1px solid #d9d9d9;
+  background-color: #e2e2e2;
+}
+
+.adminButton {
+  margin: 0.5em;
+  padding: 0.5em;
+}
+
+/*
+ * Print s
+ * Inlined to avoid the additional HTTP request:
+ * http://www.phpied.com/delay-loading-your-print-css/
+ * ========================================================================== */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important; /* Black prints faster: http://www.sanbeiji.com/archives/953 */
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+
+  /*
+       * Don't show links that are fragment identifiers,
+       * or use the `javascript:` pseudo protocol
+       */
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+
+  /*
+       * Printing Tables:
+       * http://css-discuss.incutio.com/wiki/Printing_Tables
+       */
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+  }
+
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}

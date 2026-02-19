@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.image{
+  width: auto;
+  height: 20vh;
+  cursor: pointer;
+}
+
+/* desktop */
+@media (min-width: 769px) {
+  .container {
+    gap: 1em;
+  }
+
+  .image{
+    width: auto;
+    height: 35vh;
+    transition: transform 250ms ease-out;
+  }
+}

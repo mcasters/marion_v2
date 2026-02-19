@@ -1,0 +1,269 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Meta {
+  id    Int    @id @default(autoincrement())
+  label String @unique
+  text  String @db.LongText
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  isAdmin  Boolean   @default(true)
+  messages Message[]
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  date        DateTime
+  dateUpdated DateTime?
+  text        String    @db.LongText
+  author      User      @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+model Post {
+  id        Int         @id @default(autoincrement())
+  type      String      @default("post")
+  title     String
+  date      DateTime
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  text      String?     @db.LongText
+  published Boolean     @default(false)
+  viewCount Int         @default(0)
+  images    PostImage[]
+}
+
+model PostImage {
+  id       Int     @id @default(autoincrement())
+  filename String  @unique
+  width    Int
+  height   Int
+  isMain   Boolean @default(false)
+  post     Post?   @relation(fields: [postId], references: [id])
+  postId   Int?
+}
+
+model Content {
+  id     Int            @id @default(autoincrement())
+  label  Label          @unique
+  title  String?
+  text   String         @db.LongText
+  images ContentImage[]
+}
+
+model ContentImage {
+  id        Int      @id @default(autoincrement())
+  filename  String   @unique
+  width     Int
+  height    Int
+  isMain    Boolean  @default(false)
+  content   Content? @relation(fields: [contentId], references: [id])
+  contentId Int?
+}
+
+enum Label {
+  INTRO
+  SLIDER
+  ADDRESS
+  PHONE
+  EMAIL
+  TEXT_CONTACT
+  PRESENTATION
+  DEMARCHE
+  INSPIRATION
+}
+
+model Painting {
+  id             Int               @id @default(autoincrement())
+  type           String            @default("peinture")
+  title          String
+  date           DateTime
+  technique      String            @db.LongText
+  description    String?           @db.LongText
+  height         Float
+  width          Float
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  isToSell       Boolean           @default(false)
+  price          Int?
+  sold           Boolean           @default(false)
+  imageFilename  String            @default("")
+  imageWidth     Int               @default(0)
+  imageHeight    Int               @default(0)
+  category       PaintingCategory? @relation(fields: [categoryId], references: [id])
+  categoryId     Int?
+  isOut          Boolean           @default(false)
+  outInformation String            @default("")
+}
+
+model Sculpture {
+  id             Int                @id @default(autoincrement())
+  type           String             @default("sculpture")
+  title          String
+  date           DateTime
+  technique      String             @db.LongText
+  description    String?            @db.LongText
+  height         Float
+  width          Float
+  length         Float
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  isToSell       Boolean            @default(false)
+  price          Int?
+  sold           Boolean            @default(false)
+  images         SculptureImage[]
+  category       SculptureCategory? @relation(fields: [categoryId], references: [id])
+  categoryId     Int?
+  isOut          Boolean            @default(false)
+  outInformation String             @default("")
+}
+
+model SculptureImage {
+  id          Int        @id @default(autoincrement())
+  filename    String     @unique
+  width       Int
+  height      Int
+  isMain      Boolean    @default(false)
+  sculpture   Sculpture? @relation(fields: [sculptureId], references: [id])
+  sculptureId Int?
+}
+
+model Drawing {
+  id             Int              @id @default(autoincrement())
+  type           String           @default("dessin")
+  title          String
+  date           DateTime
+  technique      String           @db.LongText
+  description    String?          @db.LongText
+  height         Float
+  width          Float
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  isToSell       Boolean          @default(false)
+  price          Int?
+  sold           Boolean          @default(false)
+  imageFilename  String           @default("")
+  imageWidth     Int              @default(0)
+  imageHeight    Int              @default(0)
+  category       DrawingCategory? @relation(fields: [categoryId], references: [id])
+  categoryId     Int?
+  isOut          Boolean          @default(false)
+  outInformation String           @default("")
+}
+
+model PaintingCategory {
+  id                Int             @id @default(autoincrement())
+  key               String          @unique
+  value             String          @unique
+  paintings         Painting[]
+  content           CategoryContent @relation(fields: [categoryContentId], references: [id])
+  categoryContentId Int             @unique
+}
+
+model SculptureCategory {
+  id                Int             @id @default(autoincrement())
+  key               String          @unique
+  value             String          @unique
+  sculptures        Sculpture[]
+  content           CategoryContent @relation(fields: [categoryContentId], references: [id])
+  categoryContentId Int             @unique
+}
+
+model DrawingCategory {
+  id                Int             @id @default(autoincrement())
+  key               String          @unique
+  value             String          @unique
+  drawings          Drawing[]
+  content           CategoryContent @relation(fields: [categoryContentId], references: [id])
+  categoryContentId Int             @unique
+}
+
+model CategoryContent {
+  id             Int                @id @default(autoincrement())
+  title          String             @default("")
+  text           String             @db.LongText
+  imageFilename  String             @default("")
+  imageWidth     Int                @default(0)
+  imageHeight    Int                @default(0)
+  paintCategory  PaintingCategory?
+  sculptCategory SculptureCategory?
+  drawCategory   DrawingCategory?
+}
+
+model Theme {
+  id                      Int     @id @default(autoincrement())
+  name                    String  @unique
+  isActive                Boolean @default(false)
+  general_lineColor       String
+  general_titleColor      String
+  general_lightbox        String
+  general_lightboxText    String
+  home_menu1_background   String
+  home_menu1_text         String
+  home_menu1_link         String
+  home_menu1_linkHover    String
+  home_menu2_background   String
+  home_menu2_text         String
+  home_menu2_link         String
+  home_menu2_linkHover    String
+  home_main_background    String
+  home_main_text          String
+  home_main_link          String
+  home_main_linkHover     String
+  home_footer_background  String
+  home_footer_text        String
+  home_footer_link        String
+  home_footer_linkHover   String
+  work_menu1_background   String
+  work_menu1_text         String
+  work_menu1_link         String
+  work_menu1_linkHover    String
+  work_menu2_background   String
+  work_menu2_text         String
+  work_menu2_link         String
+  work_menu2_linkHover    String
+  work_main_background    String
+  work_main_text          String
+  work_main_link          String
+  work_main_linkHover     String
+  work_footer_background  String
+  work_footer_text        String
+  work_footer_link        String
+  work_footer_linkHover   String
+  other_menu1_background  String
+  other_menu1_text        String
+  other_menu1_link        String
+  other_menu1_linkHover   String
+  other_menu2_background  String
+  other_menu2_text        String
+  other_menu2_link        String
+  other_menu2_linkHover   String
+  other_main_background   String
+  other_main_text         String
+  other_main_link         String
+  other_main_linkHover    String
+  other_footer_background String
+  other_footer_text       String
+  other_footer_link       String
+  other_footer_linkHover  String
+}
+
+model PresetColor {
+  id           Int    @id @default(autoincrement())
+  name         String @unique
+  color        String
+  displayOrder Int    @default(1)
+}

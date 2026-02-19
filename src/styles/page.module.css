@@ -1,0 +1,55 @@
+.limitedWidth {
+  text-align: left;
+}
+
+.section {
+  white-space: pre-line;
+  padding: 1em 0;
+}
+
+/* desktop */
+@media (min-width: 769px) {
+  .limitedWidth {
+    max-width: 42vw;
+    margin: auto;
+  }
+
+  .section {
+    padding: 2em 0;
+  }
+}
+
+/*
+POST
+ */
+.postContainer {
+  padding: 2em 0 2em;
+}
+
+.postInfo {
+  padding-bottom: 3em;
+}
+
+.postInfo h2 {
+  font-size: var(--font-size-title);
+}
+
+.postInfo p {
+  font-size: var(--font-size);
+  white-space: pre-line;
+}
+
+/* desktop */
+@media (min-width: 769px) {
+  .postContainer {
+    padding: 7em 2em 7em;
+  }
+
+  .postContainer:first-of-type {
+    padding: 0 2em 7em;
+  }
+
+  .postInfo {
+    padding: 2em 13em 3em;
+  }
+}

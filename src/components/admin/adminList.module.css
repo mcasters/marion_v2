@@ -1,0 +1,45 @@
+.listWrapper {
+  font-size: var(--font-size-min);
+  overflow: scroll;
+}
+
+.itemListWrapper {
+  height: 600px;
+}
+
+.categoryListWrapper {
+  height: 300px;
+}
+
+.itemList,
+.categoryList {
+  border-bottom: 1px dotted var(--color-light);
+  padding-left: 1em;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.itemList li,
+.categoryList li {
+  display: block;
+  height: 50px;
+  line-height: 50px;
+  overflow: hidden;
+}
+
+.itemTitle {
+  font-weight: bold;
+  text-align: left;
+  flex: 25%;
+}
+
+.itemInfo {
+  flex: 25%;
+}
+
+.itemYear,
+.itemImage,
+.itemIcon {
+flex: 10%;
+}

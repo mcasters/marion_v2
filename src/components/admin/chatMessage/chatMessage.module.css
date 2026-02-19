@@ -1,0 +1,94 @@
+.messagesHeader {
+  position: relative;
+}
+
+.shadow {
+  display: block;
+  position: absolute;
+  bottom: -11px;
+  width: 100%;
+  height: 10px;
+  background-image: url("/assets/shadow.png");
+  background-size: cover;
+  z-index: 0;
+}
+
+.messages {
+  padding: 1em;
+  max-height: 450px;
+  overflow: scroll;
+}
+
+.textRight {
+  margin-left: 30%;
+  text-align: right;
+}
+
+.textLeft {
+  margin-right: 30%;
+  text-align: left;
+}
+
+.authorName {
+  font-size: var(--font-size-min);
+  margin: 0 5px;
+}
+
+.chatButton, .message, .moreButton {
+  color: #e3e3e3;
+}
+
+.message {
+  position: relative;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 1em;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.moreButton {
+  background: unset;
+  border: unset;
+  position: absolute;
+  top: 0;
+  right: 8px;
+}
+
+.menu {
+  position: absolute;
+  top: 25px;
+  right: -10px;
+  background-color: #d9d9d9;
+  border: #ababab solid 1px;
+  border-radius: 5px;
+  box-shadow: 0 3px 5px #6c6c6c;
+  z-index: 5;
+  overflow: visible;
+}
+
+.menuItemButton {
+  width: 100%;
+  text-align: left;
+  background: unset;
+  border: unset;
+  padding: 6px 10px;
+}
+
+.menuItemButton:hover {
+  background-color: #ababab;
+  transition: background-color ease-out 0.3s;
+}
+
+.textArea {
+  width: 70%;
+  line-height: unset;
+}
+
+.chatButton {
+  padding: 13px;
+  margin: 5px;
+  border: unset;
+  border-radius: 6px;
+}

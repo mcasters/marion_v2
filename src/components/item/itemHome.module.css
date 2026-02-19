@@ -1,0 +1,88 @@
+.tagTitle {
+  text-align: left;
+  padding: 1em;
+  font-family: var(--font-family-serif-caps);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.ul {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-bottom: 2em;
+  gap: 0.5em;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: content-box;
+  border: solid 1px;
+}
+
+.categoryLink {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+}
+
+.image {
+  width: 150px;
+  height: 150px;
+}
+
+.categoryLink p {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 25px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+}
+
+.yearLink {
+  width: 80px;
+  height: 50px;
+}
+
+/* desktop */
+@media (min-width: 769px) {
+  .tagTitle {
+    padding: 2em 0 0 6em;
+  }
+
+  .ul {
+    gap: 2em;
+    padding: 2em 5em 3em;
+  }
+
+  .link:hover {
+    transition: all 0.4s ease-out;
+  }
+
+  .categoryLink {
+    width: 250px;
+    height: 250px;
+  }
+
+  .image {
+    width: 250px;
+    height: 250px;
+    transition: transform 0.4s ease-out;
+  }
+
+  .categoryLink:hover .image {
+    transform: scale(1.05);
+    transform-origin: center;
+  }
+
+  .yearLink {
+    width: 100px;
+    height: 60px;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,225 @@
+.adminWrapper {
+  padding: 6em 1em 1em;
+}
+
+/* desktop */
+@media (min-width: 769px) {
+  .adminWrapper {
+    padding: 6em 4em 3em;
+  }
+
+  .container {
+    max-width: 50vw;
+    margin: 0 auto;
+  }
+}
+
+.title1 {
+  font-size: 34px;
+  padding-bottom: 1.2em;
+}
+
+.title2 {
+  font-size: 26px;
+  padding-bottom: 1em;
+}
+
+.title3 {
+  font-size: 23px;
+  padding-bottom: 10px;
+  text-align: left;
+}
+
+.label {
+  padding: 0 0 0.5em;
+}
+
+.filterContainer {
+  display: flex;
+  column-gap: 0.5em;
+}
+
+.filter {
+  flex: auto;
+  text-align: left;
+}
+
+.column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 1em;
+}
+
+.dimensions, .checkTextForm {
+  display: flex;
+  flex-wrap: nowrap;
+  column-gap: 10px;
+}
+
+.checkTextForm {
+  column-gap: 5px;
+}
+
+.checkTextForm label {
+  min-width: 95px;
+}
+
+.buttonSection {
+  margin: 0.5em 0 0;
+  text-align: center;
+}
+
+.metaForm {
+  display: grid;
+  gap: 1em;
+  padding: 1em 6em;
+  grid-template-columns: 5fr 1fr 1fr;
+  grid-auto-rows: min-content;
+}
+
+.metaForm label {
+  padding-bottom: 0;
+}
+
+.metaForm input, .metaForm label, .metaForm textarea {
+  margin-bottom: 0;
+}
+.metaForm button{
+  min-width: unset;
+  align-self: end;
+  margin: 0;
+}
+
+/* Image */
+.imageInputContainer {
+  width: 80%;
+  margin: auto;
+}
+
+.dropZone {
+  height: 130px;
+  border: #c2c2c2 5px solid;
+  border-radius: 5px;
+  padding: 5px;
+  text-align: center;
+  color: #c2c2c2;
+  font-family: var(--font-family-serif-caps);
+  font-weight: bold;
+}
+
+.dropZoneOver {
+  border: #858585 7px solid;
+}
+
+.dropZone .inputButton {
+  display: block;
+  margin: auto;
+}
+
+.dropZone input::file-selector-button {
+  font-family: unset;
+  box-shadow: inset 0 0.8em 1em 0 #efefef;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.imageInputContainer label {
+  font-family: unset;
+  letter-spacing: unset;
+}
+
+.previewContainer {
+  text-align: center;
+}
+
+.previewContainer button {
+  margin-bottom: 1em;
+}
+
+.imageWrapper {
+  display: inline-block;
+  text-align: center;
+  padding: 0 2px;
+}
+
+.image {
+  display: block;
+  object-fit: contain;
+  padding: 0 2px;
+}
+
+/* End image */
+
+/* SelectImageList */
+
+.selectList {
+  height: 400px;
+  width: 300px;
+  margin: auto;
+  line-height: 122px;
+  vertical-align: middle;
+  position: relative;
+  background: white;
+  color: var(--color-dark);
+  overflow: scroll;
+  border-collapse: collapse;
+  border-bottom: 1px solid var(--color-dark);
+  border-top: 1px solid var(--color-dark);
+  text-align: center;
+}
+
+.option, .selectedOption {
+  padding: 5px;
+  border-bottom: 1px dotted var(--color-light);
+  transition: background-color 0.4s ease;
+}
+
+.option:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.4s ease;
+}
+
+.selectedOption:hover {
+  opacity: 60%;
+}
+
+/* End Select Image */
+
+/* Select Layout item */
+.layoutForm {
+  text-align: left;
+}
+
+.buttonLayout, .buttonDarkBackground  {
+  background: unset;
+  border: solid 6px transparent;
+  margin-right: 10px;
+}
+
+.buttonDarkBackground {
+  background: #ffffff;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px #6c6c6c ;
+}
+
+.buttonLayoutSelected {
+  border-color: #be0f02;
+}
+
+.layoutLabel {
+  display: flex;
+  align-items: center;
+  font-family: unset;
+  letter-spacing: unset;
+  padding: 0;
+  margin: 0;
+}
+
+/* End Select Layout item */
+
+.addButton {
+  margin-top: 2em;
+}

@@ -1,0 +1,40 @@
+.authStatusWrapper {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 15;
+  background-color: var(--background-color-auth-status);
+  color: var(--color-auth-status);
+  padding: 2px;
+  border: var(--color-border-auth-status) solid 1px;
+  box-shadow: 0 0 7px #363636;
+  font-weight: 500;
+  user-select: none;
+}
+
+.authStatusWrapper button {
+  font-weight: 500;
+}
+
+.container {
+  border: var(--color-border-auth-status) solid 1px;
+  text-align: center;
+  padding: 5px;
+  line-height: 1.2;
+}
+
+.loginForm {
+  padding-top: 3rem;
+}
+
+.loginForm input {
+  margin: 1rem 0;
+}
+
+.errorMessage {
+  color: red;
+}
+
+.logoutForm {
+  display: inline;
+}
