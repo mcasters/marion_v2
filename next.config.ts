@@ -10,9 +10,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "30mb",
     },
   },
-  outputFileTracingRoot: path.join(
-    __dirname,
-    "./",
-  ),
+  turbopack: {
+    root: path.join(__dirname, './'),
+  },
 };
 module.exports = nextConfig;
