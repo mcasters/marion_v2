@@ -1,6 +1,5 @@
-import { ContentFull } from "@/lib/type";
+import { ContentFull, Label } from "@/lib/type";
 import prisma from "@/lib/prisma.ts";
-import { Label } from "@@/prisma/generated/client";
 import {
   getMiscellaneousDir,
   resizeAndSaveImage,
@@ -31,15 +30,15 @@ export const findOrCreateContent = async (
   return BDContent;
 };
 
-export const updateText = async (id: number, text: string) => {
+export const updateText = async (label: Label, text: string) => {
   await prisma.content.update({
-    where: { id },
+    where: { label },
     data: { text },
   });
 };
 
 export const saveContentImage = async (
-  id: number,
+  label: Label,
   file: File,
   title: string,
   isMain: boolean,
@@ -48,7 +47,7 @@ export const saveContentImage = async (
   const fileInfo = await resizeAndSaveImage(file, title, dir);
   if (fileInfo) {
     await prisma.content.update({
-      where: { id },
+      where: { label },
       data: {
         images: {
           create: {

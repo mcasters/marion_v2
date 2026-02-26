@@ -11,7 +11,7 @@ import {
 import s from "@/components/admin/admin.module.css";
 import { Image } from "@/lib/type";
 import Preview from "@/components/admin/form/image/preview.tsx";
-import { Label } from "@@/prisma/generated/client";
+import { Label } from "@/lib/type";
 import ImageInput from "@/components/admin/form/image/imageInput.tsx";
 
 type Props = {
@@ -37,7 +37,7 @@ export default function ImagesForm({
 
   const submit = async (formData: FormData) => {
     resizedFiles.forEach((file) => formData.append("files", file));
-    const { message, isError } = await updateImageContent(null, formData);
+    const { message, isError } = await updateImageContent(formData);
     alert(message, isError);
     setResizedFiles([]);
     setReset((prevState) => prevState + 1);

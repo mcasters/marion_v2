@@ -1,30 +1,59 @@
 "use server";
+
 import { PresetColor, Theme } from "@@/prisma/generated/client";
 import prisma from "@/lib/prisma.ts";
+import { activateTheme } from "@/app/actions/theme/admin";
+
 import {
-  queryActiveTheme,
-  queryPresetColors,
-} from "@/app/actions/theme/queries";
-import { cacheDatas } from "@/lib/utils/serverUtils";
+  getBasePresetColorData,
+  getBaseThemeData,
+} from "@/lib/utils/themeUtils.ts";
+import { THEME } from "@/constants/admin.ts";
 
-export async function getActiveTheme(): Promise<Theme> {
-  const theme = await cacheDatas(() => queryActiveTheme(), "activeTheme");
+export const getActiveTheme = async (): Promise<Theme> => {
+  let theme = await prisma.theme.findFirst({
+    where: {
+      isActive: true,
+    },
+  });
+  if (!theme) {
+    theme = await queryActivatedBaseTheme();
+  }
+  return theme;
+};
 
-  return JSON.parse(JSON.stringify(theme));
-}
-
-export async function getPresetColors(): Promise<PresetColor[]> {
-  const presetColors = await cacheDatas(
-    () => queryPresetColors(),
-    "presetColors",
-  );
-
-  return JSON.parse(JSON.stringify(presetColors));
-}
+export const getPresetColors = async (): Promise<PresetColor[]> => {
+  const presetColors = await prisma.presetColor.findMany();
+  if (presetColors.length === 0) {
+    const defaultPresetColor = await prisma.presetColor.create({
+      data: {
+        ...getBasePresetColorData(),
+      },
+    });
+    presetColors.push(defaultPresetColor);
+  }
+  return presetColors;
+};
 
 // For admin
-export async function getThemesFull(): Promise<Theme[]> {
-  const themes = await prisma.theme.findMany();
+export const getThemesFull = async (): Promise<Theme[]> =>
+  await prisma.theme.findMany();
 
-  return JSON.parse(JSON.stringify(themes));
-}
+const queryActivatedBaseTheme = async (): Promise<Theme> => {
+  let theme = await prisma.theme.findUnique({
+    where: {
+      name: THEME.BASE_THEME,
+    },
+  });
+  if (!theme) {
+    theme = await prisma.theme.create({
+      data: {
+        ...getBaseThemeData(),
+      },
+    });
+  }
+  if (!theme.isActive) {
+    await activateTheme(theme.id);
+  }
+  return theme;
+};

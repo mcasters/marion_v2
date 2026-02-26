@@ -26,7 +26,7 @@ export async function createTheme(theme: Theme, newName: string) {
       },
     });
 
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: "Thème ajouté", isError: false, theme: newTheme };
   } catch (e) {
     return {
@@ -48,7 +48,7 @@ export async function updateTheme(theme: Theme) {
         ...rest,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: `Theme "${theme.name}" modifié`, isError: false };
   } catch (e) {
     return { message: "Erreur à l'enregistrement", isError: true };
@@ -91,7 +91,7 @@ export async function deleteTheme(id: number): Promise<{
     }
     const updatedThemes = await prisma.theme.findMany();
 
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: "Thème supprimé", isError: false, updatedThemes };
   } catch (e) {
     return {
@@ -121,7 +121,7 @@ export async function activateTheme(id: number) {
         isActive: false,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: `Thème "${activatedTheme.name}" activé`, isError: false };
   } catch (e) {
     return { message: "Erreur à l'activation'", isError: true };
@@ -153,7 +153,7 @@ export async function createPresetColor(
         displayOrder,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: "Couleur perso ajoutée", isError: false, newPresetColor };
   } catch (e) {
     return {
@@ -174,7 +174,7 @@ export async function updatePresetColor(presetColor: PresetColor) {
         color: presetColor.color,
       },
     });
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: "Couleur perso modifiée", isError: false };
   } catch (e) {
     return {
@@ -200,7 +200,7 @@ export async function updatePresetColorsOrder(map: Map<number, number>) {
     }
     const updatedPresetColors = await prisma.presetColor.findMany();
 
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return { message: "", isError: false, updatedPresetColors };
   } catch (e) {
     return {
@@ -274,7 +274,7 @@ export async function deletePresetColor(id: number): Promise<{
     const updatedThemes = await prisma.theme.findMany();
     const updatedPresetColors = await prisma.presetColor.findMany();
 
-    revalidatePath("/admin");
+    revalidatePath("/*");
     return {
       message: "Couleur perso supprimée",
       isError: false,

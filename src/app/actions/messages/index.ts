@@ -3,15 +3,13 @@ import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
 import { Message } from "@/lib/type";
 
-export async function getMessages(): Promise<Message[]> {
-  const res = await prisma.message.findMany({
+export const getMessages = async (): Promise<Message[]> =>
+  await prisma.message.findMany({
     include: { author: true },
     orderBy: { date: "desc" },
   });
-  return JSON.parse(JSON.stringify(res));
-}
 
-export async function addMessage(formData: FormData) {
+export const addMessage = async (formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
   if (rawFormData.id === "0") {
     const text = rawFormData.text as string;
@@ -31,9 +29,9 @@ export async function addMessage(formData: FormData) {
       return { message: `Erreur à l'enregistrement`, isError: true };
     }
   }
-}
+};
 
-export async function updateMessage(formData: FormData) {
+export const updateMessage = async (formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
   const id = Number(rawFormData.id);
   const text = rawFormData.text as string;
@@ -66,13 +64,13 @@ export async function updateMessage(formData: FormData) {
     }
   }
   return { message: `Erreur à l'enregistrement`, isError: true };
-}
+};
 
-export async function deleteMessage(id: number) {
+export const deleteMessage = async (id: number) => {
   try {
     await prisma.message.delete({
       where: { id },
     });
     revalidatePath(`/admin`);
   } catch (e) {}
-}
+};

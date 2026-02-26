@@ -5,7 +5,7 @@ import {
   getPhone,
 } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
-import { Label } from "@@/prisma/generated/client";
+import { Label } from "@/lib/type";
 import TextAreaForm from "@/components/admin/form/content/textAreaForm";
 import React from "react";
 import InputForm from "@/components/admin/form/content/inputForm";

@@ -139,12 +139,7 @@ export const deleteFile = (dir: string, filename: string) => {
   rmSync(`${dir}/${filename}`, { force: true });
 };
 
-export const getStructHexaTheme = async (
+export const getStructHexaTheme = (
   theme: Theme,
   presetColors: PresetColor[],
-): Promise<StructTheme> => {
-  return await cacheDatas(
-    async () => getStructuredTheme(themeToHexa(theme, presetColors)),
-    "structuredHexaTheme",
-  );
-};
+): StructTheme => getStructuredTheme(themeToHexa(theme, presetColors));

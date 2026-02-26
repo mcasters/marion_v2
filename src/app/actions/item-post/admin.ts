@@ -33,6 +33,7 @@ export async function createItem(formData: FormData) {
     });
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: `Item ajouté`, isError: false };
   } catch (e) {
     return { message: `Erreur à l'enregistrement`, isError: true };
@@ -61,11 +62,12 @@ export async function updateItem(formData: FormData) {
   try {
     const data = await createDataAndHandleFiles(type, formData);
     await model.update({
-      where: { id },
+      where: { title: oldTitle },
       data,
     });
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: "Item modifié", isError: false };
   } catch (e) {
     return { message: `Erreur à l'enregistrement`, isError: true };
@@ -95,6 +97,7 @@ export async function deleteItem(id: number, type: Type) {
     });
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: `Item supprimé`, isError: false };
   } catch (e) {
     return { message: `Erreur à la suppression`, isError: true };

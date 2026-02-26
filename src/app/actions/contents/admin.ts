@@ -3,16 +3,15 @@
 import { deleteFile, getMiscellaneousDir } from "@/lib/utils/serverUtils";
 import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
-import { Label } from "@@/prisma/generated/client";
 import {
   findOrCreateContent,
   saveContentImage,
   updateText,
 } from "@/app/actions/contents/queries";
-import { ContentFull } from "@/lib/type";
+import { ContentFull, Label } from "@/lib/type";
+import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
 
 export async function updateContent(
-  prevState: { message: string; isError: boolean } | null,
   formData: FormData,
 ): Promise<{ message: string; isError: boolean }> {
   const label = formData.get("label") as Label;
@@ -20,28 +19,25 @@ export async function updateContent(
 
   try {
     const content = await findOrCreateContent(label);
-    await updateText(content.id, text);
+    await updateText(content.label, text);
 
+    revalidatePath(`${RouteLabel[label]}`);
     return { message: "Contenu enregistré", isError: false };
   } catch (e) {
     return { message: "Erreur à l'enregistrement", isError: true };
   }
 }
 
-export async function updateImageContent(
-  prevState: { message: string; isError: boolean } | null,
-  formData: FormData,
-) {
+export async function updateImageContent(formData: FormData) {
   const label = formData.get("label") as Label;
   const bdContent = await findOrCreateContent(label);
 
   try {
-    if (label === Label.SLIDER) await updateImageSlider(bdContent.id, formData);
+    if (label === Label.SLIDER) await updateImageSlider(formData);
     else await updateImagePresentation(bdContent, formData);
 
-    const path =
-      label === Label.PRESENTATION ? "/admin/presentation" : "/admin/home";
-    revalidatePath(path);
+    revalidatePath(`${RouteLabel[label]}`);
+    revalidatePath(`${AdminRouteLabel[label]}`);
     return { message: "Images enregistrées", isError: false };
   } catch (e) {
     return { message: "Erreur à l'enregistrement", isError: true };
@@ -75,9 +71,16 @@ export async function deleteImageContent(filename: string) {
         });
       }
     }
-    const path = filename.startsWith("presentation")
-      ? "/admin/presentation"
-      : "/admin/home";
+
+    let path, adminPath;
+    if (filename.startsWith("presentation")) {
+      adminPath = "/admin/presentation";
+      path = "/presentation";
+    } else {
+      adminPath = "/admin/home";
+      path = "/home";
+    }
+    revalidatePath(adminPath);
     revalidatePath(path);
     return { message: "Image supprimée", isError: false };
   } catch (e) {
@@ -85,14 +88,14 @@ export async function deleteImageContent(filename: string) {
   }
 }
 
-async function updateImageSlider(id: number, formData: FormData) {
+async function updateImageSlider(formData: FormData) {
   const files = formData.getAll("files") as File[];
 
   for (const file of files) {
     if (file.size > 0) {
       const isMain = formData.get("isMain") === "true";
       const title = isMain ? "mobileSlider" : "desktopSlider";
-      await saveContentImage(id, file, title, isMain);
+      await saveContentImage(Label.SLIDER, file, title, isMain);
     }
   }
 }
@@ -101,7 +104,6 @@ async function updateImagePresentation(
   bdContent: ContentFull,
   formData: FormData,
 ) {
-  const id = bdContent.id;
   const image = bdContent.images[0];
   const files = formData.getAll("files") as File[];
 
@@ -110,7 +112,7 @@ async function updateImagePresentation(
       const oldFilename = image.filename;
       deleteFile(getMiscellaneousDir(), oldFilename);
       await prisma.content.update({
-        where: { id },
+        where: { label: Label.PRESENTATION },
         data: {
           images: {
             delete: { filename: oldFilename },
@@ -118,6 +120,6 @@ async function updateImagePresentation(
         },
       });
     }
-    await saveContentImage(id, files[0], "presentation", false);
+    await saveContentImage(Label.PRESENTATION, files[0], "presentation", false);
   }
 }
