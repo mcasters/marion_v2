@@ -36,7 +36,7 @@ model Message {
 model Post {
   id        Int         @id @default(autoincrement())
   type      String      @default("post")
-  title     String
+  title     String      @unique
   date      DateTime
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
@@ -89,7 +89,7 @@ enum Label {
 model Painting {
   id             Int               @id @default(autoincrement())
   type           String            @default("peinture")
-  title          String
+  title          String            @unique
   date           DateTime
   technique      String            @db.LongText
   description    String?           @db.LongText
@@ -112,7 +112,7 @@ model Painting {
 model Sculpture {
   id             Int                @id @default(autoincrement())
   type           String             @default("sculpture")
-  title          String
+  title          String             @unique
   date           DateTime
   technique      String             @db.LongText
   description    String?            @db.LongText
@@ -144,7 +144,7 @@ model SculptureImage {
 model Drawing {
   id             Int              @id @default(autoincrement())
   type           String           @default("dessin")
-  title          String
+  title          String           @unique
   date           DateTime
   technique      String           @db.LongText
   description    String?          @db.LongText

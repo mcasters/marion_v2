@@ -2,10 +2,9 @@ import { Meta } from "@@/prisma/generated/client";
 import { Label } from "@@/prisma/generated/enums";
 import {
   Category,
-  CategoryContent,
-  CategoryFull,
   ContentFull,
   DragListElement,
+  EnhancedCategory,
   Filter,
   HomeLayout,
   Image,
@@ -92,15 +91,17 @@ export const getImageSrc = (item: Item) => {
         ? `/images/${item.workType}/sm/${item.content.image.filename}`
         : "";
   } else if (item.type === Type.POST) {
-    let image = item.images.filter((i: Image) => i.isMain)[0];
-    if (!image) {
-      image = item.images[0];
-    }
-    src = image ? `/images/post/${image.filename}` : "";
-  } else {
-    src = `/images/${item.type}/${item.images[0].filename}`;
-  }
+    let image = item.images.find((i: Image) => i.isMain);
+    if (!image) image = item.images[0];
 
+    src =
+      image && image.filename !== "" ? `/images/post/${image.filename}` : "";
+  } else {
+    src =
+      item.images[0].filename !== ""
+        ? `/images/${item.type}/${item.images[0].filename}`
+        : "";
+  }
   return src;
 };
 
@@ -118,10 +119,12 @@ export const getEmptyWork = (
     width: 0,
     length: 0,
     isToSell: false,
-    price: undefined,
+    price: null,
     sold: false,
     images: [],
     categoryId: null,
+    isOut: false,
+    outInformation: "",
   };
 };
 
@@ -132,7 +135,9 @@ export const getEmptyPost = (): Post => {
     title: "",
     date: new Date(),
     text: "",
-    images: [],
+    images: [] as Image[],
+    published: false,
+    viewCount: 0,
   };
 };
 
@@ -145,27 +150,28 @@ export const getEmptyImage = (): Image => {
   };
 };
 
-export const getEmptyCategoryContent = (): CategoryContent => {
-  return {
-    id: 0,
-    title: "",
-    text: "",
-    image: getEmptyImage(),
-  };
-};
-
-export const getEmptyCategoryFull = (
-  workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
-): CategoryFull => {
+export const getEmptyCategory = (): Category => {
   return {
     id: 0,
     key: "",
     value: "",
+    content: {
+      title: "",
+      text: "",
+      image: getEmptyImage(),
+    },
+  };
+};
+
+export const getEnhancedCategory = (
+  workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
+): EnhancedCategory => {
+  return {
     type: Type.CATEGORY,
-    count: 0,
     workType,
-    content: getEmptyCategoryContent(),
+    count: 0,
     images: [getEmptyImage()],
+    ...getEmptyCategory(),
   };
 };
 
@@ -174,7 +180,11 @@ export const getNoCategory = (): Category => {
     id: 0,
     key: "no-category",
     value: "Sans catégorie",
-    content: getEmptyCategoryContent(),
+    content: {
+      title: "",
+      text: "",
+      image: getEmptyImage(),
+    },
   };
 };
 
@@ -212,11 +222,12 @@ export const getHomeLayout = (metas: Map<string, string>): HomeLayout => {
   return parseInt(metas.get(META.HOME_LAYOUT) || "0");
 };
 
-export const getCategoriesFull = (
+export const getEnhancedCategories = (
   categories: Category[],
   items: Work[],
-): CategoryFull[] => {
+): EnhancedCategory[] => {
   const map = new Map();
+
   categories.forEach((category) => {
     map.set(category.id, {
       ...category,
@@ -264,7 +275,7 @@ export const sortDragList = (
 };
 
 export const worksIsEmpty = (works: Work[]): boolean =>
-  works.length === 1 && works[0].id === 0;
+  works.length === 1 && works[0].title === "";
 
 export const filterWorks = (workFulls: Work[], filter: Filter): Work[] => {
   function filterByCategory(list: Work[]) {

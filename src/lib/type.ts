@@ -1,8 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-empty-object-type */
 
-import { Prisma, User } from "@@/prisma/generated/client";
-import prisma from "./prisma.ts";
+import { User } from "@@/prisma/generated/client";
 import { JSX } from "react";
 
 type StringKeys<T> = {
@@ -18,32 +17,62 @@ export enum Type {
   CATEGORY = "catégorie",
 }
 
-type Painting = Prisma.Result<typeof prisma.painting, {}, any>; // With Image[] field
-type Drawing = Prisma.Result<typeof prisma.drawing, {}, any>; // With Image[] field
-type Sculpture = typeof prisma.sculpture; // No change - just to uniformise name
-export type Work = Painting | Sculpture | Drawing;
+export type Image = {
+  filename: string;
+  width: number;
+  height: number;
+  isMain: boolean;
+};
 
-export type CategoryContent = Prisma.Result<
-  typeof prisma.categoryContent,
-  {},
-  any
->; // With Image field
 export type Category = {
   id: number;
   key: string;
   value: string;
-  content: CategoryContent;
+  content: {
+    title: string;
+    text: string;
+    image: Image;
+  };
 };
-export type CategoryFull = Category & {
+
+export type EnhancedCategory = Category & {
   type: Type.CATEGORY;
   workType: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
   images: Image[];
   count: number;
 };
 
-export type Post = Prisma.Result<typeof prisma.post, {}, any>; // No change - just to uniformise name
+export type Work = {
+  id: number;
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  title: string;
+  date: Date;
+  technique: string;
+  description: string | null;
+  height: number;
+  width: number;
+  length: number;
+  isToSell: boolean;
+  price: number | null;
+  sold: boolean;
+  images: Image[];
+  categoryId: number | null;
+  isOut: boolean;
+  outInformation: string;
+};
 
-export type Item = Work | Post | CategoryFull;
+export type Post = {
+  id: number;
+  type: Type.POST;
+  title: string;
+  date: Date;
+  text: string | null;
+  published: boolean;
+  viewCount: number;
+  images: Image[];
+};
+
+export type Item = Work | Post | EnhancedCategory;
 
 export type Message = {
   id: number;
@@ -89,13 +118,6 @@ export type ContentFull = {
   title: string | null;
   text: string;
   images: Image[];
-};
-
-export type Image = {
-  filename: string;
-  width: number;
-  height: number;
-  isMain: boolean;
 };
 
 export interface Photo {

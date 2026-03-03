@@ -55,6 +55,7 @@ export async function createCategory(
     }
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: "Catégorie ajoutée", isError: false };
   } catch (e) {
     return { message: "Erreur à la création", isError: true };
@@ -66,17 +67,18 @@ export async function updateCategory(
   formData: FormData,
 ) {
   const type = formData.get("type") as Type;
-  const id = Number(formData.get("id"));
+  const key = Number(formData.get("key"));
   const model = getCategoryModel(type);
 
   try {
     const data = getCategoryData(formData);
     await model.update({
-      where: { id },
+      where: { key },
       data,
     });
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: "Catégorie modifiée", isError: false };
   } catch (e) {
     return { message: "Erreur à la modification", isError: true };
@@ -101,6 +103,7 @@ export async function deleteCategory(
     });
 
     revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
     return { message: "Catégorie supprimée", isError: false };
   } catch (e) {
     return { message: "Erreur à la suppression", isError: true };

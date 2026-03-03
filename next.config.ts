@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import path from "node:path";
+import { join } from "node:path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
     },
   },
   turbopack: {
-    root: path.join(__dirname, './'),
+    root: join(__dirname, ".."),
   },
 };
 module.exports = nextConfig;

@@ -12,38 +12,12 @@ import { unstable_cache } from "next/cache";
 const serverLibraryPath = process.env.PHOTOS_PATH;
 const copyright = process.env.TITLE || "";
 
-export async function cacheDatas<S>(
-  fn: () => Promise<S>,
-  key: string,
-): Promise<S> {
-  const isAdmin = !!(await getSession());
-  const res = isAdmin
-    ? fn
-    : unstable_cache(async () => fn(), [key], {
-        revalidate: 60 * 2,
-        tags: [key],
-      });
-  return res();
-}
-
 export const getDir = (type: Type) => {
   return join(`${serverLibraryPath}`, type);
 };
 
 export const getMiscellaneousDir = () => {
   return join(`${serverLibraryPath}`, "miscellaneous");
-};
-
-export const createDirIfNecessary = (dir: string) => {
-  stat(dir, (err) => {
-    if (err?.code === "ENOENT")
-      mkdir(dir, { recursive: true }, (err) => {
-        throw err;
-      });
-    else {
-      throw err;
-    }
-  });
 };
 
 export const resizeAndSaveImage = async (

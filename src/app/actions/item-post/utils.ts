@@ -1,116 +1,110 @@
-import { Type } from "@/lib/type";
-import prisma from "@/lib/prisma.ts";
+import { Category, Image, Post, Type, Work } from "@/lib/type";
+import { resizeAndSaveImage } from "@/lib/utils/serverUtils";
+import { Drawing, Painting, Prisma } from "@@/prisma/generated/client";
 import {
-  deleteFile,
-  getDir,
-  resizeAndSaveImage,
-} from "@/lib/utils/serverUtils";
-import { Prisma } from "@@/prisma/generated/client";
+  getEmptyPost,
+  getEmptyWork,
+  getNoCategory,
+} from "@/lib/utils/commonUtils.ts";
 
-export const getItemModel = (type: Type) => {
-  switch (type) {
-    case Type.PAINTING:
-      return prisma.painting;
-    case Type.SCULPTURE:
-      return prisma.sculpture;
-    case Type.DRAWING:
-      return prisma.drawing;
-    case Type.POST:
-      return prisma.post;
-  }
-};
-
-export const deleteImages = async (filenamesToDelete: string, type: Type) => {
-  const dir = getDir(type);
-
-  if (!filenamesToDelete || filenamesToDelete === "") return;
-
-  for await (const filename of filenamesToDelete.split(",")) {
-    deleteFile(dir, filename);
-    if (type === Type.SCULPTURE)
-      await prisma.sculptureImage.delete({
-        where: { filename },
-      });
-    if (type === Type.POST)
-      await prisma.postImage.delete({
-        where: { filename },
-      });
-    const categoryContents = await prisma.categoryContent.findMany({
-      where: {
-        imageFilename: filename,
-      },
-    });
-    for await (const categoryContent of categoryContents) {
-      await prisma.categoryContent.update({
-        where: { id: categoryContent.id },
-        data: {
-          imageFilename: "",
-          imageWidth: 0,
-          imageHeight: 0,
-        },
-      });
-    }
-  }
-};
-
-export const getFilenameList = (images: [{ filename: string }]): string => {
-  let string = "";
-  images.forEach((image, i) => {
-    if (i === 0) string = image.filename;
-    else string += `,${image.filename}`;
-  });
-  return string;
-};
-
-export const createDataAndHandleFiles = async (
-  type: Type,
+export const createPaintingData = async (
   formData: FormData,
+  fileInfos: FileInfo[] | null,
+) => {
+  const rawFormData = Object.fromEntries(formData);
+  const id = Number(formData.get("categoryId"));
+  const oldId = Number(formData.get("oldCategoryId"));
+
+  return {
+    title: rawFormData.title as string,
+    date: new Date(rawFormData.date as string),
+    technique: rawFormData.technique as string,
+    description: rawFormData.description as string,
+    height: Number(rawFormData.height as string),
+    width: Number(rawFormData.width as string),
+    isToSell: rawFormData.isToSell === "on",
+    price: Number(rawFormData.price),
+    isOut: rawFormData.isOut === "on",
+    outInformation: rawFormData.outInformation as string,
+    category:
+      id !== 0
+        ? {
+            connect: {
+              id,
+            },
+          }
+        : oldId
+          ? {
+              disconnect: {
+                id: oldId,
+              },
+            }
+          : {},
+    imageFilename: fileInfos ? fileInfos[0].filename : undefined,
+    imageWidth: fileInfos ? fileInfos[0].width : undefined,
+    imageHeight: fileInfos ? fileInfos[0].height : undefined,
+  };
+};
+
+export const createSculptureData = async (
+  formData: FormData,
+  fileInfos: FileInfo[] | null,
 ) => {
   const rawFormData = Object.fromEntries(formData);
 
-  await deleteImages(rawFormData.filenamesToDelete as string, type);
-  const newImages = await addImages(formData, type);
+  const id = Number(formData.get("categoryId"));
+  const oldId = Number(formData.get("oldCategoryId"));
 
-  if (type === Type.POST)
-    return {
-      title: rawFormData.title as string,
-      date: new Date(rawFormData.date as string),
-      text: rawFormData.text as string,
-      images: newImages
+  return {
+    title: rawFormData.title as string,
+    date: new Date(rawFormData.date as string),
+    technique: rawFormData.technique as string,
+    description: rawFormData.description as string,
+    height: Number(rawFormData.height as string),
+    width: Number(rawFormData.width as string),
+    length: Number(rawFormData.length as string),
+    isToSell: rawFormData.isToSell === "on",
+    price: Number(rawFormData.price),
+    isOut: rawFormData.isOut === "on",
+    outInformation: rawFormData.outInformation as string,
+    category:
+      id !== 0
         ? {
-            create: newImages,
+            connect: {
+              id,
+            },
           }
-        : undefined,
-    };
-  else {
-    const isSculpture = type === Type.SCULPTURE;
-    return {
-      title: rawFormData.title as string,
-      date: new Date(rawFormData.date as string),
-      technique: rawFormData.technique as string,
-      description: rawFormData.description as string,
-      height: new Prisma.Decimal(rawFormData.height as string),
-      width: new Prisma.Decimal(rawFormData.width as string),
-      length: isSculpture
-        ? new Prisma.Decimal(rawFormData.length as string)
-        : undefined,
-      isToSell: rawFormData.isToSell === "on",
-      price: Number(rawFormData.price),
-      isOut: rawFormData.isOut === "on",
-      outInformation: rawFormData.outInformation as string,
-      category: getCategory(formData),
-      imageFilename:
-        !isSculpture && newImages ? newImages[0].filename : undefined,
-      imageWidth: !isSculpture && newImages ? newImages[0].width : undefined,
-      imageHeight: !isSculpture && newImages ? newImages[0].height : undefined,
-      images:
-        isSculpture && newImages
+        : oldId
           ? {
-              create: newImages,
+              disconnect: {
+                id: oldId,
+              },
             }
-          : undefined,
-    };
-  }
+          : {},
+    images: fileInfos
+      ? {
+          create: fileInfos,
+        }
+      : undefined,
+  };
+};
+
+export const createPostData = async (
+  formData: FormData,
+  fileInfos: FileInfo[] | null,
+) => {
+  const rawFormData = Object.fromEntries(formData);
+
+  return {
+    title: rawFormData.title as string,
+    date: new Date(rawFormData.date as string),
+    text: rawFormData.text as string,
+    images: fileInfos
+      ? {
+          create: fileInfos,
+        }
+      : undefined,
+  };
 };
 
 type FileInfo = {
@@ -120,18 +114,19 @@ type FileInfo = {
   isMain: boolean;
 };
 
-const addImages = async (
+export const saveFiles = async (
   formData: FormData,
-  type: Type,
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING | Type.POST,
+  dir: string,
 ): Promise<FileInfo[] | null> => {
   const tab: FileInfo[] = [];
   const title = formData.get("title") as string;
   const mainFile = formData.get("mainFile") as File;
   const files = formData.getAll("files") as File[];
-  const dir = getDir(type);
 
   if (type === Type.POST && mainFile && mainFile.size > 0)
     tab.push(<FileInfo>await resizeAndSaveImage(mainFile, title, dir, true));
+
   if (files.length > 0) {
     for await (const file of files) {
       if (file.size > 0) {
@@ -168,4 +163,161 @@ const getCategory = (formData: FormData) => {
           },
         }
       : {};
+};
+export const createWorkObject = (
+  data: Painting[] | Drawing[],
+  type: Type.PAINTING | Type.DRAWING,
+  noEmpty: boolean = false,
+): Work[] => {
+  const works = [] as Work[];
+
+  data.forEach((item) => {
+    works.push({
+      id: item.id,
+      type,
+      title: item.title,
+      date: new Date(item.date),
+      technique: item.technique,
+      description: item.description,
+      height: item.height,
+      width: item.width,
+      length: 0,
+      isToSell: item.isToSell,
+      price: item.price,
+      sold: item.sold,
+      isOut: item.isOut,
+      outInformation: item.outInformation,
+      categoryId: item.categoryId,
+      images: [
+        {
+          filename: item.imageFilename,
+          width: item.imageWidth,
+          height: item.imageHeight,
+          isMain: true,
+        },
+      ],
+    });
+  });
+  if (works.length === 0 && noEmpty) {
+    works.push(getEmptyWork(type));
+  }
+  return works;
+};
+
+export const createWorkObjectFromSculpture = (
+  data: Prisma.SculptureGetPayload<{
+    include: { images: true };
+  }>[],
+  noEmpty: boolean = false,
+): Work[] => {
+  const works = [] as Work[];
+
+  data.forEach((item) => {
+    const images = [] as Image[];
+    item.images.forEach((image) => {
+      images.push({
+        filename: image.filename,
+        width: image.width,
+        height: image.height,
+        isMain: image.isMain,
+      });
+    });
+
+    works.push({
+      id: item.id,
+      type: Type.SCULPTURE,
+      title: item.title,
+      date: new Date(item.date),
+      technique: item.technique,
+      description: item.description,
+      height: item.height,
+      width: item.width,
+      length: item.length,
+      isToSell: item.isToSell,
+      price: item.price,
+      sold: item.sold,
+      isOut: item.isOut,
+      outInformation: item.outInformation,
+      categoryId: item.categoryId,
+      images: item.images,
+    });
+  });
+
+  if (works.length === 0 && noEmpty) {
+    works.push(getEmptyWork(Type.SCULPTURE));
+  }
+  return works;
+};
+
+export const createPostObject = (
+  data: Prisma.PostGetPayload<{
+    include: { images: true };
+  }>[],
+  noEmpty: boolean = false,
+): Post[] => {
+  const posts = [] as Post[];
+
+  data.forEach((item) => {
+    const images = [] as Image[];
+    item.images.forEach((image) => {
+      images.push({
+        filename: image.filename,
+        width: image.width,
+        height: image.height,
+        isMain: image.isMain,
+      });
+    });
+
+    posts.push({
+      id: item.id,
+      type: Type.POST,
+      title: item.title,
+      date: new Date(item.date),
+      text: item.text,
+      published: item.published,
+      viewCount: item.viewCount,
+      images: item.images,
+    });
+  });
+
+  if (posts.length === 0 && noEmpty) {
+    posts.push(getEmptyPost());
+  }
+  return posts;
+};
+
+export const createCategoryObject = (
+  dbData:
+    | Prisma.PaintingCategoryGetPayload<{
+        include: { content: true };
+      }>[]
+    | Prisma.SculptureCategoryGetPayload<{
+        include: { content: true };
+      }>[]
+    | Prisma.DrawingCategoryGetPayload<{
+        include: { content: true };
+      }>[],
+  noCategory: boolean,
+) => {
+  const categories = [] as Category[];
+  dbData.forEach((data) => {
+    categories.push({
+      id: data.id,
+      key: data.key,
+      value: data.value,
+      content: {
+        title: data.content.title,
+        text: data.content.text,
+        image: {
+          filename: data.content.imageFilename,
+          width: data.content.imageWidth,
+          height: data.content.imageHeight,
+          isMain: true,
+        },
+      },
+    });
+  });
+
+  if (noCategory) categories.push(getNoCategory());
+  return categories;
 };

@@ -1,140 +1,270 @@
 "use server";
 
+import { Drawing, Painting, Prisma } from "@@/prisma/generated/client";
 import { Category, Post, Type, Work } from "@/lib/type";
-import {
-  KEYS,
-  queryAllCategories,
-  queryAllWorks,
-  queryCategories,
-  queryCategory,
-  queryItemsByCategory,
-  queryItemsByYear,
-  queryNoCategory,
-  queryYears,
-} from "@/app/actions/item-post/queries";
-import {
-  getEmptyCategoryFull,
-  getEmptyPost,
-  getEmptyWork,
-  getNoCategory,
-} from "@/lib/utils/commonUtils";
 
-import { cacheDatas } from "@/lib/utils/serverUtils";
 import prisma from "@/lib/prisma.ts";
+import {
+  createCategoryObject,
+  createPostObject,
+  createWorkObject,
+  createWorkObjectFromSculpture,
+} from "@/app/actions/item-post/utils.ts";
+import { SculptureGetPayload } from "@@/prisma/generated/models/Sculpture.ts";
+import { getNoCategory } from "@/lib/utils/commonUtils.ts";
+import { notFound } from "next/dist/client/components/not-found";
 
 export async function getYears(
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): Promise<number[]> {
-  const years = await cacheDatas(() => queryYears(type), `${KEYS[type].years}`);
+  let dbData;
+  switch (type) {
+    case Type.PAINTING: {
+      dbData = await prisma.painting.findMany({
+        distinct: ["date"],
+        select: {
+          date: true,
+        },
+        orderBy: { date: "asc" },
+      });
+      break;
+    }
+    case Type.SCULPTURE: {
+      dbData = await prisma.sculpture.findMany({
+        distinct: ["date"],
+        select: {
+          date: true,
+        },
+        orderBy: { date: "asc" },
+      });
+      break;
+    }
+    case Type.DRAWING: {
+      dbData = await prisma.drawing.findMany({
+        distinct: ["date"],
+        select: {
+          date: true,
+        },
+        orderBy: { date: "asc" },
+      });
+      break;
+    }
+  }
+  const years: number[] = [];
+  dbData.forEach((item) => years.push(new Date(item.date).getFullYear()));
 
-  return JSON.parse(JSON.stringify(years));
+  return [...new Set(years)];
 }
 
 export async function getCategories(
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): Promise<Category[]> {
-  const categories = await cacheDatas(
-    () => queryCategories(type),
-    KEYS[type].categories,
-  );
+  let dbData:
+    | Prisma.PaintingCategoryGetPayload<{
+        include: { content: true };
+      }>[]
+    | Prisma.SculptureCategoryGetPayload<{
+        include: { content: true };
+      }>[]
+    | Prisma.DrawingCategoryGetPayload<{
+        include: { content: true };
+      }>[];
+  let noCategory;
+  switch (type) {
+    case Type.PAINTING: {
+      dbData = await prisma.paintingCategory.findMany({
+        include: { content: true },
+        where: {
+          paintings: {
+            some: {},
+          },
+        },
+        orderBy: { value: "desc" },
+      });
 
-  const noCategory = await cacheDatas(
-    () => queryNoCategory(type),
-    KEYS[type].noCategory,
-  );
-  if (noCategory) categories.push(noCategory);
-
-  return JSON.parse(JSON.stringify(categories));
+      noCategory = !!(await prisma.painting.findFirst({
+        where: { category: null },
+      }));
+      break;
+    }
+    case Type.SCULPTURE: {
+      dbData = await prisma.sculptureCategory.findMany({
+        include: { content: true },
+        where: {
+          sculptures: {
+            some: {},
+          },
+        },
+        orderBy: { value: "desc" },
+      });
+      noCategory = !!(await prisma.sculpture.findFirst({
+        where: { category: null },
+      }));
+      break;
+    }
+    case Type.DRAWING: {
+      dbData = await prisma.drawingCategory.findMany({
+        include: { content: true },
+        where: {
+          drawings: {
+            some: {},
+          },
+        },
+        orderBy: { value: "desc" },
+      });
+      noCategory = !!(await prisma.drawing.findFirst({
+        where: { category: null },
+      }));
+      break;
+    }
+  }
+  return createCategoryObject(dbData, noCategory);
 }
 
-export async function getItemsByYear(
+export async function getWorksByYear(
   year: string,
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): Promise<Work[]> {
-  const items = await cacheDatas(
-    () => queryItemsByYear(type, year),
-    `${KEYS[type].itemsByYear}-${year}`,
-  );
-
-  return JSON.parse(JSON.stringify(items));
+  let dbData:
+    | Painting[]
+    | Drawing[]
+    | SculptureGetPayload<{ include: { images: true } }>[];
+  switch (type) {
+    case Type.PAINTING: {
+      dbData = await prisma.painting.findMany({
+        where: {
+          date: {
+            gte: new Date(`${year}-01-01`),
+            lte: new Date(`${year}-12-31`),
+          },
+        },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObject(dbData, Type.PAINTING);
+    }
+    case Type.SCULPTURE: {
+      dbData = await prisma.sculpture.findMany({
+        where: {
+          date: {
+            gte: new Date(`${year}-01-01`),
+            lte: new Date(`${year}-12-31`),
+          },
+        },
+        include: { images: true },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObjectFromSculpture(dbData);
+    }
+    case Type.DRAWING: {
+      dbData = await prisma.drawing.findMany({
+        where: {
+          date: {
+            gte: new Date(`${year}-01-01`),
+            lte: new Date(`${year}-12-31`),
+          },
+        },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObject(dbData, Type.DRAWING);
+    }
+  }
 }
 
 export async function getCategory(
   categoryKey: string,
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): Promise<Category | null> {
-  let category;
+  if (categoryKey === "no-category") return getNoCategory();
 
-  if (categoryKey === "no-category") {
-    category = getNoCategory();
-  } else {
-    category = await cacheDatas(
-      () => queryCategory(type, categoryKey),
-      `${KEYS[type].category}-${categoryKey}`,
-    );
+  let dbData:
+    | Prisma.PaintingCategoryGetPayload<{
+        include: { content: true };
+      }>
+    | Prisma.SculptureCategoryGetPayload<{
+        include: { content: true };
+      }>
+    | Prisma.DrawingCategoryGetPayload<{
+        include: { content: true };
+      }>
+    | null;
+  switch (type) {
+    case Type.PAINTING: {
+      dbData = await prisma.paintingCategory.findFirst({
+        include: { content: true },
+        where: {
+          key: categoryKey,
+        },
+      });
+      break;
+    }
+    case Type.SCULPTURE: {
+      dbData = await prisma.sculptureCategory.findFirst({
+        include: { content: true },
+        where: {
+          key: categoryKey,
+        },
+      });
+      break;
+    }
+    case Type.DRAWING: {
+      dbData = await prisma.drawingCategory.findFirst({
+        include: { content: true },
+        where: {
+          key: categoryKey,
+        },
+      });
+      break;
+    }
   }
-  return JSON.parse(JSON.stringify(category));
+  if (!dbData) return notFound();
+  return createCategoryObject([dbData], false)[0];
 }
 
-export async function getItemsByCategory(
+export async function getWorksByCategory(
   categoryKey: string,
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): Promise<Work[]> {
-  const items = await cacheDatas(
-    () => queryItemsByCategory(type, categoryKey),
-    `${KEYS[type].itemsByCategory}-${categoryKey}`,
-  );
-
-  return JSON.parse(JSON.stringify(items));
+  switch (type) {
+    case Type.PAINTING: {
+      const dbData: Painting[] = await prisma.painting.findMany({
+        where: {
+          category: categoryKey === "no-category" ? null : { key: categoryKey },
+        },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObject(dbData, Type.PAINTING);
+    }
+    case Type.SCULPTURE: {
+      const dbData: Prisma.SculptureGetPayload<{
+        include: { images: true };
+      }>[] = await prisma.sculpture.findMany({
+        where: {
+          category: categoryKey === "no-category" ? null : { key: categoryKey },
+        },
+        include: { images: true },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObjectFromSculpture(dbData);
+    }
+    case Type.DRAWING: {
+      const dbData: Drawing[] = await prisma.drawing.findMany({
+        where: {
+          category: categoryKey === "no-category" ? null : { key: categoryKey },
+        },
+        orderBy: { date: "desc" },
+      });
+      return createWorkObject(dbData, Type.DRAWING);
+    }
+  }
 }
 
 export async function getPosts(): Promise<Post[]> {
-  const posts = await cacheDatas(
-    async () =>
-      await prisma.post.findMany({
-        include: { images: true },
-        orderBy: { title: "desc" },
-      }),
-    "posts",
-  );
+  const dbData: Prisma.PostGetPayload<{
+    include: { images: true };
+  }>[] = await prisma.post.findMany({
+    include: { images: true },
+    orderBy: { title: "desc" },
+  });
 
-  return JSON.parse(JSON.stringify(posts));
-}
-
-export async function getAdminPosts(): Promise<Post[]> {
-  const posts = await cacheDatas(
-    async () =>
-      await prisma.post.findMany({
-        include: { images: true },
-        orderBy: { title: "desc" },
-      }),
-    "posts",
-  );
-
-  if (posts.length === 0) posts.push(getEmptyPost());
-
-  return JSON.parse(JSON.stringify(posts));
-}
-
-export async function getAdminCategories(
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
-): Promise<Category[]> {
-  const res = await queryAllCategories(type);
-  const noCategory = await queryNoCategory(type);
-
-  if (noCategory) res.push(noCategory);
-
-  if (res.length === 0) res.push(getEmptyCategoryFull(type));
-
-  return JSON.parse(JSON.stringify(res));
-}
-
-export async function getAdminWorks(
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
-): Promise<Work[]> {
-  const items = await queryAllWorks(type);
-
-  if (items.length === 0) items.push(getEmptyWork(type));
-
-  return JSON.parse(JSON.stringify(items));
+  return createPostObject(dbData);
 }
