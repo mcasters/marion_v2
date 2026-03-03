@@ -67,13 +67,13 @@ export async function updateCategory(
   formData: FormData,
 ) {
   const type = formData.get("type") as Type;
-  const key = Number(formData.get("key"));
+  const id = Number(formData.get("id"));
   const model = getCategoryModel(type);
 
   try {
     const data = getCategoryData(formData);
     await model.update({
-      where: { key },
+      where: { key: id },
       data,
     });
 

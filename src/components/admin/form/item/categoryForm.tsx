@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import SubmitButton from "@/components/admin/form/submitButton";
 import CancelButton from "@/components/admin/form/cancelButton";
-import { Category, CategoryFull, Image } from "@/lib/type";
+import { Category, EnhancedCategory, Image } from "@/lib/type";
 import { useAlert } from "@/app/context/alertProvider";
 import SelectImageList from "@/components/admin/form/image/selectImageList";
 
@@ -16,7 +16,7 @@ import {
 import { MESSAGE } from "@/constants/admin.ts";
 
 interface Props {
-  category: CategoryFull;
+  category: EnhancedCategory;
   onClose: () => void;
 }
 export default function CategoryForm({ category, onClose }: Props) {

@@ -48,7 +48,7 @@ export type Work = {
   title: string;
   date: Date;
   technique: string;
-  description: string | null;
+  description: string;
   height: number;
   width: number;
   length: number;
