@@ -12,18 +12,18 @@ import Gallery from "@/components/image/gallery/gallery.tsx";
 
 interface Props {
   tag: string;
-  items: Work[];
+  works: Work[];
   category?: Category;
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
 }
-export default function ItemPage({ tag, items, category, type }: Props) {
+export default function ItemPage({ tag, works, category, type }: Props) {
   const metas = useMetas();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const photosEnhanced =
     itemLayout === Layout.MULTIPLE
       ? getItemsPhotoTabEnhanced(
-          items,
-          `${items[0].title} - ${type} de ${metas.get(META.SITE_TITLE)}`,
+          works,
+          `${works[0].title} - ${type} de ${metas.get(META.SITE_TITLE)}`,
         )
       : undefined;
 
@@ -45,7 +45,7 @@ export default function ItemPage({ tag, items, category, type }: Props) {
       >
         {photosEnhanced && <Gallery photos={photosEnhanced} />}
         {itemLayout !== Layout.MULTIPLE &&
-          items.map((item, i) => (
+          works.map((item, i) => (
             <ItemLayout
               key={i}
               layout={itemLayout}

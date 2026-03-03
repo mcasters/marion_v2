@@ -1,9 +1,9 @@
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { getAdminPosts } from "@/app/actions/item-post";
 import { getEmptyPost } from "@/lib/utils/commonUtils";
 import AddButton from "@/components/admin/form/addButton.tsx";
 import ListComponent from "@/components/admin/form/item/listComponent";
+import { getAdminPosts } from "@/app/actions/item-post/admin.ts";
 
 export default async function Posts() {
   const posts = await getAdminPosts();

@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { getMetas } from "@/app/actions/meta";
 import { META } from "@/constants/admin";
-import { getItemsByYear } from "@/app/actions/item-post";
+import { getWorksByYear } from "@/app/actions/item-post";
 
 type Props = {
   params: Promise<{ year: string }>;
@@ -34,7 +34,7 @@ export async function generateMetadata({
 export default async function Page({ params }: Props) {
   const type = Type.SCULPTURE;
   const { year } = await params;
-  const items = await getItemsByYear(year, type);
+  const works = await getWorksByYear(year, type);
 
-  return <ItemPage tag={year} items={items} type={type} />;
+  return <ItemPage tag={year} works={works} type={type} />;
 }

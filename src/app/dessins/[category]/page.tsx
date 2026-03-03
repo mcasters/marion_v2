@@ -1,4 +1,4 @@
-import { getCategory, getItemsByCategory } from "@/app/actions/item-post";
+import { getCategory, getWorksByCategory } from "@/app/actions/item-post";
 import ItemPage from "@/components/item/itemPage.tsx";
 import { Type } from "@/lib/type";
 import { Metadata } from "next";
@@ -41,7 +41,7 @@ export default async function Page({ params }: Props) {
   const type = Type.DRAWING;
   const categoryKey = (await params).category;
   const category = await getCategory(categoryKey, type);
-  const items = await getItemsByCategory(categoryKey, type);
+  const works = await getWorksByCategory(categoryKey, type);
 
   return (
     <>
@@ -49,7 +49,7 @@ export default async function Page({ params }: Props) {
         <ItemPage
           tag={category.value}
           category={category}
-          items={items}
+          works={works}
           type={type}
         />
       )}
