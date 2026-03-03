@@ -92,7 +92,7 @@ model Painting {
   title          String            @unique
   date           DateTime
   technique      String            @db.LongText
-  description    String?           @db.LongText
+  description    String            @db.LongText
   height         Float
   width          Float
   createdAt      DateTime          @default(now())
@@ -115,7 +115,7 @@ model Sculpture {
   title          String             @unique
   date           DateTime
   technique      String             @db.LongText
-  description    String?            @db.LongText
+  description    String             @db.LongText
   height         Float
   width          Float
   length         Float
@@ -147,7 +147,7 @@ model Drawing {
   title          String           @unique
   date           DateTime
   technique      String           @db.LongText
-  description    String?          @db.LongText
+  description    String           @db.LongText
   height         Float
   width          Float
   createdAt      DateTime         @default(now())
