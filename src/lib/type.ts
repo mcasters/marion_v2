@@ -17,14 +17,14 @@ export enum Type {
   CATEGORY = "catégorie",
 }
 
-export type Image = {
+export interface Image {
   filename: string;
   width: number;
   height: number;
   isMain: boolean;
-};
+}
 
-export type Category = {
+export interface Category {
   id: number;
   key: string;
   value: string;
@@ -33,16 +33,9 @@ export type Category = {
     text: string;
     image: Image;
   };
-};
+}
 
-export type EnhancedCategory = Category & {
-  type: Type.CATEGORY;
-  workType: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
-  images: Image[];
-  count: number;
-};
-
-export type Work = {
+export interface Work {
   id: number;
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
   title: string;
@@ -59,9 +52,9 @@ export type Work = {
   categoryId: number | null;
   isOut: boolean;
   outInformation: string;
-};
+}
 
-export type Post = {
+export interface Post {
   id: number;
   type: Type.POST;
   title: string;
@@ -70,17 +63,39 @@ export type Post = {
   published: boolean;
   viewCount: number;
   images: Image[];
-};
+}
 
-export type Item = Work | Post | EnhancedCategory;
+export interface Admin {
+  id: string | number;
+  type: Type;
+  modifiable: boolean;
+}
 
-export type Message = {
+export interface AdminCategory extends Category {
+  type: Type.CATEGORY;
+  workType: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  images: Image[];
+  count: number;
+  modifiable: boolean;
+}
+
+export interface AdminWork extends Work {
+  modifiable: boolean;
+}
+
+export interface AdminPost extends Post {
+  modifiable: boolean;
+}
+
+export type Item = Work | Post | AdminCategory;
+
+export interface Message {
   id: number;
   date: Date;
   dateUpdated: Date | null;
   text: string;
   author: User;
-};
+}
 
 export enum Layout {
   MONO,

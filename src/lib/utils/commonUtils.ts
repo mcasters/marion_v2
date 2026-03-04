@@ -1,10 +1,10 @@
 import { Meta } from "@@/prisma/generated/client";
 import { Label } from "@@/prisma/generated/enums";
 import {
+  AdminCategory,
   Category,
   ContentFull,
   DragListElement,
-  EnhancedCategory,
   Filter,
   HomeLayout,
   Image,
@@ -163,14 +163,15 @@ export const getEmptyCategory = (): Category => {
   };
 };
 
-export const getEnhancedCategory = (
+export const getEmptyAdminCategory = (
   workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
-): EnhancedCategory => {
+): AdminCategory => {
   return {
     type: Type.CATEGORY,
     workType,
     count: 0,
     images: [getEmptyImage()],
+    modifiable: true,
     ...getEmptyCategory(),
   };
 };
@@ -222,31 +223,6 @@ export const getHomeLayout = (metas: Map<string, string>): HomeLayout => {
   return parseInt(metas.get(META.HOME_LAYOUT) || "0");
 };
 
-export const getEnhancedCategories = (
-  categories: Category[],
-  items: Work[],
-): EnhancedCategory[] => {
-  const map = new Map();
-
-  categories.forEach((category) => {
-    map.set(category.id, {
-      ...category,
-      type: "catégorie",
-      workType: items[0].type,
-      images: [],
-      count: 0,
-    });
-  });
-  items.forEach((item) => {
-    if (item.id === 0) return [...map.values()];
-    const categoryMap =
-      item.categoryId === null ? map.get(0) : map.get(item.categoryId);
-    categoryMap.images.push(...item.images);
-    categoryMap.count += 1;
-  });
-  return [...map.values()];
-};
-
 export const getYearsFromWorks = (items: Work[]): number[] => {
   const years: number[] = [];
   items.forEach((item) => {
@@ -273,9 +249,6 @@ export const sortDragList = (
   }
   return dragList.toSorted(compare);
 };
-
-export const worksIsEmpty = (works: Work[]): boolean =>
-  works.length === 1 && works[0].title === "";
 
 export const filterWorks = (workFulls: Work[], filter: Filter): Work[] => {
   function filterByCategory(list: Work[]) {

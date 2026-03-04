@@ -1,12 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Category, Post, Type, Work } from "@/lib/type";
+import { AdminCategory, AdminPost, AdminWork, Type } from "@/lib/type";
 import prisma from "@/lib/prisma.ts";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client.ts";
 import { deleteFile, getDir } from "@/lib/utils/serverUtils.ts";
 import {
-  createCategoryObject,
+  createAdminCategoryObjects,
   createPaintingData,
   createPostData,
   createPostObject,
@@ -15,6 +15,7 @@ import {
   createWorkObjectFromSculpture,
   saveFiles,
 } from "@/app/actions/item-post/utils.ts";
+import { getEmptyPost } from "@/lib/utils/commonUtils.ts";
 
 export async function createItem(formData: FormData) {
   const type = formData.get("type") as
@@ -258,20 +259,25 @@ export async function deleteItem(
   }
 }
 
-export const getAdminPosts = async (): Promise<Post[]> => {
+export const getAdminPosts = async (): Promise<AdminPost[]> => {
   const dbData = await prisma.post.findMany({
     include: { images: true },
     orderBy: { title: "desc" },
   });
 
-  return createPostObject(dbData, true);
+  const posts: AdminPost[] = dbData.map((data) => {
+    return {
+      ...createPostObject(data),
+      modifiable: true,
+    };
+  });
+  return posts.length === 0 ? [{ ...getEmptyPost(), modifiable: true }] : posts;
 };
 
 export const getAdminCategories = async (
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
-): Promise<Category[]> => {
-  let dbData;
-  let noCategory;
+): Promise<AdminCategory[]> => {
+  let dbData, items;
 
   switch (type) {
     case Type.PAINTING: {
@@ -279,45 +285,42 @@ export const getAdminCategories = async (
         include: { content: true },
         orderBy: { value: "desc" },
       });
-
-      noCategory = !!(await prisma.painting.findFirst({
-        where: { category: null },
-      }));
-      break;
+      items = await prisma.painting.findMany();
+      return createAdminCategoryObjects(dbData, items);
     }
     case Type.SCULPTURE: {
       dbData = await prisma.sculptureCategory.findMany({
         include: { content: true },
         orderBy: { value: "desc" },
       });
-      noCategory = !!(await prisma.sculpture.findFirst({
-        where: { category: null },
-      }));
-      break;
+      items = await prisma.sculpture.findMany({ include: { images: true } });
+      return createAdminCategoryObjects(dbData, items);
     }
     case Type.DRAWING: {
       dbData = await prisma.drawingCategory.findMany({
         include: { content: true },
         orderBy: { value: "desc" },
       });
-      noCategory = !!(await prisma.drawing.findFirst({
-        where: { category: null },
-      }));
-      break;
+      items = await prisma.drawing.findMany();
+      return createAdminCategoryObjects(dbData, items);
     }
   }
-  return createCategoryObject(dbData, noCategory);
 };
 
 export const getAdminWorks = async (
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
-): Promise<Work[]> => {
+): Promise<AdminWork[]> => {
   switch (type) {
     case Type.PAINTING: {
       const dbData: Painting[] = await prisma.painting.findMany({
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.PAINTING, true);
+      return dbData.map((data) => {
+        return {
+          ...createWorkObject(data, Type.PAINTING),
+          modifiable: true,
+        };
+      });
     }
     case Type.SCULPTURE: {
       const dbData: Prisma.SculptureGetPayload<{
@@ -326,13 +329,23 @@ export const getAdminWorks = async (
         include: { images: true },
         orderBy: { date: "desc" },
       });
-      return createWorkObjectFromSculpture(dbData, true);
+      return dbData.map((data) => {
+        return {
+          ...createWorkObjectFromSculpture(data),
+          modifiable: true,
+        };
+      });
     }
     case Type.DRAWING: {
       const dbData: Drawing[] = await prisma.drawing.findMany({
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.DRAWING, true);
+      return dbData.map((data) => {
+        return {
+          ...createWorkObject(data, Type.DRAWING),
+          modifiable: true,
+        };
+      });
     }
   }
 };

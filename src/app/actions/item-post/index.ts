@@ -81,7 +81,6 @@ export async function getCategories(
         },
         orderBy: { value: "desc" },
       });
-
       noCategory = !!(await prisma.painting.findFirst({
         where: { category: null },
       }));
@@ -118,7 +117,9 @@ export async function getCategories(
       break;
     }
   }
-  return createCategoryObject(dbData, noCategory);
+  const categories = dbData.map((data) => createCategoryObject(data));
+  if (noCategory) categories.push(getNoCategory());
+  return categories;
 }
 
 export async function getWorksByYear(
@@ -140,7 +141,7 @@ export async function getWorksByYear(
         },
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.PAINTING);
+      return dbData.map((data) => createWorkObject(data, Type.PAINTING));
     }
     case Type.SCULPTURE: {
       dbData = await prisma.sculpture.findMany({
@@ -153,7 +154,7 @@ export async function getWorksByYear(
         include: { images: true },
         orderBy: { date: "desc" },
       });
-      return createWorkObjectFromSculpture(dbData);
+      return dbData.map((data) => createWorkObjectFromSculpture(data));
     }
     case Type.DRAWING: {
       dbData = await prisma.drawing.findMany({
@@ -165,7 +166,7 @@ export async function getWorksByYear(
         },
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.DRAWING);
+      return dbData.map((data) => createWorkObject(data, Type.DRAWING));
     }
   }
 }
@@ -217,7 +218,7 @@ export async function getCategory(
     }
   }
   if (!dbData) return notFound();
-  return createCategoryObject([dbData], false)[0];
+  return createCategoryObject(dbData);
 }
 
 export async function getWorksByCategory(
@@ -232,7 +233,7 @@ export async function getWorksByCategory(
         },
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.PAINTING);
+      return dbData.map((data) => createWorkObject(data, Type.PAINTING));
     }
     case Type.SCULPTURE: {
       const dbData: Prisma.SculptureGetPayload<{
@@ -244,7 +245,7 @@ export async function getWorksByCategory(
         include: { images: true },
         orderBy: { date: "desc" },
       });
-      return createWorkObjectFromSculpture(dbData);
+      return dbData.map((data) => createWorkObjectFromSculpture(data));
     }
     case Type.DRAWING: {
       const dbData: Drawing[] = await prisma.drawing.findMany({
@@ -253,7 +254,7 @@ export async function getWorksByCategory(
         },
         orderBy: { date: "desc" },
       });
-      return createWorkObject(dbData, Type.DRAWING);
+      return dbData.map((data) => createWorkObject(data, Type.DRAWING));
     }
   }
 }
@@ -266,5 +267,5 @@ export async function getPosts(): Promise<Post[]> {
     orderBy: { title: "desc" },
   });
 
-  return createPostObject(dbData);
+  return dbData.map((data) => createPostObject(data));
 }

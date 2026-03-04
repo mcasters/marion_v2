@@ -1,12 +1,7 @@
-import { Category, Image, Post, Type, Work } from "@/lib/type";
+import { AdminCategory, Category, Image, Post, Type, Work } from "@/lib/type";
 import { resizeAndSaveImage } from "@/lib/utils/serverUtils";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client";
-import {
-  getEmptyPost,
-  getEmptyWork,
-  getNoCategory,
-  transformValueToKey,
-} from "@/lib/utils/commonUtils.ts";
+import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
 
 export const createPaintingData = async (
   formData: FormData,
@@ -193,129 +188,127 @@ const getCategory = (formData: FormData) => {
       : {};
 };
 export const createWorkObject = (
-  data: Painting[] | Drawing[],
+  data: Painting | Drawing,
   type: Type.PAINTING | Type.DRAWING,
-  noEmpty: boolean = false,
-): Work[] => {
-  const works = [] as Work[];
-
-  data.forEach((item) => {
-    works.push({
-      id: item.id,
-      type,
-      title: item.title,
-      date: new Date(item.date),
-      technique: item.technique,
-      description: item.description,
-      height: item.height,
-      width: item.width,
-      length: 0,
-      isToSell: item.isToSell,
-      price: item.price,
-      sold: item.sold,
-      isOut: item.isOut,
-      outInformation: item.outInformation,
-      categoryId: item.categoryId,
-      images: [
-        {
-          filename: item.imageFilename,
-          width: item.imageWidth,
-          height: item.imageHeight,
-          isMain: true,
-        },
-      ],
-    });
-  });
-  if (works.length === 0 && noEmpty) {
-    works.push(getEmptyWork(type));
-  }
-  return works;
+): Work => {
+  return {
+    id: data.id,
+    type,
+    title: data.title,
+    date: new Date(data.date),
+    technique: data.technique,
+    description: data.description,
+    height: data.height,
+    width: data.width,
+    length: 0,
+    isToSell: data.isToSell,
+    price: data.price,
+    sold: data.sold,
+    isOut: data.isOut,
+    outInformation: data.outInformation,
+    categoryId: data.categoryId,
+    images: [
+      {
+        filename: data.imageFilename,
+        width: data.imageWidth,
+        height: data.imageHeight,
+        isMain: true,
+      },
+    ],
+  };
 };
 
 export const createWorkObjectFromSculpture = (
   data: Prisma.SculptureGetPayload<{
     include: { images: true };
-  }>[],
-  noEmpty: boolean = false,
-): Work[] => {
-  const works = [] as Work[];
-
-  data.forEach((item) => {
-    const images = [] as Image[];
-    item.images.forEach((image) => {
-      images.push({
-        filename: image.filename,
-        width: image.width,
-        height: image.height,
-        isMain: image.isMain,
-      });
-    });
-
-    works.push({
-      id: item.id,
-      type: Type.SCULPTURE,
-      title: item.title,
-      date: new Date(item.date),
-      technique: item.technique,
-      description: item.description,
-      height: item.height,
-      width: item.width,
-      length: item.length,
-      isToSell: item.isToSell,
-      price: item.price,
-      sold: item.sold,
-      isOut: item.isOut,
-      outInformation: item.outInformation,
-      categoryId: item.categoryId,
-      images: item.images,
+  }>,
+): Work => {
+  const images = [] as Image[];
+  data.images.forEach((image) => {
+    images.push({
+      filename: image.filename,
+      width: image.width,
+      height: image.height,
+      isMain: image.isMain,
     });
   });
-
-  if (works.length === 0 && noEmpty) {
-    works.push(getEmptyWork(Type.SCULPTURE));
-  }
-  return works;
+  return {
+    id: data.id,
+    type: Type.SCULPTURE,
+    title: data.title,
+    date: new Date(data.date),
+    technique: data.technique,
+    description: data.description,
+    height: data.height,
+    width: data.width,
+    length: data.length,
+    isToSell: data.isToSell,
+    price: data.price,
+    sold: data.sold,
+    isOut: data.isOut,
+    outInformation: data.outInformation,
+    categoryId: data.categoryId,
+    images: data.images,
+  };
 };
 
 export const createPostObject = (
   data: Prisma.PostGetPayload<{
     include: { images: true };
-  }>[],
-  noEmpty: boolean = false,
-): Post[] => {
-  const posts = [] as Post[];
-
-  data.forEach((item) => {
-    const images = [] as Image[];
-    item.images.forEach((image) => {
-      images.push({
-        filename: image.filename,
-        width: image.width,
-        height: image.height,
-        isMain: image.isMain,
-      });
-    });
-
-    posts.push({
-      id: item.id,
-      type: Type.POST,
-      title: item.title,
-      date: new Date(item.date),
-      text: item.text,
-      published: item.published,
-      viewCount: item.viewCount,
-      images: item.images,
+  }>,
+): Post => {
+  const images = [] as Image[];
+  data.images.forEach((image) => {
+    images.push({
+      filename: image.filename,
+      width: image.width,
+      height: image.height,
+      isMain: image.isMain,
     });
   });
-
-  if (posts.length === 0 && noEmpty) {
-    posts.push(getEmptyPost());
-  }
-  return posts;
+  return {
+    id: data.id,
+    type: Type.POST,
+    title: data.title,
+    date: new Date(data.date),
+    text: data.text,
+    published: data.published,
+    viewCount: data.viewCount,
+    images: data.images,
+  };
 };
 
 export const createCategoryObject = (
-  dbData:
+  data:
+    | Prisma.PaintingCategoryGetPayload<{
+        include: { content: true };
+      }>
+    | Prisma.SculptureCategoryGetPayload<{
+        include: { content: true };
+      }>
+    | Prisma.DrawingCategoryGetPayload<{
+        include: { content: true };
+      }>,
+): Category => {
+  return {
+    id: data.id,
+    key: data.key,
+    value: data.value,
+    content: {
+      title: data.content.title,
+      text: data.content.text,
+      image: {
+        filename: data.content.imageFilename,
+        width: data.content.imageWidth,
+        height: data.content.imageHeight,
+        isMain: true,
+      },
+    },
+  };
+};
+
+export const createAdminCategoryObjects = (
+  categories:
     | Prisma.PaintingCategoryGetPayload<{
         include: { content: true };
       }>[]
@@ -325,27 +318,50 @@ export const createCategoryObject = (
     | Prisma.DrawingCategoryGetPayload<{
         include: { content: true };
       }>[],
-  noCategory: boolean,
-) => {
-  const categories = [] as Category[];
-  dbData.forEach((data) => {
-    categories.push({
-      id: data.id,
-      key: data.key,
-      value: data.value,
-      content: {
-        title: data.content.title,
-        text: data.content.text,
-        image: {
-          filename: data.content.imageFilename,
-          width: data.content.imageWidth,
-          height: data.content.imageHeight,
-          isMain: true,
-        },
-      },
+  items:
+    | Painting[]
+    | Drawing[]
+    | Prisma.SculptureGetPayload<{
+        include: { images: true };
+      }>[],
+): AdminCategory[] => {
+  const map = new Map();
+
+  categories.forEach((category) => {
+    map.set(category.id, {
+      ...createCategoryObject(category),
+      type: Type.CATEGORY,
+      workType: items[0].type,
+      images: [],
+      count: 0,
+      modifiable: true,
     });
   });
-
-  if (noCategory) categories.push(getNoCategory());
-  return categories;
+  map.set(0, {
+    ...getNoCategory(),
+    type: Type.CATEGORY,
+    workType: items[0].type,
+    images: [],
+    count: 0,
+    modifiable: false,
+  });
+  items.forEach((item) => {
+    if (item.id === 0) return [...map.values()];
+    const category =
+      item.categoryId === null ? map.get(0) : map.get(item.categoryId);
+    category.images.concat(
+      "images" in item
+        ? item.images
+        : [
+            {
+              filename: item.imageFilename,
+              width: item.width,
+              height: item.height,
+              isMain: true,
+            },
+          ],
+    );
+    category.count += 1;
+  });
+  return [...map.values()];
 };
