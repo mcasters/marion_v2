@@ -4,11 +4,8 @@
 
 import { Type } from "@/lib/type";
 import { revalidatePath } from "next/cache";
-import {
-  getCategoryData,
-  getCategoryModel,
-} from "@/app/actions/item-post/categories/utils";
 import prisma from "@/lib/prisma.ts";
+import { createCategoryData } from "@/app/actions/item-post/utils.ts";
 
 export async function createCategory(
   prevState: { message: string; isError: boolean } | null,
@@ -16,12 +13,11 @@ export async function createCategory(
 ) {
   const type = formData.get("type") as Type;
   const value = formData.get("value") as string;
-  const data = getCategoryData(formData);
-  const model = getCategoryModel(type);
+  const data = createCategoryData(formData);
 
   try {
     if (type === Type.PAINTING) {
-      const alreadyExists = await model.findUnique({
+      const alreadyExists = await prisma.paintingCategory.findUnique({
         where: { value },
       });
       if (alreadyExists)
@@ -32,7 +28,7 @@ export async function createCategory(
       await prisma.paintingCategory.create({ data });
     }
     if (type === Type.SCULPTURE) {
-      const alreadyExists = await model.findUnique({
+      const alreadyExists = await prisma.sculptureCategory.findUnique({
         where: { value },
       });
       if (alreadyExists)
@@ -43,7 +39,7 @@ export async function createCategory(
       await prisma.sculptureCategory.create({ data });
     }
     if (type === Type.DRAWING) {
-      const alreadyExists = await model.findUnique({
+      const alreadyExists = await prisma.drawingCategory.findUnique({
         where: { value },
       });
       if (alreadyExists)
@@ -68,14 +64,27 @@ export async function updateCategory(
 ) {
   const type = formData.get("type") as Type;
   const id = Number(formData.get("id"));
-  const model = getCategoryModel(type);
+  const data = createCategoryData(formData);
 
   try {
-    const data = getCategoryData(formData);
-    await model.update({
-      where: { key: id },
-      data,
-    });
+    if (type === Type.PAINTING) {
+      await prisma.paintingCategory.update({
+        where: { key: id },
+        data,
+      });
+    }
+    if (type === Type.SCULPTURE) {
+      await prisma.sculptureCategory.update({
+        where: { key: id },
+        data,
+      });
+    }
+    if (type === Type.DRAWING) {
+      await prisma.drawingCategory.update({
+        where: { key: id },
+        data,
+      });
+    }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
@@ -89,18 +98,31 @@ export async function deleteCategory(
   id: number,
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ) {
-  const model = getCategoryModel(type);
-
   try {
-    const category = await model.findUnique({
-      where: { id },
-    });
-    await model.delete({
-      where: { id },
-    });
-    await prisma.categoryContent.delete({
-      where: { id: category.categoryContentId },
-    });
+    if (type === Type.PAINTING) {
+      const category = await prisma.paintingCategory.delete({
+        where: { id },
+      });
+      await prisma.categoryContent.delete({
+        where: { id: category.categoryContentId },
+      });
+    }
+    if (type === Type.SCULPTURE) {
+      const category = await prisma.sculptureCategory.delete({
+        where: { id },
+      });
+      await prisma.categoryContent.delete({
+        where: { id: category.categoryContentId },
+      });
+    }
+    if (type === Type.DRAWING) {
+      const category = await prisma.drawingCategory.delete({
+        where: { id },
+      });
+      await prisma.categoryContent.delete({
+        where: { id: category.categoryContentId },
+      });
+    }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
