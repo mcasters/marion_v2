@@ -5,6 +5,11 @@ import style from "@/components/admin/admin.module.css";
 import AdminTheme from "@/components/admin/theme/adminTheme.tsx";
 import ChatMessages from "@/components/admin/chatMessage/chatMessages.tsx";
 import React from "react";
+import { getMetaMap } from "@/lib/utils/commonUtils.ts";
+import { getMetas } from "@/app/actions/meta";
+import { META } from "@/constants/admin.ts";
+import InputForm from "@/components/admin/content/inputForm.tsx";
+import { updateMeta } from "@/app/actions/meta/admin.ts";
 
 export const metadata: Metadata = {
   title: "",
@@ -13,8 +18,9 @@ export const metadata: Metadata = {
   openGraph: null,
 };
 
-export default async function Page() {
+export default async function AdminHome() {
   const messages = await getMessages();
+  const metas = getMetaMap(await getMetas());
 
   return (
     <>
@@ -22,7 +28,16 @@ export default async function Page() {
       <h2 className={s.title2}>Gestion du thème</h2>
       <AdminTheme />
       <div className="separate" />
-      <h2 className={style.title2}>Messages</h2>
+      <h2 className={style.title2}>Pied de page du site</h2>
+      <InputForm
+        dbLabel={META.FOOTER}
+        text={metas.get(META.FOOTER) || ""}
+        updateAction={updateMeta}
+      />
+      <div className="separate" />
+      <h2 className={style.title2}>
+        Tchat (si t'as des questions ou des remarques)
+      </h2>
       <ChatMessages dbMessages={messages} />
     </>
   );

@@ -14,7 +14,7 @@ export default function HomeLayoutForm() {
   const [value, setValue] = useState<string>(getHomeLayout(metas).toString());
 
   const submit = async (formData: FormData) => {
-    const { message, isError } = await updateMeta(null, formData);
+    const { message, isError } = await updateMeta(formData);
     alert(message, isError);
   };
 

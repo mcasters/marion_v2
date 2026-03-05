@@ -23,7 +23,7 @@ export default function ItemLayoutForm({ type }: Props) {
   );
 
   const submit = async (formData: FormData) => {
-    const { message, isError } = await updateMeta(null, formData);
+    const { message, isError } = await updateMeta(formData);
     alert(message, isError);
   };
 

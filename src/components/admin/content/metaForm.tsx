@@ -24,7 +24,7 @@ export default function MetaForm({
   const alert = useAlert();
 
   const action = async (formData: FormData) => {
-    const { message, isError } = await updateMeta(null, formData);
+    const { message, isError } = await updateMeta(formData);
     alert(message, isError);
     setIsChanged(false);
   };

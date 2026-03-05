@@ -10,6 +10,7 @@ import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
 import React from "react";
 import InputForm from "@/components/admin/content/inputForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
+import { updateContent } from "@/app/actions/contents/admin.ts";
 
 export default async function Contact() {
   const contents = await getContentsFull();
@@ -24,16 +25,18 @@ export default async function Contact() {
       />
       <div className="separate" />
       <InputForm
-        label={Label.PHONE}
-        textContent={getPhone(contents)}
-        textLabel="Téléphone"
+        dbLabel={Label.PHONE}
+        text={getPhone(contents)}
+        updateAction={updateContent}
+        label="Téléphone"
         isPhone
       />
       <div className="separate" />
       <InputForm
-        label={Label.EMAIL}
-        textContent={getEmail(contents)}
-        textLabel="E-mail"
+        dbLabel={Label.EMAIL}
+        text={getEmail(contents)}
+        updateAction={updateContent}
+        label="E-mail"
         isEmail
       />
       <div className="separate" />

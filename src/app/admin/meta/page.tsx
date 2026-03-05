@@ -1,17 +1,20 @@
 import { getMetaMap } from "@/lib/utils/commonUtils";
-import s from "@/components/admin/admin.module.css";
 import React, { Fragment } from "react";
 import { getMetas } from "@/app/actions/meta";
 import { META, SEO } from "@/constants/admin.ts";
 import MetaForm from "@/components/admin/content/metaForm.tsx";
 
-export default async function Contact() {
+export default async function Meta() {
   const metas = getMetaMap(await getMetas());
   const isM = metas.get(META.SITE_TITLE)?.startsWith("M");
 
   return (
     <>
-      <h1 className={s.title1}>Gestion des métadonnées</h1>
+      <h1>Gestion des métadonnées</h1>
+      <h3>
+        (Données accessibles par les moteurs de recherche, pour le
+        référencement)
+      </h3>
       {Object.entries(SEO).map(([key, value]) => {
         const separate = key.startsWith("description") || key === "keywords";
         if (!isM && (key.endsWith("Drawing") || key.endsWith("DrawingHome")))
