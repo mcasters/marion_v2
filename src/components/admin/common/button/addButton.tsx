@@ -1,12 +1,12 @@
 "use client";
 
-import Modal from "@/components/admin/form/modal.tsx";
-import { Category, Item, Type } from "@/lib/type";
-import PostForm from "@/components/admin/form/item/postForm";
-import WorkForm from "@/components/admin/form/item/workForm.tsx";
+import Modal from "@/components/admin/common/modal.tsx";
+import { Category, Item, Type } from "@/lib/type.ts";
+import PostForm from "@/components/admin/item/form/postForm.tsx";
+import WorkForm from "@/components/admin/item/form/workForm.tsx";
 import React from "react";
 import s from "@/components/admin/admin.module.css";
-import CategoryForm from "@/components/admin/form/item/categoryForm";
+import CategoryForm from "@/components/admin/item/form/categoryForm.tsx";
 import useModal from "@/components/hooks/useModal.ts";
 
 export type Props = {
@@ -36,7 +36,7 @@ export default function AddButton({ item, categories, disabled }: Props) {
         ) : item.type === Type.POST ? (
           <PostForm post={item} onClose={toggle} />
         ) : (
-          <WorkForm item={item} categories={categories} onClose={toggle} />
+          <WorkForm work={item} categories={categories} onClose={toggle} />
         )}
       </Modal>
     </>

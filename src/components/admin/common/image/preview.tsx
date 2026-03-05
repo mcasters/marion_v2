@@ -3,7 +3,7 @@
 import React, { Fragment } from "react";
 import DeleteIcon from "@/components/icons/deleteIcon";
 import s from "@/components/admin/admin.module.css";
-import DeleteButton from "@/components/admin/form/deleteButton";
+import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
 import Image from "next/image";
 
 type Props = {

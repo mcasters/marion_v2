@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import DeleteIcon from "@/components/icons/deleteIcon";
-import { useAlert } from "@/app/context/alertProvider";
+import DeleteIcon from "@/components/icons/deleteIcon.tsx";
+import { useAlert } from "@/app/context/alertProvider.tsx";
 
 export type DeleteButtonProps = {
   action: () => Promise<{

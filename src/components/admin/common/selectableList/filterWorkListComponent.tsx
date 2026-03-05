@@ -1,21 +1,28 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import s from "@/components/admin/admin.module.css";
-import { Category, Filter, Work } from "@/lib/type.ts";
+import { AdminWork, Category, Filter } from "@/lib/type.ts";
 import { filterWorks, getYearsFromWorks } from "@/lib/utils/commonUtils.ts";
 
 interface Props {
-  items: Work[];
+  items: AdminWork[];
   categories: Category[];
-  onFilteredItems: (items: Work[]) => void;
+  onFilter: Dispatch<SetStateAction<AdminWork[]>>;
 }
 export default function FilterWorkListComponent({
   items,
   categories,
-  onFilteredItems,
+  onFilter,
 }: Props) {
   const years = useMemo(() => getYearsFromWorks(items), [items]);
+  const [numberFilter, setNumberFilter] = useState(items.length);
   const [filter, setFilter] = useState({
     categoryFilter: -1,
     yearFilter: -1,
@@ -37,7 +44,10 @@ export default function FilterWorkListComponent({
   const handleChange = (filterName: keyof Filter, value: number) => {
     const _filter = { ...filter, [filterName]: value };
     setFilter(_filter);
-    onFilteredItems(filterWorks(items, _filter));
+
+    const filteredWorks = filterWorks(items, _filter);
+    onFilter(filteredWorks);
+    setNumberFilter(filteredWorks.length);
   };
 
   return (
@@ -90,6 +100,8 @@ export default function FilterWorkListComponent({
           <option value={1}>Sortie</option>
         </select>
       </label>
+      <br />
+      <h4>{`Filtre : ${numberFilter} ${items[0].type}s`}</h4>
     </div>
   );
 }

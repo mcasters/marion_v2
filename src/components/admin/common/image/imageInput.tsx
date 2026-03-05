@@ -3,9 +3,9 @@
 import React, { useRef, useState } from "react";
 import { useAlert } from "@/app/context/alertProvider";
 import s from "@/components/admin/admin.module.css";
-import Preview from "@/components/admin/form/image/preview.tsx";
-import { constraintImage } from "@/components/admin/form/formUtils";
-import DropFile from "@/components/admin/form/image/DropFile.tsx";
+import Preview from "@/components/admin/common/image/preview.tsx";
+import { constraintImage } from "@/components/admin/common/formUtils";
+import DropFile from "@/components/admin/common/image/DropFile.tsx";
 import { MESSAGE } from "@/constants/admin.ts";
 
 type Props = {
