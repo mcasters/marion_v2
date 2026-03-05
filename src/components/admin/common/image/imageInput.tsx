@@ -8,11 +8,11 @@ import { constraintImage } from "@/components/admin/common/formUtils";
 import DropFile from "@/components/admin/common/image/DropFile.tsx";
 import { MESSAGE } from "@/constants/admin.ts";
 
-type Props = {
+interface Props {
   isMultiple: boolean;
   acceptSmallImage: boolean;
   onNewFiles: React.Dispatch<React.SetStateAction<File[]>>;
-};
+}
 
 export default function ImageInput({
   isMultiple,

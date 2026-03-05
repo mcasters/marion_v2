@@ -151,6 +151,7 @@
   display: block;
   object-fit: contain;
   padding: 0 2px;
+  width: auto;
 }
 
 /* End image */

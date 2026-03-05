@@ -6,7 +6,7 @@ import s from "@/components/admin/admin.module.css";
 import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
 import Image from "next/image";
 
-type Props = {
+interface Props {
   filenames: string[];
   pathImage: string;
   onDelete?: (filename: string) => void;
@@ -14,7 +14,7 @@ type Props = {
     filename: string,
   ) => Promise<{ isError: boolean; message: string }>;
   title?: string;
-};
+}
 
 export default function Preview({
   filenames,
