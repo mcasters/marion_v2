@@ -44,6 +44,10 @@
   text-align: left;
 }
 
+.filter select {
+  margin: 0;
+}
+
 .column {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -61,7 +65,7 @@
 }
 
 .checkTextForm label {
-  min-width: 95px;
+  min-width: 120px;
 }
 
 .buttonSection {
