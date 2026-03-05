@@ -3,7 +3,7 @@
 import { PresetColor } from "@@/prisma/generated/client";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import PresetColorSwatch from "@/components/admin/theme/dashboard/presetColor/presetColorSwatch";
-import DragList from "@/components/admin/form/dragList/dragList.tsx";
+import DragList from "@/components/admin/common/dragList/dragList.tsx";
 import s from "@/components/admin/theme/adminTheme.module.css";
 import { updatePresetColorsOrder } from "@/app/actions/theme/admin.ts";
 import { useAlert } from "@/app/context/alertProvider.tsx";

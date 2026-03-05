@@ -2,6 +2,8 @@ import { Meta } from "@@/prisma/generated/client";
 import { Label } from "@@/prisma/generated/enums";
 import {
   AdminCategory,
+  AdminPost,
+  AdminWork,
   Category,
   ContentFull,
   DragListElement,
@@ -12,7 +14,6 @@ import {
   ItemDarkBackground,
   Layout,
   Message,
-  Post,
   Type,
   Work,
 } from "@/lib/type.ts";
@@ -107,7 +108,7 @@ export const getImageSrc = (item: Item) => {
 
 export const getEmptyWork = (
   type: Type.SCULPTURE | Type.DRAWING | Type.PAINTING,
-): Work => {
+): AdminWork => {
   return {
     id: 0,
     type,
@@ -125,10 +126,11 @@ export const getEmptyWork = (
     categoryId: null,
     isOut: false,
     outInformation: "",
+    modifiable: true,
   };
 };
 
-export const getEmptyPost = (): Post => {
+export const getEmptyPost = (): AdminPost => {
   return {
     id: 0,
     type: Type.POST,
@@ -138,6 +140,7 @@ export const getEmptyPost = (): Post => {
     images: [] as Image[],
     published: false,
     viewCount: 0,
+    modifiable: true,
   };
 };
 
@@ -150,9 +153,13 @@ export const getEmptyImage = (): Image => {
   };
 };
 
-export const getEmptyCategory = (): Category => {
+export const getEmptyCategory = (
+  workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
+): AdminCategory => {
   return {
     id: 0,
+    type: Type.CATEGORY,
+    workType,
     key: "",
     value: "",
     content: {
@@ -160,19 +167,9 @@ export const getEmptyCategory = (): Category => {
       text: "",
       image: getEmptyImage(),
     },
-  };
-};
-
-export const getEmptyAdminCategory = (
-  workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
-): AdminCategory => {
-  return {
-    type: Type.CATEGORY,
-    workType,
     count: 0,
     images: [getEmptyImage()],
     modifiable: true,
-    ...getEmptyCategory(),
   };
 };
 
@@ -198,7 +195,6 @@ export const getEmptyMessage = (): Message => {
     author: {
       id: 0,
       email: "",
-      password: "",
       isAdmin: false,
     },
   };
@@ -250,27 +246,30 @@ export const sortDragList = (
   return dragList.toSorted(compare);
 };
 
-export const filterWorks = (workFulls: Work[], filter: Filter): Work[] => {
-  function filterByCategory(list: Work[]) {
+export const filterWorks = (
+  works: AdminWork[],
+  filter: Filter,
+): AdminWork[] => {
+  function filterByCategory(list: AdminWork[]) {
     return filter.categoryFilter === -1
       ? list
       : filter.categoryFilter === 0
         ? list.filter((i) => !i.categoryId)
         : list.filter((i) => i.categoryId === filter.categoryFilter);
   }
-  function filterByYear(list: Work[]) {
+  function filterByYear(list: AdminWork[]) {
     return filter.yearFilter === -1
       ? list
       : list.filter(
           (i) => new Date(i.date).getFullYear() === filter.yearFilter,
         );
   }
-  function filterByIsOut(list: Work[]) {
+  function filterByIsOut(list: AdminWork[]) {
     return filter.isOutFilter === -1
       ? list
       : filter.isOutFilter === 0
         ? list.filter((i) => !i.isOut)
         : list.filter((i) => i.isOut);
   }
-  return filterByCategory(filterByYear(filterByIsOut(workFulls)));
+  return filterByCategory(filterByYear(filterByIsOut(works)));
 };

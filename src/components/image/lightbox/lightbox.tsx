@@ -4,7 +4,7 @@ import { Lightbox as YetLightbox } from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/captions.css";
 import "yet-another-react-lightbox/styles.css";
-import { Photo, PhotoEnhanced } from "@/lib/type";
+import { Photo, PhotoEnhanced, Work } from "@/lib/type";
 import { LightboxSlide } from "@/components/image/lightbox/lightboxSlide";
 import ImageInfos from "@/components/image/common/imageInfos";
 import { useTheme } from "@/app/context/themeProvider.tsx";
@@ -34,7 +34,7 @@ export default function Lightbox({ photos, index, onClose, isSmall }: Props) {
             {children}
             <div style={{ position: "absolute", bottom: "15px" }}>
               <ImageInfos
-                item={"item" in slide ? slide.item : undefined}
+                item={"item" in slide ? (slide.item as Work) : undefined}
                 photo={"item" in slide ? undefined : (slide as Photo)}
                 isForLightbox={true}
               />

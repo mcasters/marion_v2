@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-empty-object-type */
 
-import { User } from "@@/prisma/generated/client";
+import { Prisma, User } from "@@/prisma/generated/client";
 import { JSX } from "react";
 
 type StringKeys<T> = {
@@ -59,14 +59,14 @@ export interface Post {
   type: Type.POST;
   title: string;
   date: Date;
-  text: string | null;
+  text: string;
   published: boolean;
   viewCount: number;
   images: Image[];
 }
 
 export interface Admin {
-  id: string | number;
+  id: number;
   type: Type;
   modifiable: boolean;
 }
@@ -87,14 +87,16 @@ export interface AdminPost extends Post {
   modifiable: boolean;
 }
 
-export type Item = Work | Post | AdminCategory;
+export type Item = AdminWork | AdminPost | AdminCategory;
 
 export interface Message {
   id: number;
   date: Date;
   dateUpdated: Date | null;
   text: string;
-  author: User;
+  author: Prisma.UserGetPayload<{
+    omit: { password: true };
+  }>;
 }
 
 export enum Layout {

@@ -16,7 +16,7 @@
   background: #efefef;
   color: var(--color-dark);
   max-height: 97%;
-  padding: 2em 2em 1em;
+  padding: 1em 2em 1em;
   text-align: left;
   border-radius: 0.2rem;
   overflow: scroll;
@@ -25,7 +25,6 @@
 
 .modalTitle {
   font-size: 1.2rem;
-  line-height: 1;
   padding-bottom: 20px;
   text-align: center;
 }
