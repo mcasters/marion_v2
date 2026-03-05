@@ -10,7 +10,6 @@ import {
   Filter,
   HomeLayout,
   Image,
-  Item,
   ItemDarkBackground,
   Layout,
   Message,
@@ -83,27 +82,30 @@ export const getMetaMap = (metas: Meta[]): Map<string, string> => {
   return map;
 };
 
-export const getImageSrc = (item: Item) => {
+export const getThumbnailSrc = (
+  item: AdminCategory | AdminWork | AdminPost,
+) => {
   if (item.id === 0) return "";
-  let src;
-  if (item.type === Type.CATEGORY) {
-    src =
-      item.content.image.filename !== ""
+
+  switch (item.type) {
+    case Type.CATEGORY: {
+      return item.content.image.filename !== ""
         ? `/images/${item.workType}/sm/${item.content.image.filename}`
         : "";
-  } else if (item.type === Type.POST) {
-    let image = item.images.find((i: Image) => i.isMain);
-    if (!image) image = item.images[0];
-
-    src =
-      image && image.filename !== "" ? `/images/post/${image.filename}` : "";
-  } else {
-    src =
-      item.images[0].filename !== ""
+    }
+    case Type.POST: {
+      let image = item.images.find((i: Image) => i.isMain);
+      if (!image) image = item.images[0];
+      return image && image.filename !== ""
+        ? `/images/post/${image.filename}`
+        : "";
+    }
+    default: {
+      return item.images[0].filename !== ""
         ? `/images/${item.type}/${item.images[0].filename}`
         : "";
+    }
   }
-  return src;
 };
 
 export const getEmptyWork = (

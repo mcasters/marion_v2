@@ -87,8 +87,6 @@ export interface AdminPost extends Post {
   modifiable: boolean;
 }
 
-export type Item = AdminWork | AdminPost | AdminCategory;
-
 export interface Message {
   id: number;
   date: Date;

@@ -7,7 +7,7 @@ import AddButton from "@/components/admin/common/button/addButton.tsx";
 import {
   getEmptyCategory,
   getEmptyWork,
-  getImageSrc,
+  getThumbnailSrc,
 } from "@/lib/utils/commonUtils.ts";
 import { MESSAGE } from "@/constants/admin.ts";
 import { deleteItem } from "@/app/actions/item-post/admin.ts";
@@ -42,7 +42,7 @@ export default function WorkManagement({ works, categories }: Props) {
             }
             part3={new Date(work.date).getFullYear().toString()}
             part4={work.isOut ? "sortie" : ""}
-            imageSrc={getImageSrc(work)}
+            imageSrc={getThumbnailSrc(work)}
             deleteAction={() => deleteItem(work.id, type)}
           />
         )}
@@ -79,7 +79,7 @@ export default function WorkManagement({ works, categories }: Props) {
             item={category}
             part1={category.value}
             part2={`${category.count} ${category.workType}(s)`}
-            imageSrc={getImageSrc(category)}
+            imageSrc={getThumbnailSrc(category)}
             deleteAction={() => deleteCategory(category.id, Type.PAINTING)}
           />
         )}
