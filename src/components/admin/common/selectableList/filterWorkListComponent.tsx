@@ -51,57 +51,67 @@ export default function FilterWorkListComponent({
   };
 
   return (
-    <div className={s.filterContainer}>
-      <label className={s.filter}>
-        Filtre par catégorie
-        <select
-          name="categoryFilter"
-          value={filter.categoryFilter}
-          onChange={(e) =>
-            handleChange(e.target.name as keyof Filter, Number(e.target.value))
-          }
-        >
-          <option value={-1}>-- Pas de filtre --</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.value}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={s.filter}>
-        Filtre par année
-        <select
-          name="yearFilter"
-          value={filter.yearFilter}
-          onChange={(e) =>
-            handleChange(e.target.name as keyof Filter, Number(e.target.value))
-          }
-        >
-          <option value={-1}>-- Pas de filtre --</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={s.filter}>
-        Filtre par sortie
-        <select
-          name="isOutFilter"
-          value={filter.isOutFilter}
-          onChange={(e) =>
-            handleChange(e.target.name as keyof Filter, Number(e.target.value))
-          }
-        >
-          <option value={-1}>-- Pas de filtre --</option>
-          <option value={0}>Non sortie</option>
-          <option value={1}>Sortie</option>
-        </select>
-      </label>
-      <br />
+    <>
+      <div className={s.filterContainer}>
+        <label className={s.filter}>
+          Filtre par catégorie
+          <select
+            name="categoryFilter"
+            value={filter.categoryFilter}
+            onChange={(e) =>
+              handleChange(
+                e.target.name as keyof Filter,
+                Number(e.target.value),
+              )
+            }
+          >
+            <option value={-1}>-- Pas de filtre --</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.value}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={s.filter}>
+          Filtre par année
+          <select
+            name="yearFilter"
+            value={filter.yearFilter}
+            onChange={(e) =>
+              handleChange(
+                e.target.name as keyof Filter,
+                Number(e.target.value),
+              )
+            }
+          >
+            <option value={-1}>-- Pas de filtre --</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={s.filter}>
+          Filtre par sortie
+          <select
+            name="isOutFilter"
+            value={filter.isOutFilter}
+            onChange={(e) =>
+              handleChange(
+                e.target.name as keyof Filter,
+                Number(e.target.value),
+              )
+            }
+          >
+            <option value={-1}>-- Pas de filtre --</option>
+            <option value={0}>Non sortie</option>
+            <option value={1}>Sortie</option>
+          </select>
+        </label>
+      </div>
       <h4>{`Filtre : ${numberFilter} ${items[0].type}s`}</h4>
-    </div>
+    </>
   );
 }

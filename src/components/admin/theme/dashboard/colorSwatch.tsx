@@ -98,10 +98,7 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
         style={{
           backgroundColor: colorNameToHex(color, presetColors),
         }}
-        onClick={(e) => {
-          e.preventDefault();
-          toggle();
-        }}
+        onClick={() => toggle()}
         title={color}
       />
       <p className={s.colorLabel}>{label}</p>

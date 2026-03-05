@@ -2,7 +2,7 @@
 
 import React, { Dispatch, ReactElement, SetStateAction, useState } from "react";
 import { Admin, Type } from "@/lib/type.ts";
-import s from "@/components/admin/adminList.module.css";
+import s from "@/components/admin/common/selectableList/adminList.module.css";
 import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
 import useListSelection from "@/components/hooks/useListSelection.ts";
 import useKeyboard from "@/components/hooks/useKeyboard.ts";
@@ -64,11 +64,9 @@ export default function SelectableList<T extends Admin>({
           })}
         </ul>
       </div>
-      {openedItem !== null && (
-        <Modal isOpen={true} title="Modification">
-          {updateForm(openedItem, () => setOpenedItem(null))}
-        </Modal>
-      )}
+      <Modal isOpen={openedItem !== null} title="Modification">
+        {openedItem && updateForm(openedItem, () => setOpenedItem(null))}
+      </Modal>
     </>
   );
 }

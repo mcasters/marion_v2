@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
-import s from "@/components/admin/adminList.module.css";
+import s from "@/components/admin/common/selectableList/adminList.module.css";
 import React from "react";
 import { Admin } from "@/lib/type.ts";
 
@@ -20,7 +20,7 @@ interface Props<T extends Admin> {
   }>;
 }
 
-export default function RowComponent<T extends Admin>({
+export default function SelectableListRow<T extends Admin>({
   item,
   part1,
   part2,
@@ -31,10 +31,10 @@ export default function RowComponent<T extends Admin>({
 }: Props<T>) {
   return (
     <>
-      <span className={s.itemTitle}>{part1}</span>
-      <span className={s.itemInfo}>{part2}</span>
-      {part3 && <span className={s.itemYear}>{part3}</span>}
-      {part4 && <span className={s.itemYear}>{part4}</span>}
+      <span className={s.part1}>{part1}</span>
+      <span className={s.part2}>{part2}</span>
+      {part3 && <span className={s.part3}>{part3}</span>}
+      {part4 && <span className={s.part4}>{part4}</span>}
       <span className={s.itemImage}>
         {imageSrc !== "" && (
           <Image

@@ -12,7 +12,7 @@ import {
 import { MESSAGE } from "@/constants/admin.ts";
 import { deleteItem } from "@/app/actions/item-post/admin.ts";
 import SelectableList from "@/components/admin/common/selectableList/selectableList.tsx";
-import RowComponent from "@/components/admin/common/selectableList/rowComponent.tsx";
+import SelectableListRow from "@/components/admin/common/selectableList/selectableListRow.tsx";
 import FilterWorkListComponent from "@/components/admin/common/selectableList/filterWorkListComponent.tsx";
 import { deleteCategory } from "@/app/actions/item-post/categories/admin.ts";
 import WorkForm from "@/components/admin/item/form/workForm.tsx";
@@ -33,7 +33,7 @@ export default function WorkManagement({ works, categories }: Props) {
       <SelectableList
         items={works}
         renderItem={(work) => (
-          <RowComponent
+          <SelectableListRow
             item={work}
             part1={work.title}
             part2={
@@ -41,7 +41,7 @@ export default function WorkManagement({ works, categories }: Props) {
                 ?.value || " "
             }
             part3={new Date(work.date).getFullYear().toString()}
-            part4={work.isOut ? "sortie" : ""}
+            part4={work.isOut ? "sortie" : "Non sortie"}
             imageSrc={getThumbnailSrc(work)}
             deleteAction={() => deleteItem(work.id, type)}
           />
@@ -75,7 +75,7 @@ export default function WorkManagement({ works, categories }: Props) {
       <SelectableList
         items={categories}
         renderItem={(category) => (
-          <RowComponent
+          <SelectableListRow
             item={category}
             part1={category.value}
             part2={`${category.count} ${category.workType}(s)`}
