@@ -3,7 +3,7 @@ import s from "@/components/admin/admin.module.css";
 import React, { Fragment } from "react";
 import { getMetas } from "@/app/actions/meta";
 import { META, SEO } from "@/constants/admin.ts";
-import MetaForm from "@/components/admin/form/content/metaForm.tsx";
+import MetaForm from "@/components/admin/content/metaForm.tsx";
 
 export default async function Contact() {
   const metas = getMetaMap(await getMetas());

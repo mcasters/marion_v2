@@ -2,14 +2,14 @@ import { getIntroText } from "@/lib/utils/commonUtils";
 import { Label } from "@/lib/type";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import TextAreaForm from "@/components/admin/form/content/textAreaForm";
+import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
 import {
   getSliderLandscapeImages,
   getSliderPortraitImages,
 } from "@/lib/utils/imageUtils";
-import HomeLayoutForm from "@/components/admin/form/home/homeLayoutForm";
-import ImagesForm from "@/components/admin/form/image/imagesForm.tsx";
+import HomeLayoutForm from "@/components/admin/home/homeLayoutForm.tsx";
+import ImagesForm from "@/components/admin/common/image/imagesForm.tsx";
 
 export default async function Home() {
   const contents = await getContentsFull();

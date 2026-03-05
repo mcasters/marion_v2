@@ -6,9 +6,9 @@ import {
 } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
 import { Label } from "@/lib/type";
-import TextAreaForm from "@/components/admin/form/content/textAreaForm";
+import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
 import React from "react";
-import InputForm from "@/components/admin/form/content/inputForm";
+import InputForm from "@/components/admin/content/inputForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
 
 export default async function Contact() {

@@ -271,7 +271,7 @@ export const getAdminPosts = async (): Promise<AdminPost[]> => {
       modifiable: true,
     };
   });
-  return posts.length === 0 ? [{ ...getEmptyPost(), modifiable: true }] : posts;
+  return posts.length === 0 ? [{ ...getEmptyPost() }] : posts;
 };
 
 export const getAdminCategories = async (

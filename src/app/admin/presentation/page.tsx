@@ -6,8 +6,8 @@ import {
 } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import TextAreaForm from "@/components/admin/form/content/textAreaForm";
-import ImagesForm from "@/components/admin/form/image/imagesForm";
+import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
+import ImagesForm from "@/components/admin/common/image/imagesForm";
 import { getContentsFull } from "@/app/actions/contents";
 import { Label } from "@/lib/type.ts";
 
