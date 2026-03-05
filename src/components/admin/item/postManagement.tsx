@@ -32,7 +32,11 @@ export default function PostManagement({ posts }: Props) {
           <PostForm post={post} onClose={handleClose} />
         )}
       />
-      <AddButton item={getEmptyPost()} />
+      <AddButton
+        renderForm={(toggle) => (
+          <PostForm post={getEmptyPost()} onClose={toggle} />
+        )}
+      />
     </>
   );
 }

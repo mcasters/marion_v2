@@ -61,7 +61,15 @@ export default function WorkManagement({ works, categories }: Props) {
           />
         )}
       />
-      <AddButton item={getEmptyWork(type)} categories={categories} />
+      <AddButton
+        renderForm={(toggle) => (
+          <WorkForm
+            work={getEmptyWork(type)}
+            categories={categories}
+            onClose={toggle}
+          />
+        )}
+      />
       <div className="separate" />
       <h2 className={s.title2}>Gestion des catégories</h2>
       <SelectableList
@@ -80,7 +88,11 @@ export default function WorkManagement({ works, categories }: Props) {
         )}
       />
       <h5>{MESSAGE.category}</h5>
-      <AddButton item={getEmptyCategory(type)} />
+      <AddButton
+        renderForm={(toggle) => (
+          <CategoryForm category={getEmptyCategory(type)} onClose={toggle} />
+        )}
+      />
     </>
   );
 }
