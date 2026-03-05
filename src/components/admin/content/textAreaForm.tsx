@@ -1,25 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import SubmitButton from "@/components/admin/form/submitButton";
-import CancelButton from "@/components/admin/form/cancelButton";
-import { useAlert } from "@/app/context/alertProvider";
-import { updateContent } from "@/app/actions/contents/admin";
+import { Label } from "@/lib/type.ts";
+import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
+import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
+import { useAlert } from "@/app/context/alertProvider.tsx";
+import { updateContent } from "@/app/actions/contents/admin.ts";
 
 interface Props {
-  label: string;
+  label: Label;
   textContent: string;
   textLabel?: string;
-  isPhone?: boolean;
-  isEmail?: boolean;
 }
-export default function InputForm({
-  label,
-  textContent,
-  textLabel,
-  isPhone = false,
-  isEmail = false,
-}: Props) {
+export default function TextAreaForm({ label, textContent, textLabel }: Props) {
   const [text, setText] = useState<string>(textContent);
   const [isChanged, setIsChanged] = useState(false);
   const alert = useAlert();
@@ -35,15 +28,14 @@ export default function InputForm({
       <input type="hidden" name="label" value={label} />
       <label>
         {textLabel}
-        <input
-          placeholder={label}
+        <textarea
           name="text"
-          type={isPhone ? "tel" : isEmail ? "email" : "text"}
           value={text}
           onChange={(e) => {
             setText(e.target.value);
             setIsChanged(true);
           }}
+          rows={7}
         />
       </label>
       <SubmitButton disabled={!isChanged} />

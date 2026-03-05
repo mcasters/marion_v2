@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Image, Post, Type } from "@/lib/type";
+import { AdminPost, Image, Post, Type } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
-import { useAlert } from "@/app/context/alertProvider";
-import Preview from "@/components/admin/form/image/preview.tsx";
-import { createItem, updateItem } from "@/app/actions/item-post/admin";
-import SubmitButton from "@/components/admin/form/submitButton";
-import CancelButton from "@/components/admin/form/cancelButton";
-import ImageInput from "@/components/admin/form/image/imageInput.tsx";
+import { useAlert } from "@/app/context/alertProvider.tsx";
+import Preview from "@/components/admin/common/image/preview.tsx";
+import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
+import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
+import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
+import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 
 interface Props {
-  post: Post;
+  post: AdminPost;
   onClose: () => void;
 }
 

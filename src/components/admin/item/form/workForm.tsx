@@ -2,28 +2,28 @@
 
 import React, { useEffect, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { Category, Image, Type, Work } from "@/lib/type";
-import { useAlert } from "@/app/context/alertProvider";
-import SubmitButton from "@/components/admin/form/submitButton";
-import CancelButton from "@/components/admin/form/cancelButton";
-import { createItem, updateItem } from "@/app/actions/item-post/admin";
-import Preview from "@/components/admin/form/image/preview.tsx";
-import ImageInput from "@/components/admin/form/image/imageInput.tsx";
+import { Category, Image, Type, Work } from "@/lib/type.ts";
+import { useAlert } from "@/app/context/alertProvider.tsx";
+import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
+import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
+import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
+import Preview from "@/components/admin/common/image/preview.tsx";
+import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import { format } from "date-fns/format";
 
 interface Props {
-  item: Work;
+  work: Work;
   onClose: () => void;
   categories?: Category[];
 }
 
-export default function WorkForm({ item, onClose, categories }: Props) {
-  const isUpdate = item.id !== 0;
-  const isSculpture = item.type === Type.SCULPTURE;
+export default function WorkForm({ work, onClose, categories }: Props) {
+  const isUpdate = work.id !== 0;
+  const isSculpture = work.type === Type.SCULPTURE;
   const alert = useAlert();
-  const [workItem, setWorkItem] = useState<Work>(item);
+  const [workItem, setWorkItem] = useState<Work>(work);
   const [date, setDate] = useState<string>(
-    format(new Date(item.date), "yyyy-MM-dd"),
+    format(new Date(work.date), "yyyy-MM-dd"),
   );
   const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -52,10 +52,10 @@ export default function WorkForm({ item, onClose, categories }: Props) {
 
   return (
     <form action={submit}>
-      <input name="type" type="hidden" value={item.type} />
+      <input name="type" type="hidden" value={work.type} />
       {isUpdate && (
         <>
-          <input name="id" type="hidden" value={item.id} />
+          <input name="id" type="hidden" value={work.id} />
           <input
             name="filenamesToDelete"
             type="hidden"
@@ -63,11 +63,11 @@ export default function WorkForm({ item, onClose, categories }: Props) {
           />
         </>
       )}
-      <input name="isToSell" type="hidden" value={String(item.isToSell)} />
+      <input name="isToSell" type="hidden" value={String(work.isToSell)} />
       <input
         name="oldCategoryId"
         type="hidden"
-        value={String(item.categoryId)}
+        value={String(work.categoryId)}
       />
       <div className={s.column}>
         <input
@@ -219,7 +219,7 @@ export default function WorkForm({ item, onClose, categories }: Props) {
       </div>
       <Preview
         filenames={workItem.images.map((i: Image) => i.filename)}
-        pathImage={`/images/${item.type}`}
+        pathImage={`/images/${work.type}`}
         onDelete={handleDeleteFile}
         title={isSculpture ? "Une photo minimum :" : "Une seule photo :"}
       />

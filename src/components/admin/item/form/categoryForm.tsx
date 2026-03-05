@@ -3,20 +3,20 @@
 import React, { useState } from "react";
 
 import s from "@/components/admin/admin.module.css";
-import SubmitButton from "@/components/admin/form/submitButton";
-import CancelButton from "@/components/admin/form/cancelButton";
-import { Category, EnhancedCategory, Image } from "@/lib/type";
-import { useAlert } from "@/app/context/alertProvider";
-import SelectImageList from "@/components/admin/form/image/selectImageList";
+import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
+import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
+import { AdminCategory, Category, Image } from "@/lib/type.ts";
+import { useAlert } from "@/app/context/alertProvider.tsx";
+import SelectImageList from "@/components/admin/common/image/selectImageList.tsx";
 
 import {
   createCategory,
   updateCategory,
-} from "@/app/actions/item-post/categories/admin";
+} from "@/app/actions/item-post/categories/admin.ts";
 import { MESSAGE } from "@/constants/admin.ts";
 
 interface Props {
-  category: EnhancedCategory;
+  category: AdminCategory;
   onClose: () => void;
 }
 export default function CategoryForm({ category, onClose }: Props) {
