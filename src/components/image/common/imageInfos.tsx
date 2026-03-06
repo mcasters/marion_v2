@@ -48,23 +48,26 @@ const LongInfo = ({ item }: { item: Work }) => {
     <>
       <h2>{item.title}</h2>
       <p>
-        {item.technique} - {getSizeText(item)} -{" "}
+        {`${item.technique} - ${getSizeText(item)} - `}
         <time>{new Date(item.date).getFullYear()}</time>
       </p>
       {item.description !== "" && (
-        <>
+        <p>
           <br />
-          <p>{item.description}</p>
-        </>
+          {item.description}
+        </p>
       )}
       {item.isToSell && (
-        <>
+        <p>
           <br />
-          <p>
-            {`prix : ${item.price} euros`}
-            {item.sold ? "vendu" : ""}
-          </p>
-        </>
+          {item.price ? `Prix : ${item.price} euros` : "À vendre"}
+        </p>
+      )}
+      {item.sold && (
+        <p>
+          <br />
+          {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
+        </p>
       )}
     </>
   );
@@ -72,15 +75,27 @@ const LongInfo = ({ item }: { item: Work }) => {
 
 // For lightbox of item in gallery layout
 const LongInfoLightbox = ({ item }: { item: Work }) => (
-  <p>
-    <span>
-      <strong>{item.title}</strong>
-    </span>
-    {` - ${item.technique} - `}
-    {getSizeText(item)}
-    {" - "}
-    <time>{new Date(item.date).getFullYear()}</time>
-  </p>
+  <>
+    <p>
+      <span>
+        <strong>{item.title}</strong>
+      </span>
+      {` - ${item.technique} - ${getSizeText(item)} - `}
+      <time>{new Date(item.date).getFullYear()}</time>
+    </p>
+    <p>
+      {item.description !== "" && <span>{item.description}</span>}
+      {(item.isToSell || item.sold) && <span>{" - "}</span>}
+      {item.isToSell && (
+        <span>{item.price ? `Prix : ${item.price} euros` : "À vendre"}</span>
+      )}
+      {item.sold && (
+        <span>
+          {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
+        </span>
+      )}
+    </p>
+  </>
 );
 
 // For item in mono layout
@@ -93,17 +108,22 @@ const LongInfoMono = ({ item }: { item: Work }) => (
       <time>{new Date(item.date).getFullYear()}</time>
     </p>
     {item.description !== "" && (
-      <>
-        <p>{item.description}</p>
-      </>
+      <p>
+        <br />
+        {item.description}
+      </p>
     )}
     {item.isToSell && (
-      <>
-        <p>
-          {`prix : ${item.price} euros`}
-          {item.sold ? "vendu" : ""}
-        </p>
-      </>
+      <p>
+        <br />
+        {item.price ? `Prix : ${item.price} euros` : "À vendre"}
+      </p>
+    )}
+    {item.sold && (
+      <p>
+        <br />
+        {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
+      </p>
     )}
   </>
 );
