@@ -42,7 +42,7 @@ export default function Slides({ photos, isSmall, isPlainHomeLayout }: Props) {
         priority={index < 1}
         unoptimized
       />
-      {!isSmall && photos.length > 0 && (
+      {!isSmall && photos.length > 1 && (
         <>
           <button
             className={`${s.prev} iconButton`}
