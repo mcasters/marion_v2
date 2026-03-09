@@ -10,31 +10,26 @@ import {
   getThumbnailSrc,
 } from "@/lib/utils/commonUtils.ts";
 import { MESSAGE } from "@/constants/admin.ts";
-import { deleteItem } from "@/app/actions/item-post/admin.ts";
 import SelectableList from "@/components/admin/common/selectableList/selectableList.tsx";
 import SelectableListRow from "@/components/admin/common/selectableList/selectableListRow.tsx";
-import FilterWorkListComponent from "@/components/admin/common/selectableList/filterWorkListComponent.tsx";
 import { deleteCategory } from "@/app/actions/item-post/categories/admin.ts";
-import WorkForm from "@/components/admin/item/form/workForm.tsx";
 import CategoryForm from "@/components/admin/item/form/categoryForm.tsx";
+import FilterWorkListComponent from "@/components/admin/common/selectableList/filterWorkListComponent.tsx";
+import { deleteItem } from "@/app/actions/item-post/admin.ts";
+import WorkForm from "@/components/admin/item/form/workForm.tsx";
 
 interface Props {
   works: AdminWork[];
   categories: AdminCategory[];
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
 }
-export default function WorkManagement({ works, categories }: Props) {
-  const type = works[0].type;
-
+export default function WorkManagement({ works, categories, type }: Props) {
   return (
     <>
-      <h2
-        className={s.title2}
-      >{`Gestion des ${type}s ( total : ${works.length} )`}</h2>
       <SelectableList
         items={works}
         renderItem={(work) => (
           <SelectableListRow
-            item={work}
             part1={work.title}
             part2={
               categories.find((category) => category.id === work.categoryId)
@@ -43,22 +38,19 @@ export default function WorkManagement({ works, categories }: Props) {
             part3={new Date(work.date).getFullYear().toString()}
             part4={work.isOut ? "sortie" : "Non sortie"}
             imageSrc={getThumbnailSrc(work)}
-            deleteAction={() => deleteItem(work.id, type)}
+            deleteAction={() => deleteItem(work.id, work.type)}
           />
         )}
-        renderFilter={(handleFilter) => (
+        renderFilter={(getFilteredItems) => (
           <FilterWorkListComponent
-            items={works}
+            works={works}
             categories={categories}
-            onFilter={handleFilter}
+            onFilter={getFilteredItems}
+            type={type}
           />
         )}
-        updateForm={(work, handleCloseAction) => (
-          <WorkForm
-            work={work}
-            categories={categories}
-            onClose={handleCloseAction}
-          />
+        updateForm={(work, handleClose) => (
+          <WorkForm work={work} categories={categories} onClose={handleClose} />
         )}
       />
       <AddButton
@@ -76,11 +68,14 @@ export default function WorkManagement({ works, categories }: Props) {
         items={categories}
         renderItem={(category) => (
           <SelectableListRow
-            item={category}
             part1={category.value}
             part2={`${category.count} ${category.workType}(s)`}
             imageSrc={getThumbnailSrc(category)}
-            deleteAction={() => deleteCategory(category.id, Type.PAINTING)}
+            deleteAction={
+              !category.modifiable || category.count > 0
+                ? undefined
+                : () => deleteCategory(category.id, type)
+            }
           />
         )}
         updateForm={(category, handleClose) => (

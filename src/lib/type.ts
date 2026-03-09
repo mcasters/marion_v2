@@ -199,6 +199,13 @@ export type DragListElement = {
   order: number;
 };
 
+export type FileInfo = {
+  filename: string;
+  width: number;
+  height: number;
+  isMain: boolean;
+};
+
 export type Filter = {
   categoryFilter: number;
   yearFilter: number;

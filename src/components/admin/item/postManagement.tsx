@@ -21,7 +21,6 @@ export default function PostManagement({ posts }: Props) {
         items={posts}
         renderItem={(post) => (
           <SelectableListRow
-            item={post}
             part1={post.title}
             part2={new Date(post.date).getFullYear().toString()}
             imageSrc={getThumbnailSrc(post)}

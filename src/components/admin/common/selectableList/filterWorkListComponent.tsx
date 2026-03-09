@@ -1,28 +1,24 @@
 "use client";
 
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { AdminWork, Category, Filter } from "@/lib/type.ts";
+import { AdminCategory, AdminWork, Type } from "@/lib/type.ts";
 import { filterWorks, getYearsFromWorks } from "@/lib/utils/commonUtils.ts";
 
 interface Props {
-  items: AdminWork[];
-  categories: Category[];
-  onFilter: Dispatch<SetStateAction<AdminWork[]>>;
+  works: AdminWork[];
+  categories: AdminCategory[];
+  onFilter: (filteredItems: AdminWork[]) => void;
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
 }
 export default function FilterWorkListComponent({
-  items,
+  works,
   categories,
   onFilter,
+  type,
 }: Props) {
-  const years = useMemo(() => getYearsFromWorks(items), [items]);
-  const [numberFilter, setNumberFilter] = useState(items.length);
+  const years = useMemo(() => getYearsFromWorks(works), [works]);
+  const [count, setCount] = useState(works.length);
   const [filter, setFilter] = useState({
     categoryFilter: -1,
     yearFilter: -1,
@@ -30,25 +26,26 @@ export default function FilterWorkListComponent({
   });
 
   useEffect(() => {
-    const categoryDeleted = !categories.find(
-      (category) => category.id === filter.categoryFilter,
-    );
-    if (categoryDeleted) handleChange("categoryFilter", -1);
+    const filteredWorks = filterWorks(works, filter);
+    onFilter(filteredWorks);
+    setCount(filteredWorks.length);
+  }, [works, filter]);
+
+  useEffect(() => {
+    if (filter.categoryFilter !== -1) {
+      const categoryDeleted = !categories.find(
+        (category) => category.id === filter.categoryFilter,
+      );
+      if (categoryDeleted) setFilter({ ...filter, ["categoryFilter"]: -1 });
+    }
   }, [categories]);
 
   useEffect(() => {
-    const yearDeleted = !years.includes(filter.yearFilter);
-    if (yearDeleted) handleChange("yearFilter", -1);
+    if (filter.yearFilter !== -1) {
+      const yearDeleted = !years.includes(filter.yearFilter);
+      if (yearDeleted) setFilter({ ...filter, ["yearFilter"]: -1 });
+    }
   }, [years]);
-
-  const handleChange = (filterName: keyof Filter, value: number) => {
-    const _filter = { ...filter, [filterName]: value };
-    setFilter(_filter);
-
-    const filteredWorks = filterWorks(items, _filter);
-    onFilter(filteredWorks);
-    setNumberFilter(filteredWorks.length);
-  };
 
   return (
     <>
@@ -59,10 +56,7 @@ export default function FilterWorkListComponent({
             name="categoryFilter"
             value={filter.categoryFilter}
             onChange={(e) =>
-              handleChange(
-                e.target.name as keyof Filter,
-                Number(e.target.value),
-              )
+              setFilter({ ...filter, [e.target.name]: Number(e.target.value) })
             }
           >
             <option value={-1}>-- Pas de filtre --</option>
@@ -79,10 +73,7 @@ export default function FilterWorkListComponent({
             name="yearFilter"
             value={filter.yearFilter}
             onChange={(e) =>
-              handleChange(
-                e.target.name as keyof Filter,
-                Number(e.target.value),
-              )
+              setFilter({ ...filter, [e.target.name]: Number(e.target.value) })
             }
           >
             <option value={-1}>-- Pas de filtre --</option>
@@ -99,10 +90,7 @@ export default function FilterWorkListComponent({
             name="isOutFilter"
             value={filter.isOutFilter}
             onChange={(e) =>
-              handleChange(
-                e.target.name as keyof Filter,
-                Number(e.target.value),
-              )
+              setFilter({ ...filter, [e.target.name]: Number(e.target.value) })
             }
           >
             <option value={-1}>-- Pas de filtre --</option>
@@ -111,7 +99,7 @@ export default function FilterWorkListComponent({
           </select>
         </label>
       </div>
-      <h4>{`Filtre : ${numberFilter} ${items[0].type}s`}</h4>
+      <h4>{`Filtre : ${count} ${type}s`}</h4>
     </>
   );
 }

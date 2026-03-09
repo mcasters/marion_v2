@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { Admin, Type } from "@/lib/type.ts";
 import s from "@/components/admin/common/selectableList/adminList.module.css";
 import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
@@ -12,9 +12,9 @@ interface SelectableListProps<T extends Admin> {
   items: T[];
   renderItem: (item: T, index: number) => React.ReactNode;
   renderFilter?: (
-    handleFilter: Dispatch<SetStateAction<T[]>>,
+    getFilteredItems: (filteredItems: T[]) => void,
   ) => React.ReactNode;
-  updateForm: (item: T, handleCloseAction: () => void) => React.ReactNode;
+  updateForm: (item: T, handleClose: () => void) => React.ReactNode;
 }
 
 export default function SelectableList<T extends Admin>({
@@ -29,17 +29,19 @@ export default function SelectableList<T extends Admin>({
   useKeyboard("ArrowUp", decrease, !isOutside);
   useKeyboard("ArrowDown", increase, !isOutside);
 
-  const [openedItem, setOpenedItem] = useState<T | null>(null);
-  const [itemsToDisplay, setItemsToDisplay] = useState<T[]>(
-    items.length === 1 && items[0].id === 0 ? [] : items,
-  );
+  const [editedItem, setEditedItem] = useState<T | null>(null);
+  const [itemsToDisplay, setItemsToDisplay] = useState<T[]>(items);
+
+  useEffect(() => {
+    if (!renderFilter) setItemsToDisplay(items);
+  }, [items]);
 
   return (
     <>
-      {renderFilter !== undefined && renderFilter(setItemsToDisplay)}
+      {renderFilter && renderFilter(setItemsToDisplay)}
       <div
         ref={ref}
-        className={`${items[0].type === Type.CATEGORY ? s.categoryListWrapper : s.itemListWrapper} ${s.listWrapper} area`}
+        className={`${items[0]?.type === Type.CATEGORY ? s.categoryListWrapper : s.itemListWrapper} ${s.listWrapper} area`}
       >
         <ul>
           {itemsToDisplay.map((item, i) => {
@@ -52,9 +54,11 @@ export default function SelectableList<T extends Admin>({
                   cursor: item.modifiable ? "pointer" : undefined,
                 }}
                 onDoubleClick={() =>
-                  item.modifiable ? setOpenedItem(item) : undefined
+                  item.modifiable ? setEditedItem(item) : undefined
                 }
-                title={item.modifiable ? "Modifier" : undefined}
+                title={
+                  item.modifiable ? "Modifier" : "Ne peut pas être modifié"
+                }
                 role={item.modifiable ? "button" : undefined}
                 onClick={() => setSelectedIndex(i)}
               >
@@ -64,8 +68,8 @@ export default function SelectableList<T extends Admin>({
           })}
         </ul>
       </div>
-      <Modal isOpen={openedItem !== null} title="Modification">
-        {openedItem && updateForm(openedItem, () => setOpenedItem(null))}
+      <Modal isOpen={editedItem !== null} title="Modification">
+        {editedItem && updateForm(editedItem, () => setEditedItem(null))}
       </Modal>
     </>
   );

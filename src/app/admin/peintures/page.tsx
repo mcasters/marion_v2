@@ -21,7 +21,10 @@ export default async function Peintures() {
       <h2 className={s.title2}>Mise en page</h2>
       <ItemLayoutForm type={type} />
       <div className="separate" />
-      <WorkManagement works={works} categories={categories} />
+      <h2
+        className={s.title2}
+      >{`Gestion des peintures ( total : ${works.length} )`}</h2>
+      <WorkManagement works={works} categories={categories} type={type} />
     </div>
   );
 }

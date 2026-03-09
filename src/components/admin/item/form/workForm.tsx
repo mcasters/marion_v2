@@ -61,13 +61,15 @@ export default function WorkForm({ work, onClose, categories }: Props) {
             type="hidden"
             value={filenamesToDelete}
           />
+          {work.categoryId !== workItem.categoryId && (
+            <input
+              name="oldCategoryId"
+              type="hidden"
+              value={String(work.categoryId)}
+            />
+          )}
         </>
       )}
-      <input
-        name="oldCategoryId"
-        type="hidden"
-        value={String(work.categoryId)}
-      />
       <div className={s.columnWrapper}>
         <div>
           <input
