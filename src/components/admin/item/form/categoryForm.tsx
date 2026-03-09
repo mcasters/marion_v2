@@ -27,7 +27,7 @@ export default function CategoryForm({ category, onClose }: Props) {
 
   const submit = async (formData: FormData) => {
     const action = isUpdate ? updateCategory : createCategory;
-    const { message, isError } = await action(null, formData);
+    const { message, isError } = await action(formData);
     if (!isError) onClose();
     alert(message, isError);
   };

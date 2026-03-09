@@ -21,8 +21,6 @@ export async function updateMeta(
       text = `${layout},${darkBackground}`;
     } else text = formData.get("text") as string;
 
-    console.log(text);
-    console.log(label);
     const meta = await prisma.meta.findUnique({
       where: { label },
     });

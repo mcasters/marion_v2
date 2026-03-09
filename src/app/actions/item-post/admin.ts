@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { AdminCategory, AdminPost, AdminWork, Type } from "@/lib/type";
+import {
+  AdminCategory,
+  AdminPost,
+  AdminWork,
+  FileInfo,
+  Type,
+} from "@/lib/type";
 import prisma from "@/lib/prisma.ts";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client.ts";
 import { deleteFile, getDir } from "@/lib/utils/serverUtils.ts";
@@ -15,7 +21,6 @@ import {
   createWorkObjectFromSculpture,
   saveFiles,
 } from "@/app/actions/item-post/utils.ts";
-import { getEmptyPost } from "@/lib/utils/commonUtils.ts";
 
 export async function createItem(formData: FormData) {
   const type = formData.get("type") as
@@ -87,89 +92,90 @@ export async function updateItem(formData: FormData) {
     | Type.DRAWING
     | Type.POST;
   const title = formData.get("title") as string;
-  const filenamesToDelete = formData.get("filenamesToDelete") as string;
-  const dir = getDir(type);
+  const isChangingCategory = !!formData.get("oldCategoryId");
 
   try {
-    if (filenamesToDelete && filenamesToDelete !== "") {
-      for await (const filename of filenamesToDelete.split(",")) {
-        deleteFile(dir, filename);
-
-        if (type === Type.SCULPTURE)
-          await prisma.sculptureImage.delete({
-            where: { filename },
-          });
-        if (type === Type.POST)
-          await prisma.postImage.delete({
-            where: { filename },
-          });
-      }
-    }
-    const fileInfos = await saveFiles(formData, type, dir);
+    const fileInfos = await handleAddAndRemoveImages(type, formData);
 
     switch (type) {
       case Type.PAINTING: {
         const existingItem = await prisma.painting.findFirst({
           where: { title },
         });
-        if (existingItem && existingItem.id !== id)
-          return {
-            message: `Erreur : le titre "${title}" existe déjà`,
-            isError: true,
-          };
-        const data = await createPaintingData(formData, fileInfos);
-        await prisma.painting.update({
-          where: { id },
-          data,
-        });
+        if (existingItem) {
+          if (existingItem.id !== id)
+            return {
+              message: `Erreur : le titre "${title}" existe déjà`,
+              isError: true,
+            };
+          const data = await createPaintingData(formData, fileInfos);
+          await prisma.painting.update({
+            where: { id },
+            data,
+          });
+          if (isChangingCategory)
+            await handleImagesInCategory(existingItem.imageFilename);
+        }
         break;
       }
       case Type.SCULPTURE: {
         const existingItem = await prisma.sculpture.findFirst({
           where: { title },
+          include: { images: true },
         });
-        if (existingItem && existingItem.id !== id)
-          return {
-            message: `Erreur : le titre "${title}" existe déjà`,
-            isError: true,
-          };
-        const data = await createSculptureData(formData, fileInfos);
-        await prisma.sculpture.update({
-          where: { id },
-          data,
-        });
+        if (existingItem) {
+          if (existingItem.id !== id)
+            return {
+              message: `Erreur : le titre "${title}" existe déjà`,
+              isError: true,
+            };
+          const data = await createSculptureData(formData, fileInfos);
+          await prisma.sculpture.update({
+            where: { id },
+            data,
+          });
+          if (isChangingCategory)
+            for await (const image of existingItem.images)
+              await handleImagesInCategory(image.filename);
+        }
         break;
       }
       case Type.DRAWING: {
         const existingItem = await prisma.drawing.findFirst({
           where: { title },
         });
-        if (existingItem && existingItem.id !== id)
-          return {
-            message: `Erreur : le titre "${title}" existe déjà`,
-            isError: true,
-          };
-        const data = await createPaintingData(formData, fileInfos);
-        await prisma.drawing.update({
-          where: { id },
-          data,
-        });
+        if (existingItem) {
+          if (existingItem.id !== id)
+            return {
+              message: `Erreur : le titre "${title}" existe déjà`,
+              isError: true,
+            };
+          const data = await createPaintingData(formData, fileInfos);
+          await prisma.drawing.update({
+            where: { id },
+            data,
+          });
+          if (isChangingCategory)
+            await handleImagesInCategory(existingItem.imageFilename);
+        }
         break;
       }
       case Type.POST: {
         const existingItem = await prisma.post.findFirst({
           where: { title },
         });
-        if (existingItem && existingItem.id !== id)
-          return {
-            message: `Erreur : le titre "${title}" existe déjà`,
-            isError: true,
-          };
-        const data = await createPostData(formData, fileInfos);
-        await prisma.post.update({
-          where: { id },
-          data,
-        });
+        if (existingItem) {
+          if (existingItem.id !== id)
+            return {
+              message: `Erreur : le titre "${title}" existe déjà`,
+              isError: true,
+            };
+          const data = await createPostData(formData, fileInfos);
+          await prisma.post.update({
+            where: { id },
+            data,
+          });
+        }
         break;
       }
     }
@@ -178,7 +184,7 @@ export async function updateItem(formData: FormData) {
     revalidatePath(`/${type}s`);
     return { message: "Item modifié", isError: false };
   } catch (e) {
-    return { message: `Erreur à l'enregistrement`, isError: true };
+    return { message: `Erreur à l'enregistrement : ${e}`, isError: true };
   }
 }
 
@@ -211,9 +217,6 @@ export async function deleteItem(
           item.images.forEach((image) =>
             filenamesToDelete.push(image.filename),
           );
-          await prisma.sculptureImage.deleteMany({
-            where: { sculptureId: id },
-          });
           await prisma.sculpture.delete({ where: { id } });
         }
         break;
@@ -239,17 +242,12 @@ export async function deleteItem(
           item.images.forEach((image) =>
             filenamesToDelete.push(image.filename),
           );
-          await prisma.postImage.deleteMany({ where: { postId: id } });
           await prisma.post.delete({ where: { id } });
         }
         break;
       }
     }
-
-    filenamesToDelete.forEach((filename) => {
-      deleteFile(getDir(type), filename);
-      if (type !== Type.POST) deleteImagesInCategory(filename);
-    });
+    await handleAddAndRemoveImages(type, undefined, filenamesToDelete);
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
@@ -265,13 +263,12 @@ export const getAdminPosts = async (): Promise<AdminPost[]> => {
     orderBy: { title: "desc" },
   });
 
-  const posts: AdminPost[] = dbData.map((data) => {
+  return dbData.map((data) => {
     return {
       ...createPostObject(data),
       modifiable: true,
     };
   });
-  return posts.length === 0 ? [{ ...getEmptyPost() }] : posts;
 };
 
 export const getAdminCategories = async (
@@ -286,7 +283,7 @@ export const getAdminCategories = async (
         orderBy: { value: "desc" },
       });
       items = await prisma.painting.findMany();
-      return createAdminCategoryObjects(dbData, items);
+      return createAdminCategoryObjects(dbData, items, type);
     }
     case Type.SCULPTURE: {
       dbData = await prisma.sculptureCategory.findMany({
@@ -294,7 +291,7 @@ export const getAdminCategories = async (
         orderBy: { value: "desc" },
       });
       items = await prisma.sculpture.findMany({ include: { images: true } });
-      return createAdminCategoryObjects(dbData, items);
+      return createAdminCategoryObjects(dbData, items, type);
     }
     case Type.DRAWING: {
       dbData = await prisma.drawingCategory.findMany({
@@ -302,7 +299,7 @@ export const getAdminCategories = async (
         orderBy: { value: "desc" },
       });
       items = await prisma.drawing.findMany();
-      return createAdminCategoryObjects(dbData, items);
+      return createAdminCategoryObjects(dbData, items, type);
     }
   }
 };
@@ -350,19 +347,45 @@ export const getAdminWorks = async (
   }
 };
 
-const deleteImagesInCategory = async (filename: string) => {
-  const categoryContent = await prisma.categoryContent.findFirst({
-    where: {
-      imageFilename: filename,
+const handleAddAndRemoveImages = async (
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING | Type.POST,
+  formData?: FormData,
+  filenamesToDelete?: string[],
+): Promise<FileInfo[] | null> => {
+  const dir = getDir(type);
+  let _filenamesToDelete = filenamesToDelete ? filenamesToDelete : [];
+
+  if (formData) {
+    const files = formData.get("filenamesToDelete") as string;
+    if (files !== "") _filenamesToDelete = files.split(",");
+  }
+
+  for await (const filename of _filenamesToDelete) {
+    deleteFile(getDir(type), filename);
+
+    if (type === Type.POST) {
+      await prisma.postImage.delete({
+        where: { filename },
+      });
+    } else {
+      await handleImagesInCategory(filename);
+      if (type === Type.SCULPTURE) {
+        await prisma.sculptureImage.delete({
+          where: { filename },
+        });
+      }
+    }
+  }
+  return formData ? await saveFiles(formData, type, dir) : null;
+};
+
+const handleImagesInCategory = async (filename: string) => {
+  await prisma.categoryContent.updateMany({
+    where: { imageFilename: filename },
+    data: {
+      imageFilename: "",
+      imageWidth: 0,
+      imageHeight: 0,
     },
   });
-  if (categoryContent)
-    await prisma.categoryContent.update({
-      where: { id: categoryContent.id },
-      data: {
-        imageFilename: "",
-        imageWidth: 0,
-        imageHeight: 0,
-      },
-    });
 };

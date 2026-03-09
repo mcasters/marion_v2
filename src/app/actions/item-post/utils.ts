@@ -1,4 +1,12 @@
-import { AdminCategory, Category, Image, Post, Type, Work } from "@/lib/type";
+import {
+  AdminCategory,
+  Category,
+  FileInfo,
+  Image,
+  Post,
+  Type,
+  Work,
+} from "@/lib/type";
 import { resizeAndSaveImage } from "@/lib/utils/serverUtils";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client";
 import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
@@ -8,8 +16,8 @@ export const createPaintingData = async (
   fileInfos: FileInfo[] | null,
 ) => {
   const rawFormData = Object.fromEntries(formData);
-  const id = Number(formData.get("categoryId"));
-  const oldId = Number(formData.get("oldCategoryId"));
+  const categoryId = Number(formData.get("categoryId"));
+  const oldCategoryId = Number(formData.get("oldCategoryId"));
 
   return {
     title: rawFormData.title as string,
@@ -24,16 +32,16 @@ export const createPaintingData = async (
     isOut: rawFormData.isOut === "on",
     outInformation: rawFormData.outInformation as string,
     category:
-      id !== 0
+      categoryId !== 0
         ? {
             connect: {
-              id,
+              id: categoryId,
             },
           }
-        : oldId
+        : oldCategoryId
           ? {
               disconnect: {
-                id: oldId,
+                id: oldCategoryId,
               },
             }
           : {},
@@ -105,13 +113,6 @@ export const createPostData = async (
   };
 };
 
-type FileInfo = {
-  filename: string;
-  width: number;
-  height: number;
-  isMain: boolean;
-};
-
 export const createCategoryData = (formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
   const value = rawFormData.value as string;
@@ -171,24 +172,6 @@ export const saveFiles = async (
   return tab.length > 0 ? tab : null;
 };
 
-const getCategory = (formData: FormData) => {
-  const id = Number(formData.get("categoryId"));
-  const oldId = Number(formData.get("oldCategoryId"));
-
-  return id !== 0
-    ? {
-        connect: {
-          id,
-        },
-      }
-    : oldId
-      ? {
-          disconnect: {
-            id: oldId,
-          },
-        }
-      : {};
-};
 export const createWorkObject = (
   data: Painting | Drawing,
   type: Type.PAINTING | Type.DRAWING,
@@ -326,6 +309,7 @@ export const createAdminCategoryObjects = (
     | Prisma.SculptureGetPayload<{
         include: { images: true };
       }>[],
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
 ): AdminCategory[] => {
   const map = new Map();
 
@@ -333,7 +317,7 @@ export const createAdminCategoryObjects = (
     map.set(category.id, {
       ...createCategoryObject(category),
       type: Type.CATEGORY,
-      workType: items[0].type,
+      workType: type,
       images: [],
       count: 0,
       modifiable: true,
@@ -342,16 +326,16 @@ export const createAdminCategoryObjects = (
   map.set(0, {
     ...getNoCategory(),
     type: Type.CATEGORY,
-    workType: items[0].type,
+    workType: type,
     images: [],
     count: 0,
     modifiable: false,
   });
   items.forEach((item) => {
-    if (item.id === 0) return [...map.values()];
-    const category =
-      item.categoryId === null ? map.get(0) : map.get(item.categoryId);
-    category.images.concat(
+    const categoryId = item.categoryId === null ? 0 : item.categoryId;
+    const category = map.get(categoryId);
+    category.count += 1;
+    category.images = category.images.concat(
       "images" in item
         ? item.images
         : [
@@ -363,7 +347,8 @@ export const createAdminCategoryObjects = (
             },
           ],
     );
-    category.count += 1;
+    map.set(categoryId, category);
   });
+  if (map.get(0).count === 0) map.delete(0);
   return [...map.values()];
 };

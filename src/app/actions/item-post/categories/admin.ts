@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 "use server";
 
 import { Type } from "@/lib/type";
@@ -7,10 +5,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma.ts";
 import { createCategoryData } from "@/app/actions/item-post/utils.ts";
 
-export async function createCategory(
-  prevState: { message: string; isError: boolean } | null,
-  formData: FormData,
-) {
+export async function createCategory(formData: FormData) {
   const type = formData.get("type") as Type;
   const value = formData.get("value") as string;
   const data = createCategoryData(formData);
@@ -58,10 +53,7 @@ export async function createCategory(
   }
 }
 
-export async function updateCategory(
-  prevState: { message: string; isError: boolean } | null,
-  formData: FormData,
-) {
+export async function updateCategory(formData: FormData) {
   const type = formData.get("type") as Type;
   const id = Number(formData.get("id"));
   const data = createCategoryData(formData);
@@ -69,19 +61,19 @@ export async function updateCategory(
   try {
     if (type === Type.PAINTING) {
       await prisma.paintingCategory.update({
-        where: { key: id },
+        where: { id },
         data,
       });
     }
     if (type === Type.SCULPTURE) {
       await prisma.sculptureCategory.update({
-        where: { key: id },
+        where: { id },
         data,
       });
     }
     if (type === Type.DRAWING) {
       await prisma.drawingCategory.update({
-        where: { key: id },
+        where: { id },
         data,
       });
     }
@@ -128,6 +120,6 @@ export async function deleteCategory(
     revalidatePath(`/${type}s`);
     return { message: "Catégorie supprimée", isError: false };
   } catch (e) {
-    return { message: "Erreur à la suppression", isError: true };
+    return { message: `Erreur à la suppression : ${e}`, isError: true };
   }
 }
