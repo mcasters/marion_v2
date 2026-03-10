@@ -1,19 +1,21 @@
 import React from "react";
 
-export default function ArrowPrev() {
+interface Props {
+  width: number;
+  height: number;
+}
+
+export default function ArrowPrev({ width, height }: Props) {
   return (
     <svg
-      width="24px"
-      height="24px"
-      viewBox="0 0 24 24"
+      width={width}
+      height={height}
+      viewBox="-19.04 0 75.803 75.803"
       xmlns="http://www.w3.org/2000/svg"
       className="icon"
-      aria-hidden="true"
-      focusable="false"
     >
-      <g fill="currentColor">
-        <path d="M0 0h24v24H0z" fill="none"></path>
-        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
+      <g transform="translate(-624.082 -383.588)">
+        <path d="M660.313,383.588a1.5,1.5,0,0,1,1.06,2.561l-33.556,33.56a2.528,2.528,0,0,0,0,3.564l33.556,33.558a1.5,1.5,0,0,1-2.121,2.121L625.7,425.394a5.527,5.527,0,0,1,0-7.807l33.556-33.559A1.5,1.5,0,0,1,660.313,383.588Z" />
       </g>
     </svg>
   );

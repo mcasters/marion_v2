@@ -97,22 +97,27 @@ export default function Layout({ introduction, children }: Props) {
         .iconButton {
           color: ${theme[themePage].main.link};
         }
+
         .icon {
           fill: ${theme[themePage].main.link};
         }
+
         a:hover,
         .buttonLink:hover,
         .iconButton:hover {
           color: ${theme[themePage].main.linkHover};
         }
+
         .icon:hover {
           fill: ${theme[themePage].main.linkHover};
         }
+
         .selected,
         ::selection {
           background: ${theme[themePage].menu2.link};
           color: antiquewhite;
         }
+
         .selected .icon {
           fill: antiquewhite;
         }

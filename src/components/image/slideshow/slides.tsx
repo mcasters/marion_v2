@@ -30,18 +30,21 @@ export default function Slides({ photos, isSmall, isPlainHomeLayout }: Props) {
 
   const onNext = () => setActive((active) => (active + 1) % photos.length);
 
-  return photos.map((photo, index) => (
-    <div key={index}>
-      <Image
-        alt={photo.alt}
-        src={photo.src}
-        width={photo.width}
-        height={photo.height}
-        className={`${isPlainHomeLayout ? s.plainSlide : s.slide} ${active === index ? s.active : ""}`}
-        loading="eager"
-        priority={index < 1}
-        unoptimized
-      />
+  return (
+    <div className={s.slideContainer}>
+      {photos.map((photo, index) => (
+        <Image
+          key={photo.src}
+          alt={photo.alt}
+          src={photo.src}
+          width={photo.width}
+          height={photo.height}
+          className={`${isPlainHomeLayout ? s.plainSlide : s.slide} ${active === index ? s.active : ""}`}
+          loading="eager"
+          priority={index < 1}
+          unoptimized
+        />
+      ))}
       {!isSmall && photos.length > 1 && (
         <>
           <button
@@ -50,7 +53,7 @@ export default function Slides({ photos, isSmall, isPlainHomeLayout }: Props) {
             aria-label="Image précédente"
             title="Image précédente"
           >
-            <ArrowPrev />
+            <ArrowPrev width={60} height={60} />
           </button>
           <button
             className={`${s.next} iconButton`}
@@ -58,10 +61,10 @@ export default function Slides({ photos, isSmall, isPlainHomeLayout }: Props) {
             aria-label="Image suivante"
             title="Image suivante"
           >
-            <ArrowNext />
+            <ArrowNext width={60} height={60} />
           </button>
         </>
       )}
     </div>
-  ));
+  );
 }

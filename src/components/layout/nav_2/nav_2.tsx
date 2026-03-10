@@ -60,12 +60,15 @@ export default function Nav_2({ fixed, themePage }: Props) {
         .nav2 a {
           color: ${theme[themePage].menu2.link};
         }
+
         .nav2 a:hover {
           color: ${theme[themePage].menu2.linkHover};
         }
+
         .homeIcon {
           fill: ${theme[themePage].menu1.link};
         }
+
         .homeIcon:hover {
           fill: ${theme[themePage].menu1.linkHover};
         }
