@@ -13,7 +13,7 @@ export default function CancelButton({
   onCancel,
   text,
   classname,
-  disabled,
+  disabled = false,
 }: Props) {
   return (
     <button
@@ -22,7 +22,10 @@ export default function CancelButton({
         onCancel();
       }}
       className={`${classname ? classname : ""} adminButton`}
-      disabled={disabled ? disabled : false}
+      disabled={disabled}
+      style={{
+        cursor: disabled ? "unset" : "pointer",
+      }}
     >
       {text ? text : "Annuler"}
     </button>

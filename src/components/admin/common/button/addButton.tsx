@@ -13,14 +13,7 @@ export default function AddButton({ renderForm }: Props) {
 
   return (
     <>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          toggle();
-        }}
-        className={`${s.addButton} adminButton`}
-        aria-label={"Ajout"}
-      >
+      <button onClick={toggle} className={`${s.addButton} adminButton`}>
         Ajouter
       </button>
       <Modal isOpen={isOpen} title={`Ajout`}>

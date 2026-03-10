@@ -31,15 +31,19 @@ export default function ImagesForm({
   isMain = false,
 }: Props) {
   const alert = useAlert();
-  const [resizedFiles, setResizedFiles] = useState<File[]>([]);
-  const [reset, setReset] = useState<number>(0);
+  const [files, setFiles] = useState<File[]>([]);
+  const [resetInput, setResetInput] = useState<number>(0);
 
   const submit = async (formData: FormData) => {
-    resizedFiles.forEach((file) => formData.append("files", file));
+    files.forEach((file) => formData.append("files", file));
     const { message, isError } = await updateImageContent(formData);
     alert(message, isError);
-    setResizedFiles([]);
-    setReset((prevState) => prevState + 1);
+    reset();
+  };
+
+  const reset = () => {
+    setFiles([]);
+    setResetInput(resetInput + 1);
   };
 
   return (
@@ -54,16 +58,14 @@ export default function ImagesForm({
         <input type="hidden" name="label" value={label} />
         <input type="hidden" name="isMain" value={isMain?.toString()} />
         <ImageInput
-          key={reset}
+          key={resetInput}
           isMultiple={isMultiple}
           acceptSmallImage={acceptSmallImage}
-          onNewFiles={setResizedFiles}
+          onNewFiles={setFiles}
         />
         <div className={s.buttonSection}>
-          <SubmitButton />
-          <CancelButton
-            onCancel={() => setReset((prevState) => prevState + 1)}
-          />
+          <SubmitButton disabled={files.length === 0} />
+          <CancelButton onCancel={reset} disabled={files.length === 0} />
         </div>
       </form>
     </>

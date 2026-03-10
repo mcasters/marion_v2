@@ -9,8 +9,12 @@ export type DeleteButtonProps = {
     message: string;
     isError: boolean;
   }>;
+  disabled?: boolean;
 };
-export default function DeleteButton({ action }: DeleteButtonProps) {
+export default function DeleteButton({
+  action,
+  disabled = false,
+}: DeleteButtonProps) {
   const alert = useAlert();
 
   return (
@@ -19,7 +23,7 @@ export default function DeleteButton({ action }: DeleteButtonProps) {
         action
           ? async (e) => {
               e.preventDefault();
-              if (confirm("Sûr de vouloir supprimé ?")) {
+              if (confirm("Sûr de vouloir supprimer ?")) {
                 const res = await action();
                 alert(res.message, res.isError);
               }
@@ -27,8 +31,11 @@ export default function DeleteButton({ action }: DeleteButtonProps) {
           : undefined
       }
       className="iconButton"
-      aria-label="Supprimer"
-      disabled={!action}
+      title={`${disabled ? "Ne peut pas être supprimé" : "supprimer"}`}
+      disabled={disabled}
+      style={{
+        cursor: disabled ? "unset" : "pointer",
+      }}
     >
       <DeleteIcon />
     </button>

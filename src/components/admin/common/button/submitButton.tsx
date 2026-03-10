@@ -8,12 +8,19 @@ interface Props {
   classname?: string;
 }
 
-export default function SubmitButton({ disabled, text, classname }: Props) {
+export default function SubmitButton({
+  disabled = false,
+  text,
+  classname,
+}: Props) {
   return (
     <button
-      disabled={disabled ? disabled : false}
-      type="submit"
       className={`${classname ? classname : ""} adminButton`}
+      type="submit"
+      disabled={disabled}
+      style={{
+        cursor: disabled ? "unset" : "pointer",
+      }}
     >
       {text ? text : "Enregistrer"}
     </button>

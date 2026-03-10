@@ -57,7 +57,9 @@ export default function SelectableList<T extends Admin>({
                   item.modifiable ? setEditedItem(item) : undefined
                 }
                 title={
-                  item.modifiable ? "Modifier" : "Ne peut pas être modifié"
+                  item.modifiable
+                    ? "Double-click pour modifier"
+                    : "Ne peut pas être modifié"
                 }
                 role={item.modifiable ? "button" : undefined}
                 onClick={() => setSelectedIndex(i)}
