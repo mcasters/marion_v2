@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import { useAlert } from "@/app/context/alertProvider";
-import {
-  deleteImageContent,
-  updateImageContent,
-} from "@/app/actions/contents/admin";
+import { updateImageContent } from "@/app/actions/contents/admin";
 import s from "@/components/admin/admin.module.css";
 import { Image, Label } from "@/lib/type";
 import Preview from "@/components/admin/common/image/preview.tsx";
@@ -31,41 +28,75 @@ export default function ImagesForm({
   isMain = false,
 }: Props) {
   const alert = useAlert();
-  const [files, setFiles] = useState<File[]>([]);
+  const [workImages, setWorkImages] = useState<Image[]>(images);
+  const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
+  const [filesToAdd, setFilesToAdd] = useState<File[]>([]);
   const [resetInput, setResetInput] = useState<number>(0);
 
-  const submit = async (formData: FormData) => {
-    files.forEach((file) => formData.append("files", file));
-    const { message, isError } = await updateImageContent(formData);
-    alert(message, isError);
-    reset();
-  };
+  useEffect(() => {
+    setWorkImages(images);
+  }, [images]);
 
   const reset = () => {
-    setFiles([]);
+    setFilesToAdd([]);
+    setFilenamesToDelete([]);
     setResetInput(resetInput + 1);
+  };
+
+  const handleAddFiles = (files: File[]) => {
+    setFilesToAdd((prevState) =>
+      isMultiple ? [...prevState, ...files] : files,
+    );
+    if (!isMultiple) setWorkImages([]);
+  };
+
+  const handleDeleteFile = (filename: string) => {
+    const images = workImages.filter((i: Image) => i.filename !== filename);
+    setWorkImages(images);
+    setFilenamesToDelete([...filenamesToDelete, filename]);
+  };
+
+  const submit = async (formData: FormData) => {
+    filesToAdd.forEach((file) => formData.append("files", file));
+    const { message, isError } = await updateImageContent(formData);
+    reset();
+    alert(message, isError);
   };
 
   return (
     <>
       <label className={s.label}>{title}</label>
       <Preview
-        filenames={images.map((i) => i.filename)}
+        filenames={workImages.map((i) => i.filename)}
         pathImage="/images/miscellaneous"
-        deleteAction={(filename) => deleteImageContent(filename)}
+        onDelete={handleDeleteFile}
+        emptyInfo="Aucune image"
       />
       <form action={submit}>
         <input type="hidden" name="label" value={label} />
         <input type="hidden" name="isMain" value={isMain?.toString()} />
+        <input
+          name="filenamesToDelete"
+          type="hidden"
+          value={filenamesToDelete}
+        />
         <ImageInput
           key={resetInput}
           isMultiple={isMultiple}
-          acceptSmallImage={acceptSmallImage}
-          onNewFiles={setFiles}
+          smallImageOption={acceptSmallImage}
+          onNewFiles={handleAddFiles}
         />
         <div className={s.buttonSection}>
-          <SubmitButton disabled={files.length === 0} />
-          <CancelButton onCancel={reset} disabled={files.length === 0} />
+          <SubmitButton
+            disabled={filesToAdd.length === 0 && filenamesToDelete.length === 0}
+          />
+          <CancelButton
+            onCancel={() => {
+              reset();
+              setWorkImages(images);
+            }}
+            disabled={filesToAdd.length === 0 && filenamesToDelete.length === 0}
+          />
         </div>
       </form>
     </>

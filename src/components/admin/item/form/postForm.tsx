@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AdminPost, Image, Post, Type } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
 import { useAlert } from "@/app/context/alertProvider.tsx";
@@ -24,19 +24,10 @@ export default function PostForm({ post, onClose }: Props) {
     new Date(post.date).getFullYear().toString(),
   );
   const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
-  const [resizedMainFiles, setResizedMainFiles] = useState<File[]>([]);
-  const [resizedFiles, setResizedFiles] = useState<File[]>([]);
+  const [newMainFile, setNewMainFile] = useState<File[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
 
-  useEffect(() => {
-    const mainFilename = workPost.images
-      .filter((i: Image) => i.isMain)
-      .map((i: Image) => i.filename)[0];
-    if (mainFilename && resizedMainFiles.length > 0) {
-      handleDelete(mainFilename);
-    }
-  }, [resizedMainFiles]);
-
-  const handleDelete = (filename: string) => {
+  const handleDeleteFile = (filename: string) => {
     const images = workPost.images.filter(
       (i: Image) => i.filename !== filename,
     );
@@ -44,9 +35,19 @@ export default function PostForm({ post, onClose }: Props) {
     setFilenamesToDelete([...filenamesToDelete, filename]);
   };
 
+  const handleNewMainFile = (files: File[]) => {
+    setNewMainFile([files[0]]);
+    const mainFilename = workPost.images
+      .filter((i: Image) => i.isMain)
+      .map((i: Image) => i.filename)[0];
+    if (mainFilename) {
+      handleDeleteFile(mainFilename);
+    }
+  };
+
   const submit = async (formData: FormData) => {
-    formData.append("mainFile", resizedMainFiles[0]);
-    resizedFiles.forEach((file) => formData.append("files", file));
+    formData.append("mainFile", newMainFile[0]);
+    newFiles.forEach((file) => formData.append("files", file));
     const action = isUpdate ? updateItem : createItem;
     const { message, isError } = await action(formData);
     if (!isError) onClose();
@@ -73,7 +74,6 @@ export default function PostForm({ post, onClose }: Props) {
         value={workPost.title}
         required
         placeholder="Titre"
-        autoFocus
       />
       <br />
       <input
@@ -101,26 +101,29 @@ export default function PostForm({ post, onClose }: Props) {
           .filter((i: Image) => i.isMain)
           .map((i: Image) => i.filename)}
         pathImage={`/images/${Type.POST}`}
-        onDelete={(filename) => handleDelete(filename)}
-        title="Image principale (facultative)"
+        onDelete={(filename) => handleDeleteFile(filename)}
+        title="Image principale - une seule image (facultative)"
       />
       <ImageInput
         isMultiple={false}
-        acceptSmallImage={true}
-        onNewFiles={setResizedMainFiles}
+        smallImageOption={true}
+        onNewFiles={handleNewMainFile}
       />
       <Preview
         filenames={workPost.images
           .filter((i: Image) => !i.isMain)
           .map((i: Image) => i.filename)}
         pathImage={`/images/${Type.POST}`}
-        onDelete={(filename) => handleDelete(filename)}
+        onDelete={(filename) => handleDeleteFile(filename)}
         title="Album d'images (facultatif)"
+        style={{ marginTop: "20px" }}
       />
       <ImageInput
         isMultiple={true}
-        acceptSmallImage={true}
-        onNewFiles={setResizedFiles}
+        smallImageOption={true}
+        onNewFiles={(files) =>
+          setNewFiles((prevState) => [...prevState, ...files])
+        }
       />
       <div className={s.buttonSection}>
         <SubmitButton disabled={!workPost.title || !date} />

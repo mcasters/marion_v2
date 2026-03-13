@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import { Category, Image, Type, Work } from "@/lib/type.ts";
 import { useAlert } from "@/app/context/alertProvider.tsx";
@@ -28,18 +28,20 @@ export default function WorkForm({ work, onClose, categories }: Props) {
   const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
 
-  useEffect(() => {
-    if (!isSculpture && workItem.images.length > 0 && newFiles.length > 0) {
-      handleDeleteFile(workItem.images[0].filename);
-    }
-  }, [newFiles]);
-
   const handleDeleteFile = (filename: string) => {
     const images = workItem.images.filter(
       (i: Image) => i.filename !== filename,
     );
     setWorkItem({ ...workItem, images });
     setFilenamesToDelete([...filenamesToDelete, filename]);
+  };
+
+  const handleNewFiles = (files: File[]) => {
+    setNewFiles((prevState) =>
+      isSculpture ? [...prevState, ...files] : files,
+    );
+    if (!isSculpture && workItem.images.length !== 0)
+      handleDeleteFile(workItem.images[0].filename);
   };
 
   const submit = async (formData: FormData) => {
@@ -80,7 +82,6 @@ export default function WorkForm({ work, onClose, categories }: Props) {
             onChange={(e) =>
               setWorkItem({ ...workItem, title: e.target.value })
             }
-            autoFocus
             required
           />
           <input
@@ -266,25 +267,22 @@ export default function WorkForm({ work, onClose, categories }: Props) {
         filenames={workItem.images.map((i: Image) => i.filename)}
         pathImage={`/images/${work.type}`}
         onDelete={handleDeleteFile}
-        title={isSculpture ? "Une photo minimum :" : "Une seule photo :"}
+        emptyInfo={
+          newFiles.length === 0 && workItem.images.length === 0
+            ? isSculpture
+              ? "Une photo minimum à ajouter"
+              : "1 photo à ajouter"
+            : ""
+        }
       />
       <ImageInput
         isMultiple={isSculpture}
-        acceptSmallImage={true}
-        onNewFiles={setNewFiles}
+        smallImageOption={true}
+        onNewFiles={handleNewFiles}
+        required
       />
       <div className={s.buttonSection}>
-        <SubmitButton
-          disabled={
-            workItem.title === "" ||
-            workItem.technique === "" ||
-            date === "" ||
-            workItem.height === 0 ||
-            workItem.width === 0 ||
-            (isSculpture && workItem.length === 0) ||
-            (newFiles.length === 0 && workItem.images.length === 0)
-          }
-        />
+        <SubmitButton />
         <CancelButton onCancel={onClose} />
       </div>
     </form>

@@ -1,31 +1,32 @@
 "use client";
 
-import React, { Fragment } from "react";
+import React, { Fragment, HTMLProps, JSX } from "react";
 import DeleteIcon from "@/components/icons/deleteIcon";
-import s from "@/components/admin/admin.module.css";
-import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
+import s from "./image.module.css";
 import Image from "next/image";
 
-interface Props {
+interface Props extends HTMLProps<HTMLDivElement> {
   filenames: string[];
   pathImage: string;
   onDelete?: (filename: string) => void;
-  deleteAction?: (
-    filename: string,
-  ) => Promise<{ isError: boolean; message: string }>;
   title?: string;
+  emptyInfo?: string;
 }
 
 export default function Preview({
   filenames,
   pathImage,
   onDelete,
-  deleteAction,
   title,
-}: Props) {
+  style,
+  emptyInfo = "",
+}: Props): JSX.Element {
   return (
-    <div className={s.previewContainer}>
+    <div className={s.previewContainer} style={{ ...style }}>
       {title && <label>{title}</label>}
+      {filenames.length === 0 && (
+        <span className={s.emptyInfo}>{emptyInfo}</span>
+      )}
       {filenames.map((filename) => (
         <Fragment key={filename}>
           <div className={s.imageWrapper}>
@@ -39,20 +40,12 @@ export default function Preview({
             />
             {onDelete && (
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (onDelete) {
-                    onDelete(filename);
-                  }
-                }}
+                onClick={() => onDelete(filename)}
                 className="iconButton"
                 aria-label="Supprimer"
               >
                 <DeleteIcon />
               </button>
-            )}
-            {deleteAction && (
-              <DeleteButton action={() => deleteAction(filename)} />
             )}
           </div>
         </Fragment>
