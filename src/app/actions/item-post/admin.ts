@@ -10,7 +10,11 @@ import {
 } from "@/lib/type";
 import prisma from "@/lib/prisma.ts";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client.ts";
-import { deleteFile, getDir } from "@/lib/utils/serverUtils.ts";
+import {
+  deleteFile,
+  getDir,
+  resizeAndSaveImage,
+} from "@/lib/utils/serverUtils.ts";
 import {
   createAdminCategoryObjects,
   createPaintingData,
@@ -19,7 +23,6 @@ import {
   createSculptureData,
   createWorkObject,
   createWorkObjectFromSculpture,
-  saveFiles,
 } from "@/app/actions/item-post/utils.ts";
 
 export async function createItem(formData: FormData) {
@@ -31,7 +34,7 @@ export async function createItem(formData: FormData) {
   const title = formData.get("title") as string;
 
   try {
-    const fileInfos = await saveFiles(formData, type, getDir(type));
+    const fileInfos = await handleAddAndRemoveImages(type, formData);
 
     switch (type) {
       case Type.PAINTING: {
@@ -352,8 +355,7 @@ const handleAddAndRemoveImages = async (
   formData?: FormData,
   filenamesToDelete?: string[],
 ): Promise<FileInfo[] | null> => {
-  const dir = getDir(type);
-  let _filenamesToDelete = filenamesToDelete ? filenamesToDelete : [];
+  let _filenamesToDelete = filenamesToDelete ?? [];
 
   if (formData) {
     const files = formData.get("filenamesToDelete") as string;
@@ -376,7 +378,39 @@ const handleAddAndRemoveImages = async (
       }
     }
   }
-  return formData ? await saveFiles(formData, type, dir) : null;
+  return formData ? await saveFiles(formData, type, getDir(type)) : null;
+};
+
+const saveFiles = async (
+  formData: FormData,
+  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING | Type.POST,
+  dir: string,
+): Promise<FileInfo[] | null> => {
+  const tab: FileInfo[] = [];
+  const title = formData.get("title") as string;
+  const mainFile = formData.get("mainFile") as File;
+  const files = formData.getAll("files") as File[];
+
+  if (type === Type.POST && mainFile && mainFile.size > 0)
+    tab.push(<FileInfo>await resizeAndSaveImage(mainFile, title, dir, true));
+
+  if (files.length > 0) {
+    for await (const file of files) {
+      if (file.size > 0) {
+        tab.push(
+          <FileInfo>(
+            await resizeAndSaveImage(
+              file,
+              title,
+              dir,
+              type === Type.POST && files.length === 1,
+            )
+          ),
+        );
+      }
+    }
+  }
+  return tab.length > 0 ? tab : null;
 };
 
 const handleImagesInCategory = async (filename: string) => {

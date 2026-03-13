@@ -7,7 +7,6 @@ import {
   Type,
   Work,
 } from "@/lib/type";
-import { resizeAndSaveImage } from "@/lib/utils/serverUtils";
 import { Drawing, Painting, Prisma } from "@@/prisma/generated/client";
 import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
 
@@ -138,38 +137,6 @@ export const createCategoryData = (formData: FormData) => {
     value,
     content,
   };
-};
-
-export const saveFiles = async (
-  formData: FormData,
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING | Type.POST,
-  dir: string,
-): Promise<FileInfo[] | null> => {
-  const tab: FileInfo[] = [];
-  const title = formData.get("title") as string;
-  const mainFile = formData.get("mainFile") as File;
-  const files = formData.getAll("files") as File[];
-
-  if (type === Type.POST && mainFile && mainFile.size > 0)
-    tab.push(<FileInfo>await resizeAndSaveImage(mainFile, title, dir, true));
-
-  if (files.length > 0) {
-    for await (const file of files) {
-      if (file.size > 0) {
-        tab.push(
-          <FileInfo>(
-            await resizeAndSaveImage(
-              file,
-              title,
-              dir,
-              type === Type.POST && files.length === 1,
-            )
-          ),
-        );
-      }
-    }
-  }
-  return tab.length > 0 ? tab : null;
 };
 
 export const createWorkObject = (
