@@ -18,8 +18,11 @@ export default function SubmitButton({
       className={`${classname ? classname : ""} adminButton`}
       type="submit"
       disabled={disabled}
+      autoFocus={!disabled}
       style={{
         cursor: disabled ? "unset" : "pointer",
+        outline: !disabled ? "2px solid #b9b9b9" : undefined,
+        border: !disabled ? "2px solid #fff" : undefined,
       }}
     >
       {text ? text : "Enregistrer"}
