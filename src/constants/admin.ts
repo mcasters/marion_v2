@@ -30,6 +30,18 @@ export const THEME_TARGET_LABEL = {
   linkHover: "Lien pointé*",
 };
 
+export const LABEL = {
+  INTRO: "INTRO",
+  SLIDER: "SLIDER",
+  ADDRESS: "ADDRESS",
+  PHONE: "PHONE",
+  EMAIL: "EMAIL",
+  TEXT_CONTACT: "TEXT_CONTACT",
+  PRESENTATION: "PRESENTATION",
+  DEMARCHE: "DEMARCHE",
+  INSPIRATION: "INSPIRATION",
+} as const;
+
 export const COOKIE_NAME = "adminSession";
 
 export const META = {
@@ -72,7 +84,7 @@ export const META = {
 
   DOCUMENT_TITLE_CONTACT: "documentTitleContact",
   DESCRIPTION_CONTACT: "descriptionContact",
-};
+} as const;
 
 export const SEO: { [key: string]: string } = {
   [META.SEO_SITE_TITLE]: "Titre du site",
@@ -123,4 +135,6 @@ export const MESSAGE = {
     " la fois.",
   error_imageSize:
     "Dimension de l'image trop petite. Largeur minimum : 2000 pixels",
+  error_imageType:
+    "Type de fichier incorrect.\nFichier accepté : jpeg, jpg, png",
 };

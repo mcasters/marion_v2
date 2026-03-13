@@ -1,5 +1,4 @@
 import { getIntroText } from "@/lib/utils/commonUtils";
-import { Label } from "@/lib/type";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
 import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
@@ -10,6 +9,7 @@ import {
 } from "@/lib/utils/imageUtils";
 import HomeLayoutForm from "@/components/admin/home/homeLayoutForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm.tsx";
+import { LABEL } from "@/constants/admin.ts";
 
 export default async function Home() {
   const contents = await getContentsFull();
@@ -21,13 +21,13 @@ export default async function Home() {
       <HomeLayoutForm />
       <div className="separate" />
       <h2 className={s.title2}>{`Texte d'accueil (facultatif)`}</h2>
-      <TextAreaForm textContent={getIntroText(contents)} label={Label.INTRO} />
+      <TextAreaForm textContent={getIntroText(contents)} label={LABEL.INTRO} />
       <div className="separate" />
       <h2 className={s.title2}>{`Images affichées sur écran mobile`}</h2>
       <ImagesForm
         images={getSliderPortraitImages(contents)}
         isMultiple={true}
-        label={Label.SLIDER}
+        label={LABEL.SLIDER}
         acceptSmallImage={false}
         title={`Une ou plusieurs images possible. Format portrait mieux adapté`}
         isMain={true}
@@ -37,7 +37,7 @@ export default async function Home() {
       <ImagesForm
         images={getSliderLandscapeImages(contents)}
         isMultiple={true}
-        label={Label.SLIDER}
+        label={LABEL.SLIDER}
         acceptSmallImage={false}
         title={`Une ou plusieurs images possible. Format paysage ou carré mieux adapté`}
         isMain={false}

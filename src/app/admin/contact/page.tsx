@@ -5,12 +5,12 @@ import {
   getPhone,
 } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
-import { Label } from "@/lib/type";
 import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
 import React from "react";
 import InputForm from "@/components/admin/content/inputForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
 import { updateContent } from "@/app/actions/contents/admin.ts";
+import { LABEL } from "@/constants/admin.ts";
 
 export default async function Contact() {
   const contents = await getContentsFull();
@@ -20,30 +20,30 @@ export default async function Contact() {
       <h1 className={s.title1}>Contenus de la page contact</h1>
       <TextAreaForm
         textContent={getAddress(contents)}
-        label={Label.ADDRESS}
-        textLabel="Adresse"
+        label={LABEL.ADDRESS}
+        title="Adresse"
       />
       <div className="separate" />
       <InputForm
-        dbLabel={Label.PHONE}
-        text={getPhone(contents)}
+        label={LABEL.PHONE}
+        textContent={getPhone(contents)}
         updateAction={updateContent}
-        label="Téléphone"
+        title="Téléphone"
         isPhone
       />
       <div className="separate" />
       <InputForm
-        dbLabel={Label.EMAIL}
-        text={getEmail(contents)}
+        label={LABEL.EMAIL}
+        textContent={getEmail(contents)}
         updateAction={updateContent}
-        label="E-mail"
+        title="E-mail"
         isEmail
       />
       <div className="separate" />
       <TextAreaForm
         textContent={getContactText(contents)}
-        label={Label.TEXT_CONTACT}
-        textLabel="Texte d'accompagnement (facultatif)"
+        label={LABEL.TEXT_CONTACT}
+        title="Texte d'accompagnement (facultatif)"
       />
     </div>
   );

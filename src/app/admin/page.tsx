@@ -30,8 +30,8 @@ export default async function AdminHome() {
       <div className="separate" />
       <h2 className={style.title2}>Pied de page du site</h2>
       <InputForm
-        dbLabel={META.FOOTER}
-        text={metas.get(META.FOOTER) || ""}
+        label={META.FOOTER}
+        textContent={metas.get(META.FOOTER) || ""}
         updateAction={updateMeta}
       />
       <div className="separate" />

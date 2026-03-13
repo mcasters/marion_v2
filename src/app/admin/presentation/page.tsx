@@ -9,7 +9,8 @@ import React from "react";
 import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm";
 import { getContentsFull } from "@/app/actions/contents";
-import { Label } from "@/lib/type.ts";
+
+import { LABEL } from "@/constants/admin.ts";
 
 export default async function Presentation() {
   const contents = await getContentsFull();
@@ -20,27 +21,27 @@ export default async function Presentation() {
       <ImagesForm
         images={getPresentationImage(contents)}
         isMultiple={false}
-        label={Label.PRESENTATION}
+        label={LABEL.PRESENTATION}
         acceptSmallImage={true}
         title="Image de présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         textContent={getPresentation(contents)}
-        label={Label.PRESENTATION}
-        textLabel="Présentation (facultatif)"
+        label={LABEL.PRESENTATION}
+        title="Présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         textContent={getDemarche(contents)}
-        label={Label.DEMARCHE}
-        textLabel="Démarche artistique (facultatif)"
+        label={LABEL.DEMARCHE}
+        title="Démarche artistique (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         textContent={getInspiration(contents)}
-        label={Label.INSPIRATION}
-        textLabel="Inspiration (facultatif)"
+        label={LABEL.INSPIRATION}
+        title="Inspiration (facultatif)"
       />
     </div>
   );
