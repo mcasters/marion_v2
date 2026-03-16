@@ -5,14 +5,16 @@ import DeleteIcon from "@/components/icons/deleteIcon.tsx";
 import { useAlert } from "@/app/context/alertProvider.tsx";
 
 export type DeleteButtonProps = {
-  action?: () => Promise<{
+  onDelete?: () => void;
+  deleteAction?: () => Promise<{
     message: string;
     isError: boolean;
   }>;
   disabled?: boolean;
 };
 export default function DeleteButton({
-  action,
+  onDelete,
+  deleteAction,
   disabled = false,
 }: DeleteButtonProps) {
   const alert = useAlert();
@@ -20,15 +22,22 @@ export default function DeleteButton({
   return (
     <button
       onClick={
-        action
+        deleteAction
           ? async (e) => {
+              e.stopPropagation();
               e.preventDefault();
               if (confirm("Sûr de vouloir supprimer ?")) {
-                const res = await action();
+                const res = await deleteAction();
                 alert(res.message, res.isError);
               }
             }
-          : undefined
+          : onDelete
+            ? (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onDelete();
+              }
+            : undefined
       }
       className="iconButton"
       title={`${disabled ? "Ne peut pas être supprimé" : "supprimer"}`}

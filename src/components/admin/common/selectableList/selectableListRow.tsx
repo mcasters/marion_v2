@@ -47,7 +47,7 @@ export default function SelectableListRow({
         )}
       </span>
       <span className={s.itemIcon}>
-        <DeleteButton action={deleteAction} disabled={!deleteAction} />
+        <DeleteButton onDelete={deleteAction} disabled={!deleteAction} />
       </span>
     </>
   );
