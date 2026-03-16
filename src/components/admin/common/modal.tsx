@@ -17,7 +17,7 @@ export default function Modal({
   isOpen,
   title,
   onClickOutside,
-  width = 730,
+  width = 1000,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null!);
   const [location, setLocation] = useState<{
