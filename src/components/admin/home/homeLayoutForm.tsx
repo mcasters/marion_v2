@@ -23,7 +23,7 @@ export default function HomeLayoutForm() {
       <input type="hidden" name="label" value={"homeLayout"} />
       <input type="hidden" name="text" value={value} />
 
-      <label className={s.layoutLabel}>
+      <p className={s.layoutLabel}>
         <button
           onClick={(e) => setValue(e.currentTarget.value)}
           className={
@@ -41,13 +41,13 @@ export default function HomeLayoutForm() {
             unoptimized
           />
         </button>
-        <p>
+        <span>
           <strong>{`Texte séparé :`}</strong>
           <br />
           {`Le titre du site, les menus, et l'introduction sont situés au dessus de l'image.`}
-        </p>
-      </label>
-      <label className={s.layoutLabel}>
+        </span>
+      </p>
+      <p className={s.layoutLabel}>
         <button
           onClick={(e) => setValue(e.currentTarget.value)}
           className={
@@ -65,12 +65,12 @@ export default function HomeLayoutForm() {
             unoptimized
           />
         </button>
-        <p>
+        <span>
           <strong>{`Texte intégré :`}</strong>
           <br />
           {`Le titre du site, les menus, et l'introduction sont situés sur l'image qui prend tout l'écran. Leur couleur doit alors être accordée avec l'image pour qu'ils restent lisibles : Mettre une seule image est sans doute plus simple.`}
-        </p>
-      </label>
+        </span>
+      </p>
     </form>
   );
 }
