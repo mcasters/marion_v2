@@ -24,7 +24,7 @@ export default function TextAreaForm({ label, textContent, title }: Props) {
   return (
     <form action={action}>
       <input type="hidden" name="label" value={label} />
-      <label>
+      <label className="inputContainer">
         {title}
         <textarea
           name="text"

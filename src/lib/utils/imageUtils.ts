@@ -4,6 +4,7 @@ import {
   PhotoTab,
   PhotoTabEnhanced,
   Post,
+  Thumbnail,
   Type,
   Work,
 } from "@/lib/type.ts";
@@ -217,3 +218,8 @@ export const getSliderPortraitImages = (contents: ContentFull[]): Image[] => {
   const images: Image[] = getSliders(contents);
   return images.filter((i) => i.isMain);
 };
+
+export const getThumbnails = (filenames: string[], path: string): Thumbnail[] =>
+  filenames.map((filename) => {
+    return { filename, path };
+  });

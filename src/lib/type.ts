@@ -197,6 +197,11 @@ export type FileInfo = {
   isMain: boolean;
 };
 
+export type Thumbnail = {
+  filename: string;
+  path: string;
+};
+
 export type Filter = {
   categoryFilter: number;
   yearFilter: number;

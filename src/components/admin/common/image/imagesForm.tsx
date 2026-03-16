@@ -7,7 +7,6 @@ import { useAlert } from "@/app/context/alertProvider";
 import { updateImageContent } from "@/app/actions/contents/admin";
 import s from "@/components/admin/admin.module.css";
 import { Image, Label } from "@/lib/type";
-import Preview from "@/components/admin/common/image/preview.tsx";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
   isMultiple: boolean;
   label: Label;
   acceptSmallImage: boolean;
-  title: string;
+  title?: string;
   isMain?: boolean;
 };
 
@@ -65,13 +64,6 @@ export default function ImagesForm({
 
   return (
     <>
-      <label className={s.label}>{title}</label>
-      <Preview
-        filenames={workImages.map((i) => i.filename)}
-        pathImage="/images/miscellaneous"
-        onDelete={handleDeleteFile}
-        emptyInfo="Aucune image"
-      />
       <form action={submit}>
         <input type="hidden" name="label" value={label} />
         <input type="hidden" name="isMain" value={isMain?.toString()} />
@@ -82,9 +74,13 @@ export default function ImagesForm({
         />
         <ImageInput
           key={resetInput}
+          filenames={workImages.map((i) => i.filename)}
+          pathImage="/images/miscellaneous"
           isMultiple={isMultiple}
           smallImageOption={acceptSmallImage}
           onNewFiles={handleAddFiles}
+          onDelete={handleDeleteFile}
+          title={title}
         />
         <div className={s.buttonSection}>
           <SubmitButton

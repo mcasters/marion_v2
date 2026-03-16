@@ -35,7 +35,7 @@ export default function InputForm({
   return (
     <form action={action}>
       <input type="hidden" name="label" value={label} />
-      <label>
+      <label className="inputContainer">
         {title}
         <input
           placeholder={title}

@@ -14,7 +14,7 @@
   --font-size-nav1: 19px;
   --font-size-nav2: 17px;
   --font-size: 17px;
-  --font-size-min: 15px;
+  --font-size-min: 16px;
 
   /*
    * Layout
@@ -32,13 +32,14 @@
    * Colors
    * ======================================================================== */
 
+  --color-main: #be2d01;
   --color-light: #dcdcdc;
   --color-medium: #c4c3c3;
   --color-dark: #818181;
   --color-xdark: #333;
 
   --link-color-xdark: #8a2101;
-  --link-color-dark: #be2d01;
+  --link-color-dark: var(--color-main);
   --link-color-light: #e57c52;
   --link-color-xlight: #e0bb89;
 
@@ -176,48 +177,40 @@ button,
   cursor: pointer;
 }
 
+.inputContainer {
+  margin: 0 0 1.5em;
+}
+
 input,
 button,
 .button,
 select,
-textarea,
-label, .label {
+textarea {
   font-family: var(--font-family-serif);
   -webkit-font-smoothing: antialiased;
   font-size: var(--font-size-min);
 }
 
-label {
+label, .label {
   display: block;
   text-align: left;
+  -webkit-font-smoothing: antialiased;
   font-family: var(--font-family-serif-caps);
   font-size: 14px;
   letter-spacing: 3px;
+  margin: 10px 0 0;
 }
 
 textarea,
-.labelCheckbox,
-input:not([type="file"], [type="checkbox"]),
+input:not([type="checkbox"], [type="file"]),
 select {
+  display: block;
   width: 100%;
   background-color: white;
   border: 1px solid #d9d9d9;
   border-radius: unset;
   user-select: text;
   padding: 5px;
-  margin: 0 0 1em;
-}
-
-.area {
-  background-color: white;
-  border: 1px solid #d9d9d9;
-}
-
-input,
-.checkboxLabel,
-select {
-  height: 40px;
-  line-height: 40px;
 }
 
 textarea {
@@ -225,9 +218,25 @@ textarea {
   resize: vertical;
 }
 
+input,
+select {
+  height: 40px;
+  line-height: 40px;
+}
+
+.labelCheckbox {
+  height: 40px;
+  line-height: 40px;
+  margin: 10px 0 0;
+}
+
 input[type="checkbox"] {
-  height: unset;
-  margin-right: 8px;
+  margin: 10px 8px 0 0;
+}
+
+.area {
+  background-color: white;
+  border: 1px solid #d9d9d9;
 }
 
 .adminButton {
@@ -240,7 +249,7 @@ input[type="checkbox"] {
 }
 
 .adminButton {
-  margin: 0.5em;
+  margin: 0 0.5em;
   padding: 0.5em;
 }
 

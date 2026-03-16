@@ -15,23 +15,28 @@
 }
 
 .title1 {
-  font-size: 34px;
+  font-size: 36px;
   padding-bottom: 1.2em;
 }
 
 .title2 {
-  font-size: 26px;
+  font-size: 28px;
   padding-bottom: 1em;
 }
 
-.title3 {
-  font-size: 23px;
-  padding-bottom: 10px;
-  text-align: left;
+.title2WithInfo {
+  font-size: 28px;
+  line-height: 1;
 }
 
-.label {
-  padding: 0 0 0.5em;
+.title2WithInfo + p {
+  margin-bottom: 2em;
+}
+
+.title3 {
+  font-size: 22px;
+  padding-bottom: 10px;
+  text-align: left;
 }
 
 .filterContainer {
@@ -54,22 +59,25 @@
   grid-column-gap: 1em;
 }
 
-.dimensions, .checkTextForm {
+.flexPart {
   display: flex;
   flex-wrap: nowrap;
-  column-gap: 10px;
-}
-
-.checkTextForm {
   column-gap: 5px;
 }
 
-.checkTextForm label {
-  min-width: 120px;
+.withMarginTop {
+  margin-top: 20px;
+}
+
+.flexPart label {
+  min-width: 90px;
+}
+
+.flexPart .optionInput {
+  margin-top: 10px;
 }
 
 .buttonSection {
-  margin: 0.5em 0 0;
   text-align: center;
 }
 
@@ -81,10 +89,6 @@
   grid-auto-rows: min-content;
 }
 
-.metaForm label {
-  padding-bottom: 0;
-}
-
 .metaForm input, .metaForm label, .metaForm textarea {
   margin-bottom: 0;
 }
@@ -93,68 +97,6 @@
   align-self: end;
   margin: 0;
 }
-
-/* Image */
-.imageInputContainer {
-  width: 80%;
-  margin: auto;
-}
-
-.dropZone {
-  height: 130px;
-  border: #c2c2c2 5px solid;
-  border-radius: 5px;
-  padding: 5px;
-  text-align: center;
-  color: #c2c2c2;
-  font-family: var(--font-family-serif-caps);
-  font-weight: bold;
-}
-
-.dropZoneOver {
-  border: #858585 7px solid;
-}
-
-.dropZone .inputButton {
-  display: block;
-  margin: auto;
-}
-
-.dropZone input::file-selector-button {
-  font-family: unset;
-  box-shadow: inset 0 0.8em 1em 0 #efefef;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.imageInputContainer label {
-  font-family: unset;
-  letter-spacing: unset;
-}
-
-.previewContainer {
-  text-align: center;
-}
-
-.previewContainer button {
-  margin-bottom: 1em;
-}
-
-.imageWrapper {
-  display: inline-block;
-  text-align: center;
-  padding: 0 2px;
-}
-
-.image {
-  display: block;
-  object-fit: contain;
-  padding: 0 2px;
-  width: auto;
-}
-
-/* End image */
 
 /* SelectImageList */
 
@@ -219,6 +161,7 @@
   align-items: center;
   font-family: unset;
   letter-spacing: unset;
+  font-size: var(--font-size-min);
   padding: 0;
   margin: 0;
 }

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { AdminPost, Image, Post, Type } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
 import { useAlert } from "@/app/context/alertProvider.tsx";
-import Preview from "@/components/admin/common/image/preview.tsx";
 import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
@@ -72,8 +71,8 @@ export default function PostForm({ post, onClose }: Props) {
         name="title"
         type="text"
         value={workPost.title}
-        required
         placeholder="Titre"
+        required
       />
       <br />
       <input
@@ -85,8 +84,8 @@ export default function PostForm({ post, onClose }: Props) {
         min={1980}
         max={2100}
         value={date}
-        required
         placeholder="Date"
+        required
       />
       <br />
       <textarea
@@ -96,37 +95,32 @@ export default function PostForm({ post, onClose }: Props) {
         value={workPost.text}
         placeholder="Texte (facultatif)"
       />
-      <Preview
+      <ImageInput
         filenames={workPost.images
           .filter((i: Image) => i.isMain)
           .map((i: Image) => i.filename)}
         pathImage={`/images/${Type.POST}`}
+        isMultiple={false}
+        smallImageOption={true}
+        onNewFiles={handleNewMainFile}
         onDelete={(filename) => handleDeleteFile(filename)}
         title="Image principale - une seule image (facultative)"
       />
       <ImageInput
-        isMultiple={false}
-        smallImageOption={true}
-        onNewFiles={handleNewMainFile}
-      />
-      <Preview
         filenames={workPost.images
           .filter((i: Image) => !i.isMain)
           .map((i: Image) => i.filename)}
         pathImage={`/images/${Type.POST}`}
-        onDelete={(filename) => handleDeleteFile(filename)}
-        title="Album d'images (facultatif)"
-        style={{ marginTop: "20px" }}
-      />
-      <ImageInput
         isMultiple={true}
         smallImageOption={true}
         onNewFiles={(files) =>
           setNewFiles((prevState) => [...prevState, ...files])
         }
+        onDelete={(filename) => handleDeleteFile(filename)}
+        title="Album d'images (facultatif)"
       />
       <div className={s.buttonSection}>
-        <SubmitButton disabled={!workPost.title || !date} />
+        <SubmitButton />
         <CancelButton onCancel={onClose} />
       </div>
     </form>
