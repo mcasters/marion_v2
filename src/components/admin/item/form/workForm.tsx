@@ -203,7 +203,7 @@ export default function WorkForm({ work, onClose, categories }: Props) {
                 setWorkItem({
                   ...workItem,
                   isToSell,
-                  sold: !isToSell,
+                  sold: isToSell ? false : workItem.sold,
                 });
               }}
             />
@@ -238,7 +238,7 @@ export default function WorkForm({ work, onClose, categories }: Props) {
                 setWorkItem({
                   ...workItem,
                   sold,
-                  isToSell: !sold,
+                  isToSell: sold ? false : workItem.isToSell,
                 });
               }}
             />
