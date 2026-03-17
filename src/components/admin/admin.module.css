@@ -1,11 +1,11 @@
 .adminWrapper {
-  padding: 6em 1em 1em;
+  padding: 0 1em 1em;
 }
 
 /* desktop */
 @media (min-width: 769px) {
   .adminWrapper {
-    padding: 6em 4em 3em;
+    padding: 0 4em 3em;
   }
 
   .container {
@@ -15,17 +15,17 @@
 }
 
 .title1 {
-  font-size: 36px;
+  font-size: var(--font-size-title0);
   padding-bottom: 1.2em;
 }
 
 .title2 {
-  font-size: 28px;
+  font-size: var(--font-size-title2);
   padding-bottom: 1em;
 }
 
 .title2WithInfo {
-  font-size: 28px;
+  font-size: var(--font-size-title2);
   line-height: 1;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .title3 {
-  font-size: 22px;
+  font-size: var(--font-size-title3);
   padding-bottom: 10px;
   text-align: left;
 }
@@ -164,10 +164,4 @@
   font-size: var(--font-size-min);
   padding: 0;
   margin: 0;
-}
-
-/* End Select Layout item */
-
-.addButton {
-  margin-top: 2em;
 }

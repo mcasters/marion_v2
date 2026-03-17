@@ -31,7 +31,7 @@ POST
 }
 
 .postInfo h2 {
-  font-size: var(--font-size-title);
+  font-size: var(--font-size-title1);
 }
 
 .postInfo p {

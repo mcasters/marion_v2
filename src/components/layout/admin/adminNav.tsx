@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ADMIN_MENU } from "@/constants/specific/routes";
-import s from "@/components/admin/adminNav.module.css";
+import s from "@/components/layout/admin/adminNav.module.css";
 
 export default function AdminNav() {
   const pathname = usePathname();
@@ -11,25 +11,23 @@ export default function AdminNav() {
   return (
     <nav className={s.nav}>
       <span>Administration</span>
-      <div className={s.itemContainer}>
-        <ul className={s.navItems}>
-          {ADMIN_MENU.map((item) => {
-            const isActive = pathname === item.ROUTE;
+      <ul>
+        {ADMIN_MENU.map((item) => {
+          const isActive = pathname === item.ROUTE;
 
-            return (
-              <li key={item.TAG}>
-                <Link
-                  href={item.ROUTE}
-                  key={item.TAG}
-                  className={isActive ? `${s.link} ${s.active}` : `${s.link}`}
-                >
-                  {item.TAG}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+          return (
+            <li key={item.TAG}>
+              <Link
+                href={item.ROUTE}
+                key={item.TAG}
+                className={isActive ? `${s.link} ${s.active}` : `${s.link}`}
+              >
+                {item.TAG}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

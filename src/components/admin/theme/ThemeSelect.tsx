@@ -18,6 +18,7 @@ export default function ThemeSelect() {
         setWorkTheme(selectedWorkTheme);
       }}
       autoComplete="true"
+      className="inputContainer"
     >
       {themes.map((t: Theme) => (
         <option key={t.id} value={t.id.toString()}>

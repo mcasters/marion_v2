@@ -51,7 +51,7 @@ export default function ChatMessages({ dbMessages }: Props) {
       <div className={s.messagesHeader}>
         <div className={s.shadow} />
       </div>
-      <div className={`${s.messages} area`}>
+      <div className={`${s.messages} list`}>
         {dbMessages &&
           dbMessages.map((msg, index) => {
             const isOwner = msg.author.email === session?.user.email;

@@ -1,5 +1,5 @@
 .listWrapper {
-  font-size: var(--font-size-min);
+  font-size: var(--font-size-micro);
   text-align: center;
   overflow: scroll;
 }

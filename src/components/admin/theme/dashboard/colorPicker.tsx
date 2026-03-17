@@ -55,7 +55,6 @@ export default function ColorPicker({
         className={s.halfWidth}
       />
       <br />
-      <br />
       <input
         className={s.halfWidth}
         placeholder="Nom de la couleur"
@@ -64,7 +63,7 @@ export default function ColorPicker({
       />
       <button
         onClick={() => onCreatePresetColor(_nameColor, hexColor)}
-        className={s.halfWidth}
+        className={`${s.halfWidth} adminButton`}
         disabled={
           _nameColor === "" ||
           _nameColor === color ||
@@ -89,10 +88,14 @@ export default function ColorPicker({
           </div>
         ))}
       </div>
-      <button onClick={onClose} className={s.halfWidth}>
+      <button
+        onClick={onClose}
+        className={`${s.halfWidth} adminButton`}
+        style={{ marginRight: "1.5em" }}
+      >
         OK
       </button>
-      <button onClick={onCancel} className={s.halfWidth}>
+      <button onClick={onCancel} className={`${s.halfWidth} adminButton`}>
         Annuler
       </button>
     </div>

@@ -7,6 +7,7 @@ import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
 import useListSelection from "@/components/hooks/useListSelection.ts";
 import useKeyboard from "@/components/hooks/useKeyboard.ts";
 import Modal from "@/components/admin/common/modal.tsx";
+import { MESSAGE } from "@/constants/admin.ts";
 
 interface SelectableListProps<T extends Admin> {
   items: T[];
@@ -28,20 +29,20 @@ export default function SelectableList<T extends Admin>({
     useListSelection(items);
   useKeyboard("ArrowUp", decrease, !isOutside);
   useKeyboard("ArrowDown", increase, !isOutside);
-
   const [editedItem, setEditedItem] = useState<T | null>(null);
   const [itemsToDisplay, setItemsToDisplay] = useState<T[]>(items);
+  const isCategory = items[0]?.type === Type.CATEGORY;
 
   useEffect(() => {
     if (!renderFilter) setItemsToDisplay(items);
   }, [items]);
 
   return (
-    <>
+    <div className="inputContainer">
       {renderFilter && renderFilter(setItemsToDisplay)}
       <div
         ref={ref}
-        className={`${items[0]?.type === Type.CATEGORY ? s.categoryListWrapper : s.itemListWrapper} ${s.listWrapper} area`}
+        className={`${isCategory ? s.categoryListWrapper : s.itemListWrapper} ${s.listWrapper} list`}
       >
         <ul>
           {itemsToDisplay.map((item, i) => {
@@ -70,9 +71,10 @@ export default function SelectableList<T extends Admin>({
           })}
         </ul>
       </div>
+      {isCategory && <h5>{MESSAGE.category}</h5>}
       <Modal isOpen={editedItem !== null} title="Modification">
         {editedItem && updateForm(editedItem, () => setEditedItem(null))}
       </Modal>
-    </>
+    </div>
   );
 }

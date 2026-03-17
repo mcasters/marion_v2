@@ -3,49 +3,41 @@
   top: var(--line-height);
   left: 0;
   width: 100%;
+  height: 90px;
   background-color: var(--link-color-xdark);
   border-bottom: solid var(--color-xdark) 1px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
-  padding-top: 0.6em;
   z-index: 2;
   user-select: none;
+  line-height: 1.4;
 }
 
 .nav span {
-  color: var(--link-color-light);
-  letter-spacing: 6px;
-  font-weight: bold;
-  font-size: var(--font-size-title);
+  color: var(--link-color-dark);
+  letter-spacing: 7px;
+  font-size: var(--font-size-title1);
 }
 
-.itemContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 70px;
-}
-
-.navItems {
+.nav ul {
   list-style: none;
 }
 
 .nav li {
   display: inline-block;
   width: 100px;
-  margin: 0 auto;
+  margin: 0.6em auto;
 }
 
-.nav .link {
-  padding: 1em;
+.link {
   color: var(--link-color-light);
   display: inline-block;
 }
 
-.nav .link:hover {
+.link:hover {
   color: var(--link-color-xlight);
 }
 
-.nav .link.active {
+.link.active {
   color: var(--link-color-xlight);
 }

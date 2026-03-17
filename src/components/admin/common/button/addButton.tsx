@@ -2,7 +2,6 @@
 
 import Modal from "@/components/admin/common/modal.tsx";
 import React from "react";
-import s from "@/components/admin/admin.module.css";
 import useModal from "@/components/hooks/useModal.ts";
 
 interface Props {
@@ -13,7 +12,7 @@ export default function AddButton({ renderForm }: Props) {
 
   return (
     <>
-      <button onClick={toggle} className={`${s.addButton} adminButton`}>
+      <button onClick={toggle} className="adminButton">
         Ajouter
       </button>
       <Modal isOpen={isOpen} title={`Ajout`}>

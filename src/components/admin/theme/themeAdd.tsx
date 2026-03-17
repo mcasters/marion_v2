@@ -40,9 +40,7 @@ export default function ThemeAdd() {
           setThemeName(e.target.value);
         }}
         style={{
-          height: "unset",
-          width: "200px",
-          margin: "0.5em 0",
+          width: "230px",
         }}
       />
       <button

@@ -20,7 +20,7 @@
 
 .subTitle {
   text-decoration: underline;
-  font-size: 1em;
+  font-size: var(--font-size);
   text-align: left;
 }
 
@@ -87,9 +87,11 @@ ColorPicker
 
 .colorPicker .halfWidth {
   display: inline-block;
-  width: 50%;
-  height: 36px;
+  min-width: unset;
+  width: 45%;
+  height: 40px;
   vertical-align: top;
+  margin: 0 0 1em;
 }
 
 .pickerPresetColor {

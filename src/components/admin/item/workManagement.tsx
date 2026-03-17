@@ -9,7 +9,6 @@ import {
   getEmptyWork,
   getThumbnailSrc,
 } from "@/lib/utils/commonUtils.ts";
-import { MESSAGE } from "@/constants/admin.ts";
 import SelectableList from "@/components/admin/common/selectableList/selectableList.tsx";
 import SelectableListRow from "@/components/admin/common/selectableList/selectableListRow.tsx";
 import { deleteCategory } from "@/app/actions/item-post/categories/admin.ts";
@@ -82,7 +81,6 @@ export default function WorkManagement({ works, categories, type }: Props) {
           <CategoryForm category={category} onClose={handleClose} />
         )}
       />
-      <h5>{MESSAGE.category}</h5>
       <AddButton
         renderForm={(toggle) => (
           <CategoryForm category={getEmptyCategory(type)} onClose={toggle} />

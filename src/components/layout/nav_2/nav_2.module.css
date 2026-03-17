@@ -6,7 +6,7 @@
   user-select: none;
   font-family: var(--font-family-sans);
   font-variant: small-caps;
-  font-size: var(--font-size-nav2);
+  font-size: var(--font-size);
 }
 
 .fixed {
