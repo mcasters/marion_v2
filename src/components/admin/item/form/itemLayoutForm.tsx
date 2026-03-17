@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import { useAlert } from "@/app/context/alertProvider.tsx";
-import { updateMeta } from "@/app/actions/meta/admin.ts";
 import { Type } from "@/lib/type.ts";
 import Image from "next/image";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import { useMetas } from "@/app/context/metaProvider.tsx";
+import { updateMeta } from "@/app/actions/meta";
 
 type Props = {
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
