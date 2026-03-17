@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import { getHomeLayout } from "@/lib/utils/commonUtils.ts";
 import { updateMeta } from "@/app/actions/meta";
+import { KEY_META } from "@/constants/admin.ts";
 
 export default function HomeLayoutForm() {
   const metas = useMetas();
@@ -20,7 +21,7 @@ export default function HomeLayoutForm() {
 
   return (
     <form action={submit} className={s.layoutForm}>
-      <input type="hidden" name="label" value={"homeLayout"} />
+      <input type="hidden" name="key" value={KEY_META.HOME_LAYOUT} />
       <input type="hidden" name="text" value={value} />
 
       <p className={s.layoutLabel}>

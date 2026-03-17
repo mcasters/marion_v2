@@ -31,7 +31,7 @@ export default function ItemLayoutForm({ type }: Props) {
     <form action={submit} className={s.layoutForm}>
       <input
         type="hidden"
-        name="label"
+        name="key"
         value={
           type === Type.PAINTING
             ? "paintingLayout"
