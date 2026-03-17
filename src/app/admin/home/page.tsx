@@ -1,7 +1,7 @@
 import { getIntroText } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
+import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
 import {
   getSliderLandscapeImages,
@@ -9,7 +9,8 @@ import {
 } from "@/lib/utils/imageUtils";
 import HomeLayoutForm from "@/components/admin/home/homeLayoutForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm.tsx";
-import { LABEL } from "@/constants/admin.ts";
+import { KEY_LABEL } from "@/constants/admin.ts";
+import { updateContent } from "@/app/actions/contents/admin.ts";
 
 export default async function Home() {
   const contents = await getContentsFull();
@@ -21,7 +22,11 @@ export default async function Home() {
       <HomeLayoutForm />
       <div className="separate" />
       <h2 className={s.title2}>{`Texte d'accueil (facultatif)`}</h2>
-      <TextAreaForm textContent={getIntroText(contents)} label={LABEL.INTRO} />
+      <TextAreaForm
+        text={getIntroText(contents)}
+        key={KEY_LABEL.INTRO}
+        updateAction={updateContent}
+      />
       <div className="separate" />
       <h2
         className={s.title2WithInfo}
@@ -32,7 +37,7 @@ export default async function Home() {
       <ImagesForm
         images={getSliderPortraitImages(contents)}
         isMultiple={true}
-        label={LABEL.SLIDER}
+        label={KEY_LABEL.SLIDER}
         acceptSmallImage={false}
         isMain={true}
       />
@@ -46,7 +51,7 @@ export default async function Home() {
       <ImagesForm
         images={getSliderLandscapeImages(contents)}
         isMultiple={true}
-        label={LABEL.SLIDER}
+        label={KEY_LABEL.SLIDER}
         acceptSmallImage={false}
         isMain={false}
       />

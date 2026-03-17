@@ -8,7 +8,7 @@ import {
 import { getContentsFull } from "@/app/actions/contents";
 import { Metadata } from "next";
 import { getMetas } from "@/app/actions/meta";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import { getPhotoTabFromImages } from "@/lib/utils/imageUtils.ts";
 import s from "@/styles/page.module.css";
@@ -17,13 +17,13 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
   if (metas) {
     return {
-      title: metas.get(META.DOCUMENT_TITLE_PRESENTATION),
-      description: metas.get(META.DESCRIPTION_PRESENTATION),
+      title: metas.get(KEY_META.DOCUMENT_TITLE_PRESENTATION),
+      description: metas.get(KEY_META.DESCRIPTION_PRESENTATION),
       openGraph: {
-        title: metas.get(META.DOCUMENT_TITLE_PRESENTATION),
-        description: metas.get(META.DESCRIPTION_PRESENTATION),
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: metas.get(KEY_META.DOCUMENT_TITLE_PRESENTATION),
+        description: metas.get(KEY_META.DESCRIPTION_PRESENTATION),
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },

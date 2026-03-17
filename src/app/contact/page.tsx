@@ -9,7 +9,7 @@ import {
 import { getContentsFull } from "@/app/actions/contents";
 import InstagramIcon from "@/components/icons/instagramIcon";
 import { getMetas } from "@/app/actions/meta";
-import { META } from "@/constants/admin";
+import { KEY_META } from "@/constants/admin";
 import { Metadata } from "next";
 import s from "@/styles/page.module.css";
 
@@ -17,13 +17,13 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
   if (metas) {
     return {
-      title: metas.get(META.DOCUMENT_TITLE_CONTACT),
-      description: metas.get(META.DESCRIPTION_CONTACT),
+      title: metas.get(KEY_META.DOCUMENT_TITLE_CONTACT),
+      description: metas.get(KEY_META.DESCRIPTION_CONTACT),
       openGraph: {
-        title: metas.get(META.DOCUMENT_TITLE_CONTACT),
-        description: metas.get(META.DESCRIPTION_CONTACT),
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: metas.get(KEY_META.DOCUMENT_TITLE_CONTACT),
+        description: metas.get(KEY_META.DESCRIPTION_CONTACT),
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },
@@ -36,8 +36,8 @@ export default async function Contact() {
   const metas = getMetaMap(await getMetas());
   const email = getEmail(contents);
   const contactText = getContactText(contents);
-  const owner = metas.get(META.SITE_TITLE);
-  const instagram = metas.get(META.INSTAGRAM);
+  const owner = metas.get(KEY_META.SITE_TITLE);
+  const instagram = metas.get(KEY_META.INSTAGRAM);
 
   return (
     <>

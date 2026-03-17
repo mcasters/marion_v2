@@ -6,7 +6,7 @@ import { useSession } from "@/app/context/sessionProvider";
 import Link from "next/link";
 import { useTheme } from "@/app/context/themeProvider";
 import { useMetas } from "@/app/context/metaProvider";
-import { META } from "@/constants/admin";
+import { KEY_META } from "@/constants/admin";
 import React from "react";
 
 type Props = {
@@ -26,7 +26,7 @@ export default function Footer({ themePage }: Props) {
         backgroundColor: theme[themePage].footer.background,
       }}
     >
-      <p>{metas.get(META.FOOTER)}</p>
+      <p>{metas.get(KEY_META.FOOTER)}</p>
       {!session?.user && (
         <Link
           href={ROUTES.LOGIN}

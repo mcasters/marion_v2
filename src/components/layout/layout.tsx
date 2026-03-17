@@ -15,7 +15,7 @@ import AdminNav from "@/components/layout/admin/adminNav";
 import { useMetas } from "@/app/context/metaProvider";
 import { HomeLayout } from "@/lib/type";
 import { hexToRgb } from "@/lib/utils/themeUtils";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 import HomeHeader from "@/components/layout/homeHeader.tsx";
 
 interface Props {
@@ -83,7 +83,7 @@ export default function Layout({ introduction, children }: Props) {
       ) : isHome ? (
         <HomeHeader
           isPlainHomeLayout={isPlainHomeLayout}
-          title={metas.get(META.SITE_TITLE) || ""}
+          title={metas.get(KEY_META.SITE_TITLE) || ""}
           introduction={introduction}
         />
       ) : (

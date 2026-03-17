@@ -6,13 +6,13 @@ import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import { useAlert } from "@/app/context/alertProvider";
 import { updateImageContent } from "@/app/actions/contents/admin";
 import s from "@/components/admin/admin.module.css";
-import { Image, Label } from "@/lib/type";
+import { Image, KeyContent } from "@/lib/type";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 
 type Props = {
   images: Image[];
   isMultiple: boolean;
-  label: Label;
+  label: KeyContent;
   acceptSmallImage: boolean;
   title?: string;
   isMain?: boolean;

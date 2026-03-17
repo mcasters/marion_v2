@@ -1,12 +1,14 @@
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import React, { Fragment } from "react";
-import { getMetas } from "@/app/actions/meta";
-import { META, SEO } from "@/constants/admin.ts";
-import MetaForm from "@/components/admin/content/metaForm.tsx";
+import { getMetas, updateMeta } from "@/app/actions/meta";
+import { KEY_META, SEO } from "@/constants/admin.ts";
+import { getMetaMap } from "@/lib/utils/commonUtils.ts";
+import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
+import InputForm from "@/components/admin/text/inputForm.tsx";
+import { KeyMeta } from "@/lib/type.ts";
 
-export default async function Meta() {
-  const metas = getMetaMap(await getMetas());
-  const isM = metas.get(META.SITE_TITLE)?.startsWith("M");
+export default async function Page() {
+  const metaMap = getMetaMap(await getMetas());
+  const isM = metaMap.get(KEY_META.SITE_TITLE)?.startsWith("M");
 
   return (
     <>
@@ -15,24 +17,37 @@ export default async function Meta() {
         (Données accessibles par les moteurs de recherche, pour le
         référencement)
       </h3>
-      {Object.entries(SEO).map(([key, value]) => {
-        const separate = key.startsWith("description") || key === "keywords";
+      {Object.entries(SEO).map(([k, value]) => {
+        const key = k as KeyMeta;
         if (!isM && (key.endsWith("Drawing") || key.endsWith("DrawingHome")))
           return;
+        const isTextArea = key.startsWith("description") || key === "keywords";
         return (
           <Fragment key={key}>
-            <MetaForm
-              content={metas.get(key) || ""}
-              label={value}
-              dbLabel={key}
-              isTextArea={key.startsWith("description") || key === "keywords"}
-            />
-            {separate && (
-              <span>
-                <br />
-                <br />
-                ***
-              </span>
+            {!isTextArea && (
+              <InputForm
+                key={key}
+                text={metaMap.get(key) || ""}
+                updateAction={updateMeta}
+                title={value}
+                metaLayout={true}
+              />
+            )}
+            {isTextArea && (
+              <>
+                <TextAreaForm
+                  key={key}
+                  text={metaMap.get(key) || ""}
+                  updateAction={updateMeta}
+                  title={value}
+                  metaLayout={true}
+                />
+                <span>
+                  <br />
+                  <br />
+                  ***
+                </span>
+              </>
             )}
           </Fragment>
         );

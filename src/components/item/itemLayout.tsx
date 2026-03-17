@@ -7,7 +7,7 @@ import { getItemPhotoTab } from "@/lib/utils/imageUtils.ts";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import ImageInfos from "@/components/image/common/imageInfos.tsx";
 import Lightbox from "@/components/image/lightbox/lightbox.tsx";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 import Image from "next/image";
 import { DEVICE, IMAGE_INFO } from "@/constants/image.ts";
 import useWindowRect from "@/components/hooks/useWindowRect.ts";
@@ -25,7 +25,7 @@ export default function ItemLayout({ item, layout, priority }: Props) {
     () =>
       getItemPhotoTab(
         item,
-        `${item.title} - ${item.type} de ${metas.get(META.SITE_TITLE)}`,
+        `${item.title} - ${item.type} de ${metas.get(KEY_META.SITE_TITLE)}`,
       ),
     [item],
   );

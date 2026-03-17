@@ -3,7 +3,7 @@ import { Type } from "@/lib/type";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { getMetas } from "@/app/actions/meta";
 import { Metadata } from "next";
-import { META } from "@/constants/admin";
+import { KEY_META } from "@/constants/admin";
 import { getWorksByYear } from "@/app/actions/item-post";
 
 type Props = {
@@ -17,13 +17,13 @@ export async function generateMetadata({
   const metas = getMetaMap(await getMetas());
   if (metas) {
     return {
-      title: `${metas.get(META.DOCUMENT_TITLE_PAINTING)} - Année ${year}`,
-      description: `${metas.get(META.DESCRIPTION_PAINTING)} - Année ${year}`,
+      title: `${metas.get(KEY_META.DOCUMENT_TITLE_PAINTING)} - Année ${year}`,
+      description: `${metas.get(KEY_META.DESCRIPTION_PAINTING)} - Année ${year}`,
       openGraph: {
-        title: `${metas.get(META.DOCUMENT_TITLE_PAINTING)} - Année ${year}`,
-        description: `${metas.get(META.DESCRIPTION_PAINTING)} - Année ${year}`,
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: `${metas.get(KEY_META.DOCUMENT_TITLE_PAINTING)} - Année ${year}`,
+        description: `${metas.get(KEY_META.DESCRIPTION_PAINTING)} - Année ${year}`,
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },

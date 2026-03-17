@@ -4,7 +4,7 @@ import { Type } from "@/lib/type";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { getMetas } from "@/app/actions/meta";
-import { META } from "@/constants/admin";
+import { KEY_META } from "@/constants/admin";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -23,13 +23,13 @@ export async function generateMetadata({
         ? category.value
         : `Série ${category.value}`;
     return {
-      title: `${metas.get(META.DOCUMENT_TITLE_DRAWING)} - ${text}`,
-      description: `${metas.get(META.DESCRIPTION_DRAWING)} - ${text}`,
+      title: `${metas.get(KEY_META.DOCUMENT_TITLE_DRAWING)} - ${text}`,
+      description: `${metas.get(KEY_META.DESCRIPTION_DRAWING)} - ${text}`,
       openGraph: {
-        title: `${metas.get(META.DOCUMENT_TITLE_DRAWING)} - ${text}`,
-        description: `${metas.get(META.DESCRIPTION_DRAWING)} - ${text}`,
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: `${metas.get(KEY_META.DOCUMENT_TITLE_DRAWING)} - ${text}`,
+        description: `${metas.get(KEY_META.DESCRIPTION_DRAWING)} - ${text}`,
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },

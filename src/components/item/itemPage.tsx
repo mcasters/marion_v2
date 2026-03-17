@@ -7,7 +7,7 @@ import { useMetas } from "@/app/context/metaProvider.tsx";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import ItemLayout from "@/components/item/itemLayout.tsx";
 import { getItemsPhotoTabEnhanced } from "@/lib/utils/imageUtils.ts";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 import Gallery from "@/components/image/gallery/gallery.tsx";
 
 interface Props {
@@ -23,7 +23,7 @@ export default function ItemPage({ tag, works, category, type }: Props) {
     itemLayout === Layout.MULTIPLE
       ? getItemsPhotoTabEnhanced(
           works,
-          `${works[0].title} - ${type} de ${metas.get(META.SITE_TITLE)}`,
+          `${works[0].title} - ${type} de ${metas.get(KEY_META.SITE_TITLE)}`,
         )
       : undefined;
 

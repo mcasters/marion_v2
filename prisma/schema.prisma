@@ -11,9 +11,9 @@ datasource db {
 }
 
 model Meta {
-  id    Int    @id @default(autoincrement())
-  label String @unique
-  text  String @db.LongText
+  id   Int    @id @default(autoincrement())
+  key  String @unique
+  text String @db.LongText
 }
 
 model User {

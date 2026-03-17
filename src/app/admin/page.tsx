@@ -7,8 +7,8 @@ import ChatMessages from "@/components/admin/chatMessage/chatMessages.tsx";
 import React from "react";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { getMetas } from "@/app/actions/meta";
-import { META } from "@/constants/admin.ts";
-import InputForm from "@/components/admin/content/inputForm.tsx";
+import { KEY_META } from "@/constants/admin.ts";
+import InputForm from "@/components/admin/text/inputForm.tsx";
 import { updateMeta } from "@/app/actions/meta/admin.ts";
 
 export const metadata: Metadata = {
@@ -30,8 +30,8 @@ export default async function AdminHome() {
       <div className="separate" />
       <h2 className={style.title2}>Pied de page du site</h2>
       <InputForm
-        label={META.FOOTER}
-        textContent={metas.get(META.FOOTER) || ""}
+        key={KEY_META.FOOTER}
+        text={metas.get(KEY_META.FOOTER) || ""}
         updateAction={updateMeta}
       />
       <div className="separate" />

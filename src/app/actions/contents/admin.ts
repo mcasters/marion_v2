@@ -7,19 +7,21 @@ import {
 } from "@/lib/utils/serverUtils";
 import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
-import { ContentFull, Label } from "@/lib/type";
+import { ContentFull, KeyContent } from "@/lib/type";
 import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
-import { LABEL } from "@/constants/admin.ts";
+import { KEY_LABEL } from "@/constants/admin.ts";
 
 export async function updateContent(
   formData: FormData,
 ): Promise<{ message: string; isError: boolean }> {
-  const label = formData.get("label") as Label;
+  const label = formData.get("key") as KeyContent;
   const text = formData.get("text") as string;
 
   try {
-    const content = await findOrCreateContent(label);
-    await updateText(content.label, text);
+    await prisma.content.update({
+      where: { label },
+      data: { text },
+    });
 
     revalidatePath(`${RouteLabel[label]}`);
     return { message: "Contenu enregistré", isError: false };
@@ -29,12 +31,14 @@ export async function updateContent(
 }
 
 export async function updateImageContent(formData: FormData) {
-  const label = formData.get("label") as Label;
-  const bdContent = await findOrCreateContent(label);
+  const label = formData.get("key") as KeyContent;
 
   try {
-    if (label === LABEL.SLIDER) await updateImageSlider(formData);
-    else await updateImagePresentation(bdContent, formData);
+    if (label === KEY_LABEL.SLIDER) await updateImageSlider(formData);
+    else {
+      const bdContent = await findOrCreateContent(label);
+      await updateImagePresentation(bdContent, formData);
+    }
 
     revalidatePath(`${RouteLabel[label]}`);
     revalidatePath(`${AdminRouteLabel[label]}`);
@@ -56,11 +60,11 @@ async function updateImageSlider(formData: FormData) {
     if (file.size > 0) {
       const isMain = formData.get("isMain") === "true";
       const title = isMain ? "mobileSlider" : "desktopSlider";
-      await saveContentImage(LABEL.SLIDER, file, title, isMain);
+      await saveContentImage(KEY_LABEL.SLIDER, file, title, isMain);
     }
   }
   for await (const filename of _filenamesToDelete)
-    await deleteImageContent(LABEL.SLIDER, filename);
+    await deleteImageContent(KEY_LABEL.SLIDER, filename);
 }
 
 async function updateImagePresentation(
@@ -73,14 +77,19 @@ async function updateImagePresentation(
 
   if (files.length > 0 && files[0].size > 0) {
     if (oldImage)
-      await deleteImageContent(LABEL.PRESENTATION, oldImage.filename);
-    await saveContentImage(LABEL.PRESENTATION, files[0], "presentation", false);
+      await deleteImageContent(KEY_LABEL.PRESENTATION, oldImage.filename);
+    await saveContentImage(
+      KEY_LABEL.PRESENTATION,
+      files[0],
+      "presentation",
+      false,
+    );
   } else if (filenamesToDelete !== "")
-    await deleteImageContent(LABEL.PRESENTATION, oldImage.filename);
+    await deleteImageContent(KEY_LABEL.PRESENTATION, oldImage.filename);
 }
 
 const saveContentImage = async (
-  label: Label,
+  label: KeyContent,
   file: File,
   title: string,
   isMain: boolean,
@@ -103,7 +112,7 @@ const saveContentImage = async (
   }
 };
 
-const deleteImageContent = async (label: Label, filename: string) => {
+const deleteImageContent = async (label: KeyContent, filename: string) => {
   deleteFile(getMiscellaneousDir(), filename);
   await prisma.content.update({
     where: { label },
@@ -115,7 +124,7 @@ const deleteImageContent = async (label: Label, filename: string) => {
   });
 };
 
-const findOrCreateContent = async (label: Label): Promise<ContentFull> => {
+const findOrCreateContent = async (label: KeyContent): Promise<ContentFull> => {
   let BDContent = await prisma.content.findUnique({
     where: {
       label,
@@ -136,11 +145,4 @@ const findOrCreateContent = async (label: Label): Promise<ContentFull> => {
   }
 
   return BDContent;
-};
-
-const updateText = async (label: Label, text: string) => {
-  await prisma.content.update({
-    where: { label },
-    data: { text },
-  });
 };

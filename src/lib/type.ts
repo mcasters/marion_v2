@@ -3,7 +3,7 @@
 
 import { Prisma, User } from "@@/prisma/generated/client";
 import { JSX } from "react";
-import { LABEL, META } from "@/constants/admin.ts";
+import { KEY_LABEL, KEY_META } from "@/constants/admin.ts";
 
 type StringKeys<T> = {
   [k in keyof T]: T[k] extends string ? k : never;
@@ -115,12 +115,12 @@ export enum HomeLayout {
   NAV,
 }
 
-export type Label = (typeof LABEL)[keyof typeof LABEL];
+export type KeyContent = (typeof KEY_LABEL)[keyof typeof KEY_LABEL];
 
-export type Meta = (typeof META)[keyof typeof META];
+export type KeyMeta = (typeof KEY_META)[keyof typeof KEY_META];
 
 export type ContentFull = {
-  label: Label;
+  label: KeyContent;
   title: string | null;
   text: string;
   images: Image[];

@@ -16,7 +16,7 @@ import {
   Type,
   Work,
 } from "@/lib/type.ts";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 
 export const transformValueToKey = (value: string): string =>
   value
@@ -76,9 +76,7 @@ export const getContactText = (contents: ContentFull[]): string =>
 
 export const getMetaMap = (metas: Meta[]): Map<string, string> => {
   const map = new Map();
-  metas.forEach((meta) => {
-    map.set(meta.label, meta.text);
-  });
+  metas.forEach((meta) => map.set(meta.key, meta.text));
   return map;
 };
 
@@ -208,17 +206,17 @@ export const getWorkLayout = (
 ): [Layout, ItemDarkBackground] => {
   const metaLayout =
     type === Type.PAINTING
-      ? metas.get(META.PAINTING_LAYOUT) || "1,1"
+      ? metas.get(KEY_META.PAINTING_LAYOUT) || "1,1"
       : type === Type.SCULPTURE
-        ? metas.get(META.SCULPTURE_LAYOUT) || "3,1"
-        : metas.get(META.DRAWING_LAYOUT) || "1,1";
+        ? metas.get(KEY_META.SCULPTURE_LAYOUT) || "3,1"
+        : metas.get(KEY_META.DRAWING_LAYOUT) || "1,1";
 
   const strings = metaLayout.split(",");
   return [parseInt(strings[0]), parseInt(strings[1])];
 };
 
 export const getHomeLayout = (metas: Map<string, string>): HomeLayout => {
-  return parseInt(metas.get(META.HOME_LAYOUT) || "0");
+  return parseInt(metas.get(KEY_META.HOME_LAYOUT) || "0");
 };
 
 export const getYearsFromWorks = (items: Work[]): number[] => {

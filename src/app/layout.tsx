@@ -11,7 +11,7 @@ import { getContentsFull } from "@/app/actions/contents";
 import { getActiveTheme, getPresetColors } from "@/app/actions/theme";
 import { getMetas } from "@/app/actions/meta";
 import { Cormorant_SC, EB_Garamond } from "next/font/google";
-import { META } from "@/constants/admin";
+import { KEY_META } from "@/constants/admin";
 import { getStructHexaTheme } from "@/lib/utils/serverUtils";
 
 const garamond = EB_Garamond({
@@ -37,14 +37,14 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
   if (metas) {
     return {
-      title: metas.get(META.DOCUMENT_TITLE_HOME),
-      description: metas.get(META.DESCRIPTION_HOME),
-      keywords: metas.get(META.KEYWORDS),
+      title: metas.get(KEY_META.DOCUMENT_TITLE_HOME),
+      description: metas.get(KEY_META.DESCRIPTION_HOME),
+      keywords: metas.get(KEY_META.KEYWORDS),
       openGraph: {
-        title: metas.get(META.DOCUMENT_TITLE_HOME),
-        description: metas.get(META.DESCRIPTION_HOME),
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: metas.get(KEY_META.DOCUMENT_TITLE_HOME),
+        description: metas.get(KEY_META.DESCRIPTION_HOME),
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },

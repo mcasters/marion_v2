@@ -6,11 +6,12 @@ import {
 } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import TextAreaForm from "@/components/admin/content/textAreaForm.tsx";
+import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm";
 import { getContentsFull } from "@/app/actions/contents";
 
-import { LABEL } from "@/constants/admin.ts";
+import { KEY_LABEL } from "@/constants/admin.ts";
+import { updateContent } from "@/app/actions/contents/admin.ts";
 
 export default async function Presentation() {
   const contents = await getContentsFull();
@@ -21,26 +22,29 @@ export default async function Presentation() {
       <ImagesForm
         images={getPresentationImage(contents)}
         isMultiple={false}
-        label={LABEL.PRESENTATION}
+        label={KEY_LABEL.PRESENTATION}
         acceptSmallImage={true}
         title="Image de présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
-        textContent={getPresentation(contents)}
-        label={LABEL.PRESENTATION}
+        text={getPresentation(contents)}
+        key={KEY_LABEL.PRESENTATION}
+        updateAction={updateContent}
         title="Présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
-        textContent={getDemarche(contents)}
-        label={LABEL.DEMARCHE}
+        text={getDemarche(contents)}
+        key={KEY_LABEL.DEMARCHE}
+        updateAction={updateContent}
         title="Démarche artistique (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
-        textContent={getInspiration(contents)}
-        label={LABEL.INSPIRATION}
+        text={getInspiration(contents)}
+        key={KEY_LABEL.INSPIRATION}
+        updateAction={updateContent}
         title="Inspiration (facultatif)"
       />
     </div>

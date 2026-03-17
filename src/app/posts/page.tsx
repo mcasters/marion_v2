@@ -5,7 +5,7 @@ import { getPosts } from "@/app/actions/item-post";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { getMetas } from "@/app/actions/meta";
-import { META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
 import s from "@/styles/page.module.css";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import Gallery from "@/components/image/gallery/gallery.tsx";
@@ -15,13 +15,13 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
   if (metas) {
     return {
-      title: metas.get(META.DOCUMENT_TITLE_POST),
-      description: metas.get(META.DESCRIPTION_POST),
+      title: metas.get(KEY_META.DOCUMENT_TITLE_POST),
+      description: metas.get(KEY_META.DESCRIPTION_POST),
       openGraph: {
-        title: metas.get(META.DOCUMENT_TITLE_POST),
-        description: metas.get(META.DESCRIPTION_POST),
-        url: metas.get(META.URL),
-        siteName: metas.get(META.SEO_SITE_TITLE),
+        title: metas.get(KEY_META.DOCUMENT_TITLE_POST),
+        description: metas.get(KEY_META.DESCRIPTION_POST),
+        url: metas.get(KEY_META.URL),
+        siteName: metas.get(KEY_META.SEO_SITE_TITLE),
         locale: "fr",
         type: "website",
       },
