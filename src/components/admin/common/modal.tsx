@@ -64,7 +64,16 @@ export default function Modal({
             onDrag={onDrag}
             onDragOver={(e) => e.preventDefault()}
           >
-            <h2 className={s.modalTitle}>{title}</h2>
+            <h2
+              style={{
+                fontSize:
+                  width < 500
+                    ? "var(--font-size-title4)"
+                    : "var(--font-size-title2)",
+              }}
+            >
+              {title}
+            </h2>
             <div draggable onDragStart={(e) => e.preventDefault()}>
               {children}
             </div>

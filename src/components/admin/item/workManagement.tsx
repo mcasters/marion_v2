@@ -60,6 +60,7 @@ export default function WorkManagement({ works, categories, type }: Props) {
             onClose={toggle}
           />
         )}
+        modalWidth={900}
       />
       <div className="separate" />
       <h2 className={s.title2}>Gestion des catégories</h2>
@@ -85,6 +86,7 @@ export default function WorkManagement({ works, categories, type }: Props) {
         renderForm={(toggle) => (
           <CategoryForm category={getEmptyCategory(type)} onClose={toggle} />
         )}
+        modalWidth={700}
       />
     </>
   );

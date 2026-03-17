@@ -16,14 +16,13 @@
   background: #efefef;
   color: var(--color-dark);
   max-height: 97%;
-  padding: 1em 2em 1em;
-  text-align: left;
+  padding:1em;
   border-radius: 0.2rem;
   overflow: scroll;
   user-select: none;
+  text-align: center;
 }
 
-.modalTitle {
-  font-size: var(--font-size-title1);
-  text-align: center;
+.modalBox h2 {
+  padding-bottom: 1em;
 }

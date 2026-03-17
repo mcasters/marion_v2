@@ -6,8 +6,9 @@ import useModal from "@/components/hooks/useModal.ts";
 
 interface Props {
   renderForm: (arg0: () => void) => React.ReactNode;
+  modalWidth: number;
 }
-export default function AddButton({ renderForm }: Props) {
+export default function AddButton({ renderForm, modalWidth }: Props) {
   const { isOpen, toggle } = useModal();
 
   return (
@@ -15,7 +16,7 @@ export default function AddButton({ renderForm }: Props) {
       <button onClick={toggle} className="adminButton">
         Ajouter
       </button>
-      <Modal isOpen={isOpen} title={`Ajout`}>
+      <Modal isOpen={isOpen} title={`Ajout`} width={modalWidth}>
         {renderForm(toggle)}
       </Modal>
     </>

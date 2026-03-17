@@ -104,9 +104,9 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
       <p className={s.colorLabel}>{label}</p>
       <Modal
         isOpen={isOpen}
-        title={`${THEME_LABEL[themeKey as keyof StructTheme]} / ${pageKey ? `${THEME_PAGE_LABEL[pageKey as keyof ThemePage]} /` : ""} ${label}`}
+        title={`${THEME_LABEL[themeKey as keyof StructTheme]} | ${pageKey ? `${THEME_PAGE_LABEL[pageKey as keyof ThemePage]} |` : ""} ${label}`}
         onClickOutside={toggle}
-        width={425}
+        width={440}
       >
         <ColorPicker
           color={color}

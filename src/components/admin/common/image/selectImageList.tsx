@@ -20,6 +20,7 @@ export default function SelectImageList({
   type,
 }: Props) {
   const [filename, setFilename] = useState<string>(selectedImage.filename);
+  const isEmpty = itemsImages.length === 1 && itemsImages[0].filename === "";
 
   const onSelectImage = (image: IImage) => {
     setFilename(image.filename);
@@ -27,8 +28,8 @@ export default function SelectImageList({
   };
 
   return (
-    <>
-      <label className={s.label}>Image de la catégorie (facultative)</label>
+    <div className="inputContainer">
+      <span className="label">Image de la catégorie (facultative)</span>
       <div className={s.selectList}>
         <div
           onClick={() => onSelectImage(getEmptyImage())}
@@ -36,7 +37,7 @@ export default function SelectImageList({
         >
           -- Aucune image --
         </div>
-        {itemsImages.length > 0 &&
+        {!isEmpty &&
           itemsImages.map((image: IImage) => {
             const isCategoryImage = image.filename === filename;
             return (
@@ -62,8 +63,12 @@ export default function SelectImageList({
             );
           })}
       </div>
-      Les images sont ici tronquées au carré, comme elles sont affichées dans la
-      pastille de la catégorie.
-    </>
+      {!isEmpty && (
+        <p>
+          Les images sont ici tronquées au carré, comme elles sont affichées
+          dans la pastille de la catégorie.
+        </p>
+      )}
+    </div>
   );
 }

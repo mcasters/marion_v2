@@ -101,7 +101,7 @@
 /* SelectImageList */
 
 .selectList {
-  height: 400px;
+  max-height: 400px;
   width: 300px;
   margin: auto;
   line-height: 122px;

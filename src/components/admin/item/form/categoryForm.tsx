@@ -39,57 +39,57 @@ export default function CategoryForm({ category, onClose }: Props) {
       <input type="hidden" name="filename" value={image.filename} />
       <input type="hidden" name="width" value={image.width} />
       <input type="hidden" name="height" value={image.height} />
-      <input
-        name="value"
-        type="text"
-        value={workCategory.value}
-        onChange={(e) =>
-          setWorkCategory({ ...workCategory, value: e.target.value })
-        }
-        required
-        placeholder="Nom de la catégorie"
-        autoFocus
-      />
+      <label>
+        Nom de la catégorie
+        <input
+          name="value"
+          type="text"
+          value={workCategory.value}
+          onChange={(e) =>
+            setWorkCategory({ ...workCategory, value: e.target.value })
+          }
+          required
+        />
+      </label>
       {!isUpdate && (
         <p>
           <small>{MESSAGE.categoryImage}</small>
         </p>
       )}
-      <br />
-      <input
-        name="title"
-        type="text"
-        value={workCategory.content.title}
-        onChange={(e) =>
-          setWorkCategory({
-            ...workCategory,
-            content: { ...workCategory.content, title: e.target.value },
-          })
-        }
-        placeholder="Titre du descriptif (facultatif)"
-      />
-      <br />
-      <textarea
-        name="text"
-        rows={5}
-        value={workCategory.content.text}
-        onChange={(e) =>
-          setWorkCategory({
-            ...workCategory,
-            content: { ...workCategory.content, text: e.target.value },
-          })
-        }
-        placeholder="Texte descriptif (facultatif)"
-      />
-      <br />
-      {isUpdate && (
-        <SelectImageList
-          itemsImages={category.images}
-          selectedImage={workCategory.content.image}
-          onChange={(image) => setImage(image)}
-          type={category.workType}
+      <label>
+        Titre (facultatif)
+        <input
+          name="title"
+          type="text"
+          value={workCategory.content.title}
+          onChange={(e) =>
+            setWorkCategory({
+              ...workCategory,
+              content: { ...workCategory.content, title: e.target.value },
+            })
+          }
         />
-      )}
+      </label>
+      <label>
+        Texte descriptif (facultatif)
+        <textarea
+          name="text"
+          rows={5}
+          value={workCategory.content.text}
+          onChange={(e) =>
+            setWorkCategory({
+              ...workCategory,
+              content: { ...workCategory.content, text: e.target.value },
+            })
+          }
+        />
+      </label>
+      <SelectImageList
+        itemsImages={category.images}
+        selectedImage={workCategory.content.image}
+        onChange={(image) => setImage(image)}
+        type={category.workType}
+      />
       <div className={s.buttonSection}>
         <SubmitButton />
         <CancelButton onCancel={onClose} />

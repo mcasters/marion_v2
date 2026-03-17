@@ -35,6 +35,7 @@ export default function PostManagement({ posts }: Props) {
         renderForm={(toggle) => (
           <PostForm post={getEmptyPost()} onClose={toggle} />
         )}
+        modalWidth={900}
       />
     </>
   );

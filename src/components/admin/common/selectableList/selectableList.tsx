@@ -72,7 +72,11 @@ export default function SelectableList<T extends Admin>({
         </ul>
       </div>
       {isCategory && <h5>{MESSAGE.category}</h5>}
-      <Modal isOpen={editedItem !== null} title="Modification">
+      <Modal
+        isOpen={editedItem !== null}
+        title="Modification"
+        width={isCategory ? 700 : 900}
+      >
         {editedItem && updateForm(editedItem, () => setEditedItem(null))}
       </Modal>
     </div>
