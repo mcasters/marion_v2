@@ -132,7 +132,7 @@ export const MESSAGE = {
     "Parmi les renseignements facultatif d'une catégorie, en plus d'un descriptif, la photo d'une" +
     " œuvre peut être assignée à cette catégorie, cela permet à l'utilisateur d'avoir une idée du genre d'œuvre qui s'y trouve (cette photo s'affiche dans la pastille sur laquelle on clique pour voir les œuvres de la catégorie). Cependant, cette photo ne peut être ajoutée qu'une fois que des œuvres y sont classées, puisque le choix de la photo s'effectue parmi ces œuvres. Donc après avoir créé la catégorie, et après y avoir classé des œuvres, tu pourras alors choisir une photo en allant dans la mise à jour de la catégorie.",
   error_sizeUpload:
-    "La taille totale des fichiers excède la limite de sécurité (30 MB).\nAjouter moins de fichier à" +
+    "La taille totale du transfert excède la limite de sécurité (30 MB).\nAjouter moins de fichier à" +
     " la fois.",
   error_imageSize:
     "Dimension de l'image trop petite. Largeur minimum : 2000 pixels",

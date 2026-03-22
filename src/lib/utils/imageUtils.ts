@@ -4,12 +4,12 @@ import {
   PhotoTab,
   PhotoTabEnhanced,
   Post,
-  Thumbnail,
   Type,
   Work,
 } from "@/lib/type.ts";
-import { IMAGE } from "@/constants/image.ts";
+import { FILE_TYPES, IMAGE } from "@/constants/image.ts";
 import { getSliderContent, getSliders } from "@/lib/utils/commonUtils.ts";
+import { MESSAGE } from "@/constants/admin.ts";
 
 const getEmptyPhotoTab = (): PhotoTab => {
   return { sm: [], md: [], lg: [] };
@@ -219,7 +219,27 @@ export const getSliderPortraitImages = (contents: ContentFull[]): Image[] => {
   return images.filter((i) => i.isMain);
 };
 
-export const getThumbnails = (filenames: string[], path: string): Thumbnail[] =>
-  filenames.map((filename) => {
-    return { filename, path };
-  });
+export const validateFile = async (
+  file: File,
+  increaseWeight: (arg0: number) => number,
+  acceptSmallImage: boolean,
+): Promise<{ message: string; isError: boolean }> => {
+  if (!FILE_TYPES.includes(file.type))
+    return { message: MESSAGE.error_imageType, isError: true };
+
+  const weight = increaseWeight(file.size);
+  if (weight > 30000000) {
+    return { message: MESSAGE.error_sizeUpload, isError: true };
+  }
+
+  if (!acceptSmallImage) {
+    const bmp = await createImageBitmap(file);
+    if (bmp.width < 2000) {
+      bmp.close();
+      return { message: MESSAGE.error_imageSize, isError: true };
+    }
+    bmp.close();
+  }
+
+  return { message: "OK", isError: false };
+};

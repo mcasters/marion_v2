@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import { Category, Image, Type, Work } from "@/lib/type.ts";
-import { useAlert } from "@/app/context/alertProvider.tsx";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import { format } from "date-fns/format";
+import useActionResult from "@/components/hooks/useActionResult.ts";
 
 interface Props {
   work: Work;
@@ -17,59 +17,25 @@ interface Props {
 }
 
 export default function WorkForm({ work, onClose, categories }: Props) {
-  const isUpdate = work.id !== 0;
   const isSculpture = work.type === Type.SCULPTURE;
-  const alert = useAlert();
   const [workItem, setWorkItem] = useState<Work>(work);
-  const [date, setDate] = useState<string>(
-    format(new Date(work.date), "yyyy-MM-dd"),
+  const [changed, setChanged] = useState<boolean>(false);
+  const [state, action] = useActionState(
+    work.id !== 0 ? updateItem : createItem,
+    null,
   );
-  const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
-
-  const handleDeleteFile = (filename: string) => {
-    const images = workItem.images.filter(
-      (i: Image) => i.filename !== filename,
-    );
-    setWorkItem({ ...workItem, images });
-    setFilenamesToDelete([...filenamesToDelete, filename]);
-  };
-
-  const handleNewFiles = (files: File[]) => {
-    setNewFiles((prevState) =>
-      isSculpture ? [...prevState, ...files] : files,
-    );
-    if (!isSculpture && workItem.images.length !== 0)
-      handleDeleteFile(workItem.images[0].filename);
-  };
-
-  const submit = async (formData: FormData) => {
-    newFiles.forEach((file) => formData.append("files", file));
-    const action = isUpdate ? updateItem : createItem;
-    const { message, isError } = await action(formData);
-    if (!isError) onClose();
-    alert(message, isError);
-  };
+  useActionResult(state, onClose);
 
   return (
-    <form action={submit}>
+    <form action={action}>
       <input name="type" type="hidden" value={work.type} />
-      {isUpdate && (
-        <>
-          <input name="id" type="hidden" value={work.id} />
-          <input
-            name="filenamesToDelete"
-            type="hidden"
-            value={filenamesToDelete}
-          />
-          {work.categoryId !== workItem.categoryId && (
-            <input
-              name="oldCategoryId"
-              type="hidden"
-              value={String(work.categoryId)}
-            />
-          )}
-        </>
+      <input name="id" type="hidden" value={work.id} />
+      {work.categoryId !== workItem.categoryId && (
+        <input
+          name="oldCategoryId"
+          type="hidden"
+          value={String(work.categoryId)}
+        />
       )}
       <div className={s.columnWrapper}>
         <div>
@@ -90,10 +56,10 @@ export default function WorkForm({ work, onClose, categories }: Props) {
             <input
               name="date"
               type="date"
-              value={date}
-              onChange={(e) => {
-                setDate(e.target.value);
-              }}
+              value={format(new Date(workItem.date), "yyyy-MM-dd")}
+              onChange={(e) =>
+                setWorkItem({ ...workItem, date: new Date(e.target.value) })
+              }
               required
             />
           </label>
@@ -291,12 +257,11 @@ export default function WorkForm({ work, onClose, categories }: Props) {
         </div>
       </div>
       <ImageInput
-        filenames={workItem.images.map((i: Image) => i.filename)}
-        pathImage={`/images/${work.type}`}
+        filesPath={workItem.images.map(
+          (i: Image) => `/images/${work.type}/sm/${i.filename}`,
+        )}
         isMultiple={isSculpture}
         smallImageOption={true}
-        onNewFiles={handleNewFiles}
-        onDelete={handleDeleteFile}
         title={isSculpture ? "Images * :" : "Image * :"}
         required
       />

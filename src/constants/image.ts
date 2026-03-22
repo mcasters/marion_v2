@@ -6,6 +6,8 @@ export const IMAGE = {
   MAX_PX: 2000,
 };
 
+export const FILE_TYPES = ["image/jpeg", "image/png"];
+
 export const DEVICE = {
   SMALL: 768,
   MEDIUM: 1200,

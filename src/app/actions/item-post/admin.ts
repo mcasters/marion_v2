@@ -25,7 +25,7 @@ import {
   createWorkObjectFromSculpture,
 } from "@/app/actions/item-post/utils.ts";
 
-export async function createItem(formData: FormData) {
+export async function createItem(initialState: any, formData: FormData) {
   const type = formData.get("type") as
     | Type.PAINTING
     | Type.SCULPTURE
@@ -87,7 +87,7 @@ export async function createItem(formData: FormData) {
   }
 }
 
-export async function updateItem(formData: FormData) {
+export async function updateItem(initialState: any, formData: FormData) {
   const id = Number(formData.get("id"));
   const type = formData.get("type") as
     | Type.PAINTING
@@ -358,8 +358,9 @@ const handleAddAndRemoveImages = async (
   let _filenamesToDelete = filenamesToDelete ?? [];
 
   if (formData) {
-    const files = formData.get("filenamesToDelete") as string;
-    if (files !== "") _filenamesToDelete = files.split(",");
+    const filenamesToDelete = formData.get("filenamesToDelete") as string;
+    if (filenamesToDelete !== "")
+      _filenamesToDelete = filenamesToDelete.split(",");
   }
 
   for await (const filename of _filenamesToDelete) {
@@ -378,36 +379,23 @@ const handleAddAndRemoveImages = async (
       }
     }
   }
-  return formData ? await saveFiles(formData, type, getDir(type)) : null;
-};
+  if (!formData) return null;
 
-const saveFiles = async (
-  formData: FormData,
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING | Type.POST,
-  dir: string,
-): Promise<FileInfo[] | null> => {
   const tab: FileInfo[] = [];
+  const dir = getDir(type);
   const title = formData.get("title") as string;
-  const mainFile = formData.get("mainFile") as File;
-  const files = formData.getAll("files") as File[];
+  const mainFileToAdd = formData.getAll("mainFile") as File[];
+  const filesToAdd = formData.getAll("filesToAdd") as File[];
 
-  if (type === Type.POST && mainFile && mainFile.size > 0)
-    tab.push(<FileInfo>await resizeAndSaveImage(mainFile, title, dir, true));
+  if (type === Type.POST && mainFileToAdd.length)
+    tab.push(
+      <FileInfo>await resizeAndSaveImage(mainFileToAdd[0], title, dir, true),
+    );
 
-  if (files.length > 0) {
-    for await (const file of files) {
-      if (file.size > 0) {
-        tab.push(
-          <FileInfo>(
-            await resizeAndSaveImage(
-              file,
-              title,
-              dir,
-              type === Type.POST && files.length === 1,
-            )
-          ),
-        );
-      }
+  if (filesToAdd.length) {
+    for await (const file of filesToAdd) {
+      if (file.size > 0)
+        tab.push(<FileInfo>await resizeAndSaveImage(file, title, dir, false));
     }
   }
   return tab.length > 0 ? tab : null;

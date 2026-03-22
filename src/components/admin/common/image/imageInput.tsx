@@ -1,177 +1,144 @@
 "use client";
 
-import React, { HTMLProps, JSX, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  HTMLProps,
+  JSX,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useAlert } from "@/app/context/alertProvider";
 import s from "./image.module.css";
 import { constraintImage } from "@/components/admin/common/formUtils";
-import { MESSAGE } from "@/constants/admin.ts";
 import ArrowDown from "@/components/icons/arrowDown.tsx";
-import { Thumbnail } from "@/lib/type.ts";
-import { getThumbnails } from "@/lib/utils/imageUtils.ts";
 import Image from "next/image";
 import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
+import { validateFile } from "@/lib/utils/imageUtils.ts";
 
 interface Props extends HTMLProps<HTMLInputElement> {
-  filenames: string[];
-  pathImage: string;
+  filesPath: string[];
   isMultiple: boolean;
   smallImageOption: boolean;
-  onNewFiles: (files: File[]) => void;
-  onDelete: (filename: string) => void;
+  onChange?: () => void;
   title?: string;
   required?: boolean;
 }
 
 export default function ImageInput({
-  filenames,
-  pathImage,
+  filesPath,
   isMultiple,
   smallImageOption,
-  onNewFiles,
-  onDelete,
+  onChange,
   title = "",
   required = false,
 }: Props): JSX.Element {
   const alert = useAlert();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
   const [acceptSmallImage, setAcceptSmallImage] = useState<boolean>(false);
-  const [isOver, setIsOver] = useState<boolean>(false);
-  const [thumbnails, setThumbnails] = useState<Thumbnail[]>(
-    getThumbnails(filenames, pathImage),
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>(
+    filesPath.map((path) => new File(["f"], path)),
   );
 
   useEffect(() => {
     const dataTransfer = new DataTransfer();
-    filenames.forEach((filename) => {
-      dataTransfer.items.add(new File(["foo"], filename));
+    files.forEach((file) => {
+      if (!file.name.startsWith("/images/")) dataTransfer.items.add(file);
     });
     if (inputRef.current) inputRef.current.files = dataTransfer.files;
-  }, []);
+  }, [files]);
 
-  useEffect(() => {
-    const dataTransfer = new DataTransfer();
-    thumbnails.forEach((thumbnail) => {
-      dataTransfer.items.add(new File(["foo"], thumbnail.filename));
-    });
-    if (inputRef.current) inputRef.current.files = dataTransfer.files;
-  }, [thumbnails]);
-
-  const dragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsOver(true);
-  };
-
-  const drop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsOver(false);
-    await handleUpload(e.dataTransfer.files);
-  };
-
-  const dragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsOver(false);
-  };
-
-  const handleOnDelete = (thumbnail: Thumbnail) => {
-    if (thumbnail.path !== "") onDelete(thumbnail.filename);
-    setThumbnails(
-      thumbnails.filter((item) => item.filename !== thumbnail.filename),
-    );
-  };
-
-  const handleUpload = async (fileList: FileList | null) => {
-    const files = Array.from(fileList ?? []);
-
-    let weight = 0;
-    let resizedFiles: File[] = [];
-    let thumbnails: Thumbnail[] = [];
-
-    for await (const file of files) {
-      if (file.type !== "image/png" && file.type !== "image/jpeg") {
-        alert(MESSAGE.error_imageType, true, 5000);
-        return;
-      }
-      weight += file.size;
-      if (weight > 30000000) {
-        alert(MESSAGE.error_sizeUpload, true, 5000);
-        return;
-      }
-      if (!acceptSmallImage) {
-        const bmp = await createImageBitmap(file);
-        if (bmp.width < 2000) {
-          alert(MESSAGE.error_imageSize, true, 5000);
-          bmp.close();
-          return;
-        }
-        bmp.close();
-      }
-      const resizedFile = await constraintImage(file);
-      thumbnails.push({ filename: URL.createObjectURL(resizedFile), path: "" });
-      resizedFiles.push(resizedFile);
+  const handleDelete = (filepath: string) => {
+    if (filepath.startsWith("/images/")) {
+      const filename = filepath.substring(filepath.lastIndexOf("/") + 1);
+      setFilenamesToDelete((prev) =>
+        isMultiple ? [...prev, filename] : [filename],
+      );
     }
-    setThumbnails(isMultiple ? (prev) => [...prev, ...thumbnails] : thumbnails);
-    onNewFiles(resizedFiles);
+    setFiles(files.filter((file) => file.name !== filepath));
+    if (onChange) onChange();
+  };
+
+  const handleAdd = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files || [];
+    if (files.length === 0) return;
+
+    let resizedFiles: File[] = [];
+    let weight = 0;
+    const increaseWeight = (size: number) => (weight += size);
+    for await (const file of files) {
+      const result = await validateFile(file, increaseWeight, acceptSmallImage);
+      if (result.isError) {
+        if (inputRef.current) inputRef.current.value = "";
+        alert(result.message, result.isError, 5000);
+        return;
+      }
+      resizedFiles.push(await constraintImage(file));
+    }
+
+    if (!isMultiple) {
+      setFiles(resizedFiles);
+      if (filesPath.length)
+        setFilenamesToDelete([
+          filesPath[0].substring(filesPath[0].lastIndexOf("/") + 1),
+        ]);
+    } else {
+      setFiles((prev) => [...prev, ...resizedFiles]);
+    }
+    if (onChange) onChange();
   };
 
   return (
     <div className="inputContainer">
-      <>
-        {title && <p className="label">{title}</p>}
-        <div
-          ref={dropRef}
-          className={isOver ? `${s.dropZoneOver} ${s.dropZone}` : s.dropZone}
-          onDragOver={dragOver}
-          onDrop={drop}
-          onDragLeave={dragLeave}
-        >
+      <input name="filenamesToDelete" type="hidden" value={filenamesToDelete} />
+      {title && <p className="label">{title}</p>}
+      <div className={s.dropZone}>
+        <div className={s.dropIcon}>
+          <ArrowDown width={50} height={50} />
+        </div>
+        <div>{`Glisser ${isMultiple ? "les" : "la"} photo${isMultiple ? "s" : ""} ou cliquer`}</div>
+        <input
+          ref={inputRef}
+          type="file"
+          name="filesToAdd"
+          onChange={handleAdd}
+          multiple={isMultiple}
+          accept="image/png, image/jpeg"
+          className={s.input}
+          required={required && !files.length}
+        />
+      </div>
+      {smallImageOption && (
+        <label className={s.smallImageLabel}>
           <input
-            ref={inputRef}
-            type="file"
-            onChange={(e) => handleUpload(e.target.files)}
-            multiple={isMultiple}
-            accept="image/png, image/jpeg"
-            className={s.input}
-            required={required}
+            type="checkbox"
+            checked={acceptSmallImage}
+            onChange={() => setAcceptSmallImage(!acceptSmallImage)}
           />
-          <div className={s.dropIcon}>
-            <ArrowDown width={50} height={50} />
-          </div>
-          {`Glisser ${isMultiple ? "les" : "la"} photo${isMultiple ? "s" : ""} ou cliquer`}
-        </div>
-        {smallImageOption && (
-          <label className={s.smallImageLabel}>
-            <input
-              type="checkbox"
-              checked={acceptSmallImage}
-              onChange={() => setAcceptSmallImage(!acceptSmallImage)}
-            />
-            Accepter les images en dessous de 2000 px de large
-          </label>
-        )}
-      </>
-      {thumbnails.length > 0 && (
-        <div className={s.previewContainer}>
-          {thumbnails.map(({ filename, path }) => (
-            <div key={filename} className={s.imageWrapper}>
-              <Image
-                src={path === "" ? filename : `${path}/sm/${filename}`}
-                width={150}
-                height={150}
-                alt="Image de l'item"
-                unoptimized={true}
-                className={s.image}
-              />
-              <DeleteButton
-                onDelete={() => handleOnDelete({ filename, path })}
-              />
-            </div>
-          ))}
-        </div>
+          Accepter les images en dessous de 2000 px de large
+        </label>
       )}
+      <div className={s.previewContainer}>
+        {files.length === 0 && <p className={s.emptyInfo}>Aucune image</p>}
+        {files.map((file, i) => (
+          <div key={i} className={s.imageWrapper}>
+            <Image
+              src={
+                file.name.startsWith("/images/")
+                  ? file.name
+                  : URL.createObjectURL(file)
+              }
+              width={150}
+              height={150}
+              alt="Image de l'item"
+              unoptimized={true}
+              className={s.image}
+            />
+            <DeleteButton onDelete={() => handleDelete(file.name)} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

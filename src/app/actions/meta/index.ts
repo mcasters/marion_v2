@@ -8,6 +8,7 @@ export const getMetas = async (): Promise<Meta[]> =>
   await prisma.meta.findMany();
 
 export async function updateMeta(
+  initialState: any,
   formData: FormData,
 ): Promise<{ message: string; isError: boolean }> {
   try {

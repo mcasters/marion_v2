@@ -99,7 +99,7 @@ export const getThumbnailSrc = (
         : "";
     }
     default: {
-      return item.images[0].filename !== ""
+      return item.images[0] && item.images[0].filename !== ""
         ? `/images/${item.type}/${item.images[0].filename}`
         : "";
     }

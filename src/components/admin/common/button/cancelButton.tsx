@@ -21,9 +21,6 @@ export default function CancelButton({
       }}
       className="adminButton"
       disabled={disabled}
-      style={{
-        cursor: disabled ? "unset" : "pointer",
-      }}
     >
       {text ? text : "Annuler"}
     </button>

@@ -7,11 +7,12 @@ import {
 } from "@/lib/utils/serverUtils";
 import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
-import { ContentFull, KeyContent } from "@/lib/type";
+import { KeyContent } from "@/lib/type";
 import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
 import { KEY_LABEL } from "@/constants/admin.ts";
 
 export async function updateContent(
+  initialState: any,
   formData: FormData,
 ): Promise<{ message: string; isError: boolean }> {
   const label = formData.get("key") as KeyContent;
@@ -24,91 +25,93 @@ export async function updateContent(
     });
 
     revalidatePath(`${RouteLabel[label]}`);
-    return { message: "Contenu enregistré", isError: false };
+    return { message: "Enregistré", isError: false };
   } catch (e) {
     return { message: "Erreur à l'enregistrement", isError: true };
   }
 }
 
-export async function updateImageContent(formData: FormData) {
+export async function updateImageContent(
+  initialState: any,
+  formData: FormData,
+) {
   const label = formData.get("key") as KeyContent;
 
   try {
     if (label === KEY_LABEL.SLIDER) await updateImageSlider(formData);
     else {
-      const bdContent = await findOrCreateContent(label);
-      await updateImagePresentation(bdContent, formData);
+      await updateImagePresentation(formData);
     }
 
     revalidatePath(`${RouteLabel[label]}`);
     revalidatePath(`${AdminRouteLabel[label]}`);
-    return { message: "Images enregistrées", isError: false };
+    return { message: "Enregistré", isError: false };
   } catch (e) {
     return { message: `Erreur à l'enregistrement`, isError: true };
   }
 }
 
 async function updateImageSlider(formData: FormData) {
-  const files = formData.getAll("files") as File[];
+  const filesToAdd = formData.getAll("filesToAdd") as File[];
   const filenamesToDelete = formData.get("filenamesToDelete") as string;
 
-  let _filenamesToDelete: string[] = [];
-  if (filenamesToDelete !== "")
-    _filenamesToDelete = filenamesToDelete.split(",");
-
-  for await (const file of files) {
-    if (file.size > 0) {
-      const isMain = formData.get("isMain") === "true";
-      const title = isMain ? "mobileSlider" : "desktopSlider";
-      await saveContentImage(KEY_LABEL.SLIDER, file, title, isMain);
-    }
+  if (filesToAdd.length > 0) {
+    const isMain = formData.get("isMain") === "true";
+    const title = isMain ? "mobileSlider" : "desktopSlider";
+    await saveContentImage(KEY_LABEL.SLIDER, filesToAdd, title, isMain);
   }
-  for await (const filename of _filenamesToDelete)
-    await deleteImageContent(KEY_LABEL.SLIDER, filename);
+
+  if (filenamesToDelete !== "")
+    for await (const filename of filenamesToDelete.split(",")) {
+      await deleteImageContent(KEY_LABEL.SLIDER, filename);
+    }
 }
 
-async function updateImagePresentation(
-  bdContent: ContentFull,
-  formData: FormData,
-) {
-  const oldImage = bdContent.images[0];
-  const files = formData.getAll("files") as File[];
+async function updateImagePresentation(formData: FormData) {
+  const filesToAdd = formData.getAll("filesToAdd") as File[];
   const filenamesToDelete = formData.get("filenamesToDelete") as string;
 
-  if (files.length > 0 && files[0].size > 0) {
-    if (oldImage)
-      await deleteImageContent(KEY_LABEL.PRESENTATION, oldImage.filename);
+  if (filenamesToDelete !== "")
+    await deleteImageContent(KEY_LABEL.PRESENTATION, filenamesToDelete);
+
+  if (filesToAdd.length > 0)
     await saveContentImage(
       KEY_LABEL.PRESENTATION,
-      files[0],
+      filesToAdd,
       "presentation",
       false,
     );
-  } else if (filenamesToDelete !== "")
-    await deleteImageContent(KEY_LABEL.PRESENTATION, oldImage.filename);
 }
 
 const saveContentImage = async (
   label: KeyContent,
-  file: File,
+  filesToAdd: File[],
   title: string,
   isMain: boolean,
 ) => {
-  const fileInfo = await resizeAndSaveImage(file, title, getMiscellaneousDir());
-  if (fileInfo) {
-    await prisma.content.update({
-      where: { label },
-      data: {
-        images: {
-          create: {
-            filename: fileInfo.filename,
-            width: fileInfo.width,
-            height: fileInfo.height,
-            isMain,
+  for await (const file of filesToAdd) {
+    if (file.size > 0) {
+      const fileInfo = await resizeAndSaveImage(
+        file,
+        title,
+        getMiscellaneousDir(),
+      );
+      if (fileInfo) {
+        await prisma.content.update({
+          where: { label },
+          data: {
+            images: {
+              create: {
+                filename: fileInfo.filename,
+                width: fileInfo.width,
+                height: fileInfo.height,
+                isMain,
+              },
+            },
           },
-        },
-      },
-    });
+        });
+      }
+    }
   }
 };
 
@@ -122,27 +125,4 @@ const deleteImageContent = async (label: KeyContent, filename: string) => {
       },
     },
   });
-};
-
-const findOrCreateContent = async (label: KeyContent): Promise<ContentFull> => {
-  let BDContent = await prisma.content.findUnique({
-    where: {
-      label,
-    },
-    include: { images: true },
-  });
-
-  if (!BDContent) {
-    BDContent = await prisma.content.create({
-      data: {
-        label,
-        title: "",
-        text: "",
-        images: {},
-      },
-      include: { images: true },
-    });
-  }
-
-  return BDContent;
 };
