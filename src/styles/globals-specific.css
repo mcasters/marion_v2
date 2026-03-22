@@ -68,7 +68,7 @@
 }
 
 html {
-  font-family: var(--font-family-serif);
+  font-family: var(--font-family-serif), serif;
   -webkit-font-smoothing: antialiased;
   font-size: var(--font-size);
 }
@@ -182,7 +182,7 @@ input,
 button,
 select,
 textarea {
-  font-family: var(--font-family-serif);
+  font-family: var(--font-family-serif), serif;
   -webkit-font-smoothing: antialiased;
   font-size: var(--font-size-min);
 }
@@ -191,7 +191,7 @@ label, .label {
   display: block;
   text-align: left;
   -webkit-font-smoothing: antialiased;
-  font-family: var(--font-family-serif-caps);
+  font-family: var(--font-family-serif-caps), serif;
   font-size: 14px;
   letter-spacing: 3px;
   margin: 10px 0 0;
@@ -236,7 +236,7 @@ input[type="checkbox"] {
 }
 
 .adminButton {
-  font-family: var(--font-family-serif);
+  font-family: var(--font-family-serif), serif;
   min-width: 200px;
   height: 40px;
   box-shadow: inset 0 0.8em 1em 0 #f6f6f6;

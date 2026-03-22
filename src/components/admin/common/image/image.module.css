@@ -1,7 +1,7 @@
 .dropZone {
   position: relative;
   height: 150px;
-  font-family: var(--font-family-serif-caps);
+  font-family: var(--font-family-serif-caps), serif;
   font-weight: bold;
   text-align: center;
   color: #c2c2c2;
@@ -60,7 +60,7 @@
 }
 
 .emptyInfo {
-  font-family: var(--font-family-serif-caps);
+  font-family: var(--font-family-serif-caps), serif;
   font-weight: bold;
 }
 

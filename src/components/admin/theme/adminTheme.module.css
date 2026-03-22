@@ -7,7 +7,7 @@
 }
 
 .sectionTitle {
-  font-family: var( --font-family-serif-caps);
+  font-family: var( --font-family-serif-caps), serif;
   letter-spacing: 3px;
   padding-bottom: 1em;
   font-size: 1.1em;
@@ -103,7 +103,7 @@ ColorPicker
 .presetColorContainer {
   width: 50px;
   padding: 0 1px;
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-sans), sans-serif;
   font-size: 11px;
   word-break: break-word;
 }

@@ -57,7 +57,7 @@
   }
 
   .monoContainer  h2 {
-    font-family: var(--font-family-serif-caps);
+    font-family: var(--font-family-serif-caps), serif;
     letter-spacing: 3px;
     margin-bottom: 1em;
   }

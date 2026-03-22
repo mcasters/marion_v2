@@ -4,7 +4,7 @@
   line-height: var(--nav-2-height);
   z-index: 2;
   user-select: none;
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-sans), sans-serif;
   font-variant: small-caps;
   font-size: var(--font-size);
 }

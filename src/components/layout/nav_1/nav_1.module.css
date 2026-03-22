@@ -29,7 +29,7 @@
 }
 
 .ul a {
-  font-family: var(--font-family-serif-caps);
+  font-family: var(--font-family-serif-caps), serif;
   font-size: var(--font-size-title4);
   font-weight: 500;
   display: inline-block;

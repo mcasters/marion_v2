@@ -60,7 +60,7 @@ export default async function RootLayout({
   const session = await getSession();
   const theme = await getActiveTheme();
   const pColors = await getPresetColors();
-  const structuredTheme = await getStructHexaTheme(theme, pColors);
+  const structuredTheme = getStructHexaTheme(theme, pColors);
   const metas = await getMetas();
   const contents = await getContentsFull();
 
