@@ -20,13 +20,13 @@ export default async function Contact() {
       <h1 className={s.title1}>Contenus de la page contact</h1>
       <TextAreaForm
         text={getAddress(contents)}
-        key={KEY_LABEL.ADDRESS}
+        dbKey={KEY_LABEL.ADDRESS}
         updateAction={updateContent}
         title="Adresse"
       />
       <div className="separate" />
       <InputForm
-        key={KEY_LABEL.PHONE}
+        dbKey={KEY_LABEL.PHONE}
         text={getPhone(contents)}
         updateAction={updateContent}
         title="Téléphone"
@@ -34,7 +34,7 @@ export default async function Contact() {
       />
       <div className="separate" />
       <InputForm
-        key={KEY_LABEL.EMAIL}
+        dbKey={KEY_LABEL.EMAIL}
         text={getEmail(contents)}
         updateAction={updateContent}
         title="E-mail"
@@ -43,7 +43,7 @@ export default async function Contact() {
       <div className="separate" />
       <TextAreaForm
         text={getContactText(contents)}
-        key={KEY_LABEL.TEXT_CONTACT}
+        dbKey={KEY_LABEL.TEXT_CONTACT}
         updateAction={updateContent}
         title="Texte d'accompagnement (facultatif)"
       />

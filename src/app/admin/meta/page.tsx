@@ -26,7 +26,7 @@ export default async function Page() {
           <Fragment key={key}>
             {!isTextArea && (
               <InputForm
-                key={key}
+                dbKey={key}
                 text={metaMap.get(key) || ""}
                 updateAction={updateMeta}
                 title={value}
@@ -36,7 +36,7 @@ export default async function Page() {
             {isTextArea && (
               <>
                 <TextAreaForm
-                  key={key}
+                  dbKey={key}
                   text={metaMap.get(key) || ""}
                   updateAction={updateMeta}
                   title={value}

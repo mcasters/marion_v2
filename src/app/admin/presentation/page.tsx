@@ -29,21 +29,21 @@ export default async function Presentation() {
       <div className="separate" />
       <TextAreaForm
         text={getPresentation(contents)}
-        key={KEY_LABEL.PRESENTATION}
+        dbKey={KEY_LABEL.PRESENTATION}
         updateAction={updateContent}
         title="Présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         text={getDemarche(contents)}
-        key={KEY_LABEL.DEMARCHE}
+        dbKey={KEY_LABEL.DEMARCHE}
         updateAction={updateContent}
         title="Démarche artistique (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         text={getInspiration(contents)}
-        key={KEY_LABEL.INSPIRATION}
+        dbKey={KEY_LABEL.INSPIRATION}
         updateAction={updateContent}
         title="Inspiration (facultatif)"
       />

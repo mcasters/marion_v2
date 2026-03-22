@@ -24,7 +24,7 @@ export default async function Home() {
       <h2 className={s.title2}>{`Texte d'accueil (facultatif)`}</h2>
       <TextAreaForm
         text={getIntroText(contents)}
-        key={KEY_LABEL.INTRO}
+        dbKey={KEY_LABEL.INTRO}
         updateAction={updateContent}
       />
       <div className="separate" />

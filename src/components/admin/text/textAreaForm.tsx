@@ -1,39 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
-import { useAlert } from "@/app/context/alertProvider.tsx";
 import { KeyContent, KeyMeta } from "@/lib/type.ts";
 import s from "../admin.module.css";
+import useActionResult from "@/components/hooks/useActionResult.ts";
 
 interface Props {
-  key: KeyContent | KeyMeta;
+  dbKey: KeyContent | KeyMeta;
   text: string;
   updateAction: (
+    initialState: any,
     formData: FormData,
   ) => Promise<{ message: string; isError: boolean }>;
   title?: string;
   metaLayout?: boolean;
 }
 export default function TextAreaForm({
-  key,
+  dbKey,
   text,
   updateAction,
   title,
   metaLayout = false,
 }: Props) {
   const [_text, set_text] = useState<string>(text);
-  const alert = useAlert();
-
-  const action = async (formData: FormData) => {
-    const { message, isError } = await updateAction(formData);
-    alert(message, isError);
-  };
+  const [state, action] = useActionState(updateAction, null);
+  useActionResult(state);
 
   return (
     <form action={action} className={metaLayout ? s.metaForm : undefined}>
-      <input type="hidden" name="key" value={key} />
+      <input type="hidden" name="key" value={dbKey} />
       <label className="inputContainer">
         {title}
         <textarea

@@ -29,7 +29,7 @@ export default async function AdminHome() {
       <div className="separate" />
       <h2 className={style.title2}>Pied de page du site</h2>
       <InputForm
-        key={KEY_META.FOOTER}
+        dbKey={KEY_META.FOOTER}
         text={metas.get(KEY_META.FOOTER) || ""}
         updateAction={updateMeta}
       />
