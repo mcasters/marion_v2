@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import { AdminPost, Image, Post, Type } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
-import { useAlert } from "@/app/context/alertProvider.tsx";
 import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
+import useActionResult from "@/components/hooks/useActionResult.ts";
 
 interface Props {
   post: AdminPost;
@@ -15,57 +15,17 @@ interface Props {
 }
 
 export default function PostForm({ post, onClose }: Props) {
-  const isUpdate = post.id !== 0;
-  const alert = useAlert();
-
   const [workPost, setWorkPost] = useState<Post>(post);
-  const [date, setDate] = useState<string>(
-    new Date(post.date).getFullYear().toString(),
+  const [state, action] = useActionState(
+    post.id !== 0 ? updateItem : createItem,
+    null,
   );
-  const [filenamesToDelete, setFilenamesToDelete] = useState<string[]>([]);
-  const [newMainFile, setNewMainFile] = useState<File[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
-
-  const handleDeleteFile = (filename: string) => {
-    const images = workPost.images.filter(
-      (i: Image) => i.filename !== filename,
-    );
-    setWorkPost({ ...workPost, images });
-    setFilenamesToDelete([...filenamesToDelete, filename]);
-  };
-
-  const handleNewMainFile = (files: File[]) => {
-    setNewMainFile([files[0]]);
-    const mainFilename = workPost.images
-      .filter((i: Image) => i.isMain)
-      .map((i: Image) => i.filename)[0];
-    if (mainFilename) {
-      handleDeleteFile(mainFilename);
-    }
-  };
-
-  const submit = async (formData: FormData) => {
-    formData.append("mainFile", newMainFile[0]);
-    newFiles.forEach((file) => formData.append("files", file));
-    const action = isUpdate ? updateItem : createItem;
-    const { message, isError } = await action(formData);
-    if (!isError) onClose();
-    alert(message, isError);
-  };
+  useActionResult(state, onClose);
 
   return (
-    <form action={submit}>
+    <form action={action}>
       <input type="hidden" name="type" value={Type.POST} />
-      {isUpdate && (
-        <>
-          <input type="hidden" name="id" value={post.id} />
-          <input
-            type="hidden"
-            name="filenamesToDelete"
-            value={filenamesToDelete}
-          />
-        </>
-      )}
+      <input name="id" type="hidden" value={post.id} />
       <input
         onChange={(e) => setWorkPost({ ...workPost, title: e.target.value })}
         name="title"
@@ -76,15 +36,14 @@ export default function PostForm({ post, onClose }: Props) {
       />
       <br />
       <input
-        onChange={(e) => {
-          setDate(e.target.value);
-        }}
         name="date"
         type="number"
         min={1980}
         max={2100}
-        value={date}
-        placeholder="Date"
+        value={new Date(workPost.date).getFullYear().toString()}
+        onChange={(e) =>
+          setWorkPost({ ...workPost, date: new Date(e.target.value) })
+        }
         required
       />
       <br />
@@ -96,27 +55,19 @@ export default function PostForm({ post, onClose }: Props) {
         placeholder="Texte (facultatif)"
       />
       <ImageInput
-        filenames={workPost.images
-          .filter((i: Image) => i.isMain)
-          .map((i: Image) => i.filename)}
-        pathImage={`/images/${Type.POST}`}
-        isMultiple={false}
+        filesPath={workPost.images
+          .filter((i) => i.isMain)
+          .map((i: Image) => `/images/${Type.POST}/sm/${i.filename}`)}
         smallImageOption={true}
-        onNewFiles={handleNewMainFile}
-        onDelete={(filename) => handleDeleteFile(filename)}
         title="Image principale - une seule image (facultative)"
+        isMain={true}
       />
       <ImageInput
-        filenames={workPost.images
-          .filter((i: Image) => !i.isMain)
-          .map((i: Image) => i.filename)}
-        pathImage={`/images/${Type.POST}`}
+        filesPath={workPost.images
+          .filter((i) => !i.isMain)
+          .map((i: Image) => `/images/${Type.POST}/sm/${i.filename}`)}
         isMultiple={true}
         smallImageOption={true}
-        onNewFiles={(files) =>
-          setNewFiles((prevState) => [...prevState, ...files])
-        }
-        onDelete={(filename) => handleDeleteFile(filename)}
         title="Album d'images (facultatif)"
       />
       <div className={s.buttonSection}>

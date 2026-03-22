@@ -18,20 +18,22 @@ import { validateFile } from "@/lib/utils/imageUtils.ts";
 
 interface Props extends HTMLProps<HTMLInputElement> {
   filesPath: string[];
-  isMultiple: boolean;
   smallImageOption: boolean;
+  isMultiple?: boolean;
   onChange?: () => void;
-  title?: string;
+  isMain?: boolean;
   required?: boolean;
+  title?: string;
 }
 
 export default function ImageInput({
   filesPath,
-  isMultiple,
   smallImageOption,
   onChange,
-  title = "",
+  isMultiple = false,
+  isMain = false,
   required = false,
+  title = "",
 }: Props): JSX.Element {
   const alert = useAlert();
   const [acceptSmallImage, setAcceptSmallImage] = useState<boolean>(false);
@@ -91,7 +93,16 @@ export default function ImageInput({
 
   return (
     <div className="inputContainer">
-      <input name="filenamesToDelete" type="hidden" value={filenamesToDelete} />
+      <input
+        name={"mainFilenameToDelete"}
+        type="hidden"
+        value={isMain ? filenamesToDelete : ""}
+      />
+      <input
+        name={"filenamesToDelete"}
+        type="hidden"
+        value={isMain ? "" : filenamesToDelete}
+      />
       {title && <p className="label">{title}</p>}
       <div className={s.dropZone}>
         <div className={s.dropIcon}>
@@ -101,7 +112,7 @@ export default function ImageInput({
         <input
           ref={inputRef}
           type="file"
-          name="filesToAdd"
+          name={isMain ? "mainFileToAdd" : "filesToAdd"}
           onChange={handleAdd}
           multiple={isMultiple}
           accept="image/png, image/jpeg"

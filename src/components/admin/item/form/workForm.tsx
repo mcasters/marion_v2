@@ -19,7 +19,6 @@ interface Props {
 export default function WorkForm({ work, onClose, categories }: Props) {
   const isSculpture = work.type === Type.SCULPTURE;
   const [workItem, setWorkItem] = useState<Work>(work);
-  const [changed, setChanged] = useState<boolean>(false);
   const [state, action] = useActionState(
     work.id !== 0 ? updateItem : createItem,
     null,
