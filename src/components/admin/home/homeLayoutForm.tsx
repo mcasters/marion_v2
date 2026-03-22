@@ -1,26 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { useAlert } from "@/app/context/alertProvider.tsx";
 import Image from "next/image";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import { getHomeLayout } from "@/lib/utils/commonUtils.ts";
 import { updateMeta } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
+import useActionResult from "@/components/hooks/useActionResult.ts";
 
 export default function HomeLayoutForm() {
   const metas = useMetas();
-  const alert = useAlert();
   const [value, setValue] = useState<string>(getHomeLayout(metas).toString());
-
-  const submit = async (formData: FormData) => {
-    const { message, isError } = await updateMeta(formData);
-    alert(message, isError);
-  };
+  const [state, action] = useActionState(updateMeta, null);
+  useActionResult(state);
 
   return (
-    <form action={submit} className={s.layoutForm}>
+    <form action={action} className={s.layoutForm}>
       <input type="hidden" name="key" value={KEY_META.HOME_LAYOUT} />
       <input type="hidden" name="text" value={value} />
 

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { useAlert } from "@/app/context/alertProvider.tsx";
 import { Type } from "@/lib/type.ts";
 import Image from "next/image";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import { updateMeta } from "@/app/actions/meta";
+import useActionResult from "@/components/hooks/useActionResult.ts";
 
 type Props = {
   type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
@@ -15,20 +15,16 @@ type Props = {
 
 export default function ItemLayoutForm({ type }: Props) {
   const metas = useMetas();
-  const alert = useAlert();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const [layout, setLayout] = useState<string>(itemLayout.toString());
   const [darkBackground, setDarkBackground] = useState<boolean>(
     itemDarkBackground === 1,
   );
-
-  const submit = async (formData: FormData) => {
-    const { message, isError } = await updateMeta(formData);
-    alert(message, isError);
-  };
+  const [state, action] = useActionState(updateMeta, null);
+  useActionResult(state);
 
   return (
-    <form action={submit} className={s.layoutForm}>
+    <form action={action} className={s.layoutForm}>
       <input
         type="hidden"
         name="key"
