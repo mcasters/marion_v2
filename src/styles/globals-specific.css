@@ -251,16 +251,14 @@ input[type="checkbox"] {
   background-color: #e5e5e5;
 }
 
-button {
-  cursor: pointer;
-}
-
-button:disabled, button:disabled:hover {
-  cursor: initial;
+.adminButton:disabled {
   border-color: #d9d9d9;
   background-color: #efefef;
 }
 
+button {
+  cursor: pointer;
+}
 /*
  * Print s
  * Inlined to avoid the additional HTTP request:
