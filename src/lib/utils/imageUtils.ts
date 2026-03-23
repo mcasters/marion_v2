@@ -10,6 +10,7 @@ import {
 import { FILE_TYPES, IMAGE } from "@/constants/image.ts";
 import { getSliderContent, getSliders } from "@/lib/utils/commonUtils.ts";
 import { MESSAGE } from "@/constants/admin.ts";
+import Resizer from "react-image-file-resizer";
 
 const getEmptyPhotoTab = (): PhotoTab => {
   return { sm: [], md: [], lg: [] };
@@ -92,7 +93,7 @@ const getSplitMainPhotosFromImages = (
   return { mainPhotos, photos };
 };
 
-const getPhotosEnhancedFromImages = (
+const createPhotoTabEnhanced = (
   item: Work,
   alt: string,
   photos: PhotoTabEnhanced,
@@ -198,13 +199,13 @@ export const getItemPhotoTab = (item: Work, alt: string): PhotoTab => {
   return getPhotoTabFromImages(item.images, folder, alt, item.title, item.date);
 };
 
-export const getItemsPhotoTabEnhanced = (
+export const getPhotoTabEnhanced = (
   items: Work[],
   alt: string,
 ): PhotoTabEnhanced => {
   let photosEnhanced = getEmptyPhotoTabEnhanced();
   items.forEach((item) => {
-    photosEnhanced = getPhotosEnhancedFromImages(item, alt, photosEnhanced);
+    photosEnhanced = createPhotoTabEnhanced(item, alt, photosEnhanced);
   });
   return photosEnhanced;
 };
@@ -240,6 +241,33 @@ export const validateFile = async (
     }
     bmp.close();
   }
-
   return { message: "OK", isError: false };
+};
+
+const resizeFile = (file: File, quality: number) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      2000,
+      2000,
+      "JPEG",
+      quality,
+      0,
+      (file) => {
+        resolve(file);
+      },
+      "file",
+    );
+  });
+export const constraintImage = async (
+  file: File,
+  quality = 90,
+  drop = 10,
+): Promise<File> => {
+  const done = (await resizeFile(file, quality)) as File;
+
+  if (done.size > 200000 && quality - drop > 10) {
+    return constraintImage(file, quality - drop);
+  }
+  return done;
 };

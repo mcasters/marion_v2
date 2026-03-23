@@ -24,7 +24,7 @@ export default function FormattedPhoto({
   const isSmall = useWindowRect().innerWidth < DEVICE.SMALL;
   const [index, setIndex] = useState(-1);
   const photo = isSmall ? photoTab.sm[0] : photoTab.md[0];
-  const ratio = Math.round((photo?.width / photo?.height) * 10000);
+  const ratio = Math.round((photo.width / photo.height) * 10000);
   const isLandscape = ratio >= 10300;
 
   if (photo)
