@@ -10,11 +10,10 @@ import React, {
 } from "react";
 import { useAlert } from "@/app/context/alertProvider";
 import s from "./image.module.css";
-import { constraintImage } from "@/components/admin/common/formUtils";
 import ArrowDown from "@/components/icons/arrowDown.tsx";
 import Image from "next/image";
 import DeleteButton from "@/components/admin/common/button/deleteButton.tsx";
-import { validateFile } from "@/lib/utils/imageUtils.ts";
+import { constraintImage, validateFile } from "@/lib/utils/imageUtils.ts";
 
 interface Props extends HTMLProps<HTMLInputElement> {
   filesPath: string[];
@@ -134,17 +133,12 @@ export default function ImageInput({
         {files.length === 0 && <p className={s.emptyInfo}>Aucune image</p>}
         {files.map((file, i) => (
           <div key={i} className={s.imageWrapper}>
-            <Image
+            <SizedImage
               src={
                 file.name.startsWith("/images/")
                   ? file.name
                   : URL.createObjectURL(file)
               }
-              width={150}
-              height={150}
-              alt="Image de l'item"
-              unoptimized={true}
-              className={s.image}
             />
             <DeleteButton onDelete={() => handleDelete(file.name)} />
           </div>
@@ -153,3 +147,32 @@ export default function ImageInput({
     </div>
   );
 }
+
+const SizedImage = ({ src }: { src: string }): JSX.Element => {
+  const [size, setSize] = useState({ naturalWidth: 0, naturalHeight: 0 });
+  return (
+    <Image
+      src={src}
+      onLoad={(e) => {
+        const { naturalWidth, naturalHeight } = e.target as HTMLImageElement;
+        setSize({ naturalWidth, naturalHeight });
+      }}
+      width={size.naturalWidth}
+      height={size.naturalHeight}
+      alt="Preview"
+      unoptimized={true}
+      style={
+        size.naturalWidth / size.naturalHeight >= 1.03
+          ? {
+              width: 150,
+              height: "auto",
+            }
+          : {
+              width: "auto",
+              height: 150,
+            }
+      }
+      className={s.image}
+    />
+  );
+};

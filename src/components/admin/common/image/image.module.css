@@ -10,7 +10,7 @@
   border-radius: 1px;
 
   &:hover {
-    box-shadow: 0 3px 5px rgba(0,0,0,.2);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
     background-color: #e7e7e7;
     border-width: 2px;
   }
@@ -36,7 +36,7 @@
   }
 
   &::file-selector-button {
-  opacity: 0;
+    opacity: 0;
   }
 }
 
@@ -66,13 +66,9 @@
 
 .imageWrapper {
   display: inline-block;
-  text-align: center;
-  padding: 0 2px;
-}
 
-.image {
-  display: block;
-  object-fit: contain;
-  padding: 0 2px;
-  width: auto;
+  & .image {
+    display: block;
+    padding: 0 4px;
+  }
 }
