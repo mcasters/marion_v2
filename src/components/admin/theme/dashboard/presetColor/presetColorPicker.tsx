@@ -38,7 +38,11 @@ export default function PresetColorPicker({
         prefixed={true}
         className={s.halfWidth}
       />
-      <button className={s.halfWidth} onClick={() => onUpdate(color)}>
+      <button
+        className={s.halfWidth}
+        onClick={() => onUpdate(color)}
+        style={{ marginRight: "1.5em" }}
+      >
         OK
       </button>
       <button className={s.halfWidth} onClick={onCancel}>

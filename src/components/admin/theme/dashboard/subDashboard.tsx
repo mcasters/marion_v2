@@ -2,9 +2,19 @@
 
 import React, { Fragment } from "react";
 import s from "../adminTheme.module.css";
-import { THEME_PAGE_LABEL } from "@/constants/admin";
+import {
+  THEME_GEN_TARGET_LABEL,
+  THEME_LABEL,
+  THEME_PAGE_LABEL,
+  THEME_TARGET_LABEL,
+} from "@/constants/admin";
 import ColorSwatch from "@/components/admin/theme/dashboard/colorSwatch";
-import { StructTheme, ThemePage } from "@/lib/type";
+import {
+  StructTheme,
+  ThemeGenTarget,
+  ThemePage,
+  ThemeTarget,
+} from "@/lib/type";
 
 interface Props {
   structuredTheme: StructTheme;
@@ -14,15 +24,15 @@ interface Props {
 export default function SubDashboard({ structuredTheme, themeKey }: Props) {
   if (themeKey === "general") {
     return Object.entries(structuredTheme[themeKey]).map(
-      ([targetKey, value], i) =>
-        value !== "" ? (
+      ([targetKey, value], i) => {
+        return value !== "" ? (
           <ColorSwatch
             key={i}
-            themeKey={themeKey}
-            pageKey={null}
-            targetKey={targetKey}
+            dbKey={`${themeKey}_${targetKey}`}
+            fullLabel={`${THEME_LABEL[themeKey as keyof StructTheme]} | ${THEME_GEN_TARGET_LABEL[targetKey as keyof ThemeGenTarget]}`}
           />
-        ) : undefined,
+        ) : undefined;
+      },
     );
   } else
     return Object.entries(structuredTheme[themeKey]).map(
@@ -37,9 +47,8 @@ export default function SubDashboard({ structuredTheme, themeKey }: Props) {
               )}
               {value !== "" && (
                 <ColorSwatch
-                  themeKey={themeKey}
-                  pageKey={pageKey}
-                  targetKey={targetKey}
+                  dbKey={`${themeKey}_${pageKey}_${targetKey}`}
+                  fullLabel={`${THEME_LABEL[themeKey as keyof StructTheme]} | ${THEME_PAGE_LABEL[pageKey as keyof ThemePage]} | ${THEME_TARGET_LABEL[targetKey as keyof ThemeTarget]}`}
                 />
               )}
             </Fragment>

@@ -96,7 +96,6 @@ export async function updateItem(initialState: any, formData: FormData) {
     | Type.SCULPTURE
     | Type.DRAWING
     | Type.POST;
-  console.log(formData);
   const title = formData.get("title") as string;
   const isChangingCategory = !!formData.get("oldCategoryId");
 
@@ -378,9 +377,7 @@ const handleAddAndRemoveImages = async (
       <FileInfo>await resizeAndSaveImage(mainFileToAdd, title, dir, true),
     );
 
-  console.log("OUT /// ", filesToAdd);
   if (filesToAdd.length) {
-    console.log("/// ", filesToAdd);
     for await (const file of filesToAdd) {
       if (file.size > 0)
         tab.push(<FileInfo>await resizeAndSaveImage(file, title, dir, false));

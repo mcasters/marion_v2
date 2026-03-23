@@ -8,7 +8,7 @@ import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import { colorNameToHex } from "@/lib/utils/themeUtils";
 
 interface Props {
-  color: string;
+  color: string; // Hex or presetColor name
   onColorChange: (color: string) => void;
   onCreatePresetColor: (nameColor: string, hexColor: string) => void;
   onClose: () => void;
@@ -25,32 +25,35 @@ export default function ColorPicker({
   const { workTheme, presetColors } = useAdminWorkThemeContext();
   const isPresetColor = !color.startsWith("#");
   const hexColor = colorNameToHex(color, presetColors);
-  const [_nameColor, set_nameColor] = useState<string>("");
-  const [isColorChanged, setIsColorChanged] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [colorChanged, setColorChanged] = useState<boolean>(false);
 
   useEffect(() => {
-    set_nameColor(isPresetColor ? color : "");
+    setName(isPresetColor ? color : "");
   }, [workTheme]);
 
-  const handleColorChange = (color: string) => {
-    if (color.startsWith("#")) {
-      set_nameColor("");
-      setIsColorChanged(true);
-    } else setIsColorChanged(false);
+  const handleNewColor = (color: string) => {
+    setName("");
+    setColorChanged(true);
     onColorChange(color);
+  };
+
+  const handleSelectPresetColor = (name: string) => {
+    setColorChanged(false);
+    onColorChange(name);
   };
 
   return (
     <div className={s.colorPicker}>
       <HexColorPicker
         color={hexColor}
-        onChange={handleColorChange}
+        onChange={handleNewColor}
         style={{ width: "300px", margin: "0 auto 1em" }}
       />
       <div className={s.halfWidth} style={{ backgroundColor: hexColor }}></div>
       <HexColorInput
         color={hexColor}
-        onChange={handleColorChange}
+        onChange={handleNewColor}
         prefixed={true}
         className={s.halfWidth}
       />
@@ -58,16 +61,14 @@ export default function ColorPicker({
       <input
         className={s.halfWidth}
         placeholder="Nom de la couleur"
-        value={_nameColor}
-        onChange={(e) => set_nameColor(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
       <button
-        onClick={() => onCreatePresetColor(_nameColor, hexColor)}
+        onClick={() => onCreatePresetColor(name, hexColor)}
         className={`${s.halfWidth} adminButton`}
         disabled={
-          _nameColor === "" ||
-          _nameColor === color ||
-          (!isColorChanged && isPresetColor)
+          name === "" || name === color || (!colorChanged && isPresetColor)
         }
       >
         Mémoriser la couleur
@@ -82,7 +83,7 @@ export default function ColorPicker({
               style={{
                 background: p.color,
               }}
-              onClick={() => handleColorChange(p.name)}
+              onClick={() => handleSelectPresetColor(p.name)}
             />
             <p>{p.name}</p>
           </div>

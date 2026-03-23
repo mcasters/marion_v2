@@ -56,8 +56,12 @@
   height: 28px;
   border-radius: 1px;
   border: 1px solid #aaa;
-  cursor: pointer;
   margin: 4px;
+  transition: transform .2s;
+}
+
+.swatch:hover {
+  transform: scale(1.1);
 }
 
 .colorLabel {

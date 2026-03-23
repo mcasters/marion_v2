@@ -4,33 +4,20 @@ import { Theme } from "@@/prisma/generated/client";
 import React, { useRef } from "react";
 import s from "@/components/admin/theme/adminTheme.module.css";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
-import {
-  OnlyString,
-  StructTheme,
-  ThemeGenTarget,
-  ThemePage,
-  ThemeTarget,
-} from "@/lib/type";
+import { OnlyString } from "@/lib/type";
 import ColorPicker from "@/components/admin/theme/dashboard/colorPicker";
 import Modal from "@/components/admin/common/modal.tsx";
 import { createPresetColor } from "@/app/actions/theme/admin";
 import { useAlert } from "@/app/context/alertProvider";
 import { colorNameToHex } from "@/lib/utils/themeUtils";
-import {
-  THEME_GEN_TARGET_LABEL,
-  THEME_LABEL,
-  THEME_PAGE_LABEL,
-  THEME_TARGET_LABEL,
-} from "@/constants/admin";
 import useModal from "@/components/hooks/useModal.ts";
 
 interface Props {
-  themeKey: string;
-  pageKey: string | null;
-  targetKey: string;
+  dbKey: string;
+  fullLabel: string;
 }
 
-export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
+export default function ColorSwatch({ dbKey, fullLabel }: Props) {
   const {
     workTheme,
     setWorkTheme,
@@ -41,20 +28,14 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
   } = useAdminWorkThemeContext();
   const alert = useAlert();
   const { isOpen, toggle } = useModal();
-  const dbLabel = pageKey
-    ? `${themeKey}_${pageKey}_${targetKey}`
-    : `${themeKey}_${targetKey}`;
-  const label = pageKey
-    ? THEME_TARGET_LABEL[targetKey as keyof ThemeTarget]
-    : THEME_GEN_TARGET_LABEL[targetKey as keyof ThemeGenTarget];
-  const color: string = workTheme[dbLabel as keyof OnlyString<Theme>];
+  const color: string = workTheme[dbKey as keyof OnlyString<Theme>];
   const initialColor = useRef(color);
   const initialIsSaved = useRef(isSaved);
 
   const handleColorChange = (color: string) => {
     setWorkTheme({
       ...workTheme,
-      [dbLabel]: color,
+      [dbKey]: color,
     } as Theme);
     setIsSaved(false);
   };
@@ -70,7 +51,7 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
     );
     if (res.newPresetColor) {
       setPresetColors([...presetColors, res.newPresetColor]);
-      setWorkTheme({ ...workTheme, [dbLabel]: nameColor } as Theme);
+      setWorkTheme({ ...workTheme, [dbKey]: nameColor } as Theme);
       setIsSaved(false);
     }
     alert(res.message, res.isError);
@@ -80,7 +61,7 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
     setIsSaved(initialIsSaved.current);
     setWorkTheme({
       ...workTheme,
-      [dbLabel]: initialColor.current,
+      [dbKey]: initialColor.current,
     } as Theme);
     toggle();
   };
@@ -101,10 +82,12 @@ export default function ColorSwatch({ themeKey, pageKey, targetKey }: Props) {
         onClick={() => toggle()}
         title={color}
       />
-      <p className={s.colorLabel}>{label}</p>
+      <p className={s.colorLabel}>
+        {fullLabel.substring(fullLabel.lastIndexOf("|") + 2)}
+      </p>
       <Modal
         isOpen={isOpen}
-        title={`${THEME_LABEL[themeKey as keyof StructTheme]} | ${pageKey ? `${THEME_PAGE_LABEL[pageKey as keyof ThemePage]} |` : ""} ${label}`}
+        title={fullLabel}
         onClickOutside={toggle}
         width={440}
       >
