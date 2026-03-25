@@ -1,11 +1,11 @@
-import { rmSync } from "fs";
+import {rmSync} from "fs";
 import sharp from "sharp";
-import { join } from "path";
-import { transformValueToKey } from "@/lib/utils/commonUtils.ts";
-import { IMAGE } from "@/constants/image.ts";
-import { StructTheme, Type } from "@/lib/type.ts";
-import { PresetColor, Theme } from "@@/prisma/generated/client";
-import { getStructuredTheme, themeToHexa } from "@/lib/utils/themeUtils.ts";
+import {join} from "path";
+import {transformValueToKey} from "@/lib/utils/commonUtils.ts";
+import {IMAGE} from "@/constants/image.ts";
+import {StructTheme, Type} from "@/lib/type.ts";
+import {PresetColor, Theme} from "@@/prisma/generated/client";
+import {getStructuredTheme, themeToHexa} from "@/lib/utils/themeUtils.ts";
 
 const serverLibraryPath = process.env.PHOTOS_PATH;
 const copyright = process.env.TITLE || "";
@@ -26,24 +26,18 @@ export const resizeAndSaveImage = async (
 ) => {
   const titleString = transformValueToKey(title);
   const newFilename = `${titleString}-${Date.now()}.jpeg`;
-  const bytes = await file.arrayBuffer();
-  const imageBuffer = await sharp(Buffer.from(bytes))
-    .jpeg({ quality: 100 })
-    .toBuffer();
-
   const sharpStream = sharp({ failOn: "none" });
   const promises = [];
 
   promises.push(
     sharpStream
       .clone()
-      .withMetadata({
-        exif: {
-          IFD0: {
-            Copyright: copyright,
-          },
+      .withExif({
+        IFD0: {
+          Copyright: copyright,
         },
       })
+      .jpeg({ quality: 80})
       .toFile(`${dir}/${newFilename}`),
   );
   promises.push(
@@ -54,13 +48,12 @@ export const resizeAndSaveImage = async (
         fit: sharp.fit.inside,
         withoutEnlargement: true,
       })
-      .withMetadata({
-        exif: {
-          IFD0: {
-            Copyright: copyright,
-          },
+      .withExif({
+        IFD0: {
+          Copyright: copyright,
         },
       })
+      .jpeg({ quality: 80})
       .toFile(`${dir}/md/${newFilename}`),
   );
   promises.push(
@@ -71,16 +64,19 @@ export const resizeAndSaveImage = async (
         fit: sharp.fit.inside,
         withoutEnlargement: true,
       })
-      .withMetadata({
-        exif: {
-          IFD0: {
-            Copyright: copyright,
-          },
+      .withExif({
+        IFD0: {
+          Copyright: copyright,
         },
       })
+      .jpeg({ quality: 80})
       .toFile(`${dir}/sm/${newFilename}`),
   );
 
+  const bytes = await file.arrayBuffer();
+  const imageBuffer = await sharp(Buffer.from(bytes))
+    .jpeg({ quality: 100 })
+    .toBuffer();
   sharp(imageBuffer).pipe(sharpStream);
 
   return Promise.all(promises)
