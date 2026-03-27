@@ -45,7 +45,7 @@ export const KEY_LABEL = {
 export const COOKIE_NAME = "adminSession";
 
 export const KEY_META = {
-  SITE_TITLE: "siteTitle",
+  OWNER: "owner",
   SITE_EMAIL: "siteEmail",
   FOOTER: "footerContent",
   INSTAGRAM: "instagram",

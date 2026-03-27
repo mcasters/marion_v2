@@ -1,11 +1,12 @@
 "use server";
-import prisma from "@/lib/prisma.ts";
-import { Meta } from "@@/prisma/generated/client";
-import { KEY_META } from "@/constants/admin.ts";
-import { revalidatePath } from "next/cache";
+import {KEY_META} from "@/constants/admin.ts";
+import {revalidatePath} from "next/cache";
+import {meta} from "@/db/schema.ts"
+import {db} from "@/db";
+import {eq} from "drizzle-orm";
 
-export const getMetas = async (): Promise<Meta[]> =>
-  await prisma.meta.findMany();
+export const getMetas = async (): Promise<typeof meta.$inferSelect[]> =>
+  await db.select().from(meta);
 
 export async function updateMeta(
   initialState: any,
@@ -25,22 +26,21 @@ export async function updateMeta(
       text = `${layout},${darkBackground}`;
     } else text = formData.get("text") as string;
 
-    const meta = await prisma.meta.findUnique({
-      where: { key },
-    });
-    if (!meta) {
-      await prisma.meta.create({
-        data: {
+    const metaFind = await db.select()
+      .from(meta)
+      .where(eq(meta.key, key));
+
+    if (!metaFind) {
+      await db.insert(meta).values({
           key,
           text,
-        },
       });
     } else {
-      await prisma.meta.update({
-        where: { key },
-        data: { text },
-      });
+      await db.update(meta)
+        .set({text})
+        .where(eq(meta.key, key));
     }
+
     revalidatePath("/admin");
     return { message: "Modification enregistrée", isError: false };
   } catch (e) {
