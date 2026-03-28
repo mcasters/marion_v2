@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { PresetColor, Theme } from "@@/prisma/generated/client";
+import { PresetColor, Theme } from "@/lib/type.ts";
 
 export interface AdminWorkThemeContextType {
   workTheme: Theme;

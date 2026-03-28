@@ -4,6 +4,7 @@
 import { Prisma, User } from "@@/prisma/generated/client";
 import { JSX } from "react";
 import { KEY_LABEL, KEY_META } from "@/constants/admin.ts";
+import { presetColor, theme } from "@/db/schema.ts";
 
 type StringKeys<T> = {
   [k in keyof T]: T[k] extends string ? k : never;
@@ -202,3 +203,9 @@ export type Filter = {
   yearFilter: number;
   isOutFilter: number;
 };
+
+export type Theme = typeof theme.$inferSelect;
+export type NewTheme = typeof theme.$inferInsert;
+
+export type PresetColor = typeof presetColor.$inferSelect;
+export type NewPresetColor = typeof presetColor.$inferInsert;

@@ -4,11 +4,11 @@ import { AdminWorkThemeProvider } from "@/app/context/adminWorkThemeProvider";
 import {
   getActiveTheme,
   getPresetColors,
-  getThemesFull,
+  getThemes,
 } from "@/app/actions/theme";
 
 export default async function layout({ children }: { children: ReactNode }) {
-  const themes = await getThemesFull();
+  const themes = await getThemes();
   const activeTheme =
     themes.find((t) => t.isActive) || (await getActiveTheme());
   const presetColors = await getPresetColors();

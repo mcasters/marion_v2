@@ -1,5 +1,5 @@
 export const THEME = {
-  BASE_THEME: "Thème de base",
+  BASE_THEME_NAME: "Thème de base",
 };
 
 export const THEME_LABEL = {
