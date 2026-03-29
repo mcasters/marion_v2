@@ -75,15 +75,15 @@ export const drawing = mysqlTable(
   {
     id: int().autoincrement().notNull(),
     title: varchar({ length: 191 }).notNull(),
-    date: datetime({ mode: "string", fsp: 3 }).notNull(),
+    date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
     description: longtext().notNull(),
     height: double().notNull(),
     width: double().notNull(),
-    createdAt: datetime({ mode: "string", fsp: 3 })
+    createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "string", fsp: 3 }).notNull(),
+    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => drawingCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -130,12 +130,12 @@ export const message = mysqlTable(
   "Message",
   {
     id: int().autoincrement().notNull(),
-    date: datetime({ mode: "string", fsp: 3 }).notNull(),
+    date: datetime({ mode: "date", fsp: 3 }).notNull(),
     text: longtext().notNull(),
     userId: int()
       .notNull()
       .references(() => user.id, { onDelete: "restrict", onUpdate: "cascade" }),
-    dateUpdated: datetime({ mode: "string", fsp: 3 }),
+    dateUpdated: datetime({ mode: "date", fsp: 3 }),
   },
   (table) => [primaryKey({ columns: [table.id], name: "Message_id" })],
 );
@@ -158,15 +158,15 @@ export const painting = mysqlTable(
   {
     id: int().autoincrement().notNull(),
     title: varchar({ length: 191 }).notNull(),
-    date: datetime({ mode: "string", fsp: 3 }).notNull(),
+    date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
     description: longtext().notNull(),
     height: double().notNull(),
     width: double().notNull(),
-    createdAt: datetime({ mode: "string", fsp: 3 })
+    createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "string", fsp: 3 }).notNull(),
+    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => paintingCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -217,11 +217,11 @@ export const post = mysqlTable(
     id: int().autoincrement().notNull(),
     type: varchar({ length: 191 }).default("post").notNull(),
     title: varchar({ length: 191 }).notNull(),
-    date: datetime({ mode: "string", fsp: 3 }).notNull(),
-    createdAt: datetime({ mode: "string", fsp: 3 })
+    date: datetime({ mode: "date", fsp: 3 }).notNull(),
+    createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "string", fsp: 3 }).notNull(),
+    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     text: longtext().notNull(),
     published: boolean().default(false).notNull(),
     viewCount: int().default(0).notNull(),
@@ -271,16 +271,16 @@ export const sculpture = mysqlTable(
   {
     id: int().autoincrement().notNull(),
     title: varchar({ length: 191 }).notNull(),
-    date: datetime({ mode: "string", fsp: 3 }).notNull(),
+    date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
     description: longtext().notNull(),
     height: double().notNull(),
     width: double().notNull(),
     length: double().notNull(),
-    createdAt: datetime({ mode: "string", fsp: 3 })
+    createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "string", fsp: 3 }).notNull(),
+    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => sculptureCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
