@@ -1,7 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-empty-object-type */
 
-import { Prisma, User } from "@@/prisma/generated/client";
 import { JSX } from "react";
 import { KEY_LABEL, KEY_META } from "@/constants/admin.ts";
 import { presetColor, theme } from "@/db/schema.ts";
@@ -89,14 +88,22 @@ export interface AdminPost extends Post {
   modifiable: boolean;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  isAdmin: boolean;
+}
+
+export type Session = {
+  user: User;
+};
+
 export interface Message {
   id: number;
   date: Date;
   dateUpdated: Date | null;
   text: string;
-  author: Prisma.UserGetPayload<{
-    omit: { password: true };
-  }>;
+  author: User;
 }
 
 export enum Layout {
@@ -153,10 +160,6 @@ export type PhotoTabEnhanced = {
   lg: PhotoEnhanced[];
 };
 
-export type Session = {
-  user: User;
-};
-
 export type ThemeTarget = {
   background: string;
   text: string;
@@ -208,4 +211,3 @@ export type Theme = typeof theme.$inferSelect;
 export type NewTheme = typeof theme.$inferInsert;
 
 export type PresetColor = typeof presetColor.$inferSelect;
-export type NewPresetColor = typeof presetColor.$inferInsert;
