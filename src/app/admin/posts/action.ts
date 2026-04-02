@@ -1,74 +1,61 @@
 "use server";
 
-import { AdminCategory, Type, Work } from "@/lib/type.ts";
-import {
-  createAdminCategoryObjects,
-  createPaintingData,
-  createSculptureData,
-  createWorkObjectFromSculpture,
-} from "@/app/actions/item-post/utils.ts";
+import { Post } from "@/lib/type.ts";
 import { db } from "@/db";
-import { desc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import {
-  categoryContent,
-  sculpture,
-  sculptureCategory,
-  sculptureImage,
-} from "@/db/schema.ts";
+import { post, postImage, TYPE } from "@/db/schema.ts";
 import {
   handleAddAndRemoveFiles,
-  handleImagesInCategory,
   handleRemoveFiles,
-} from "@/app/admin/utils/workActionUtils.ts";
+} from "@/app/admin/utils/itemActionUtils.ts";
+import { createPostData } from "@/lib/utils/actionUtils.ts";
 
-export async function createSculpture(initialState: any, formData: FormData) {
+export async function createPost(initialState: any, formData: FormData) {
   const title = formData.get("title") as string;
-  const type = Type.SCULPTURE;
+  const type = TYPE.POST;
 
   try {
-    if (await db.query.sculpture.findFirst({ where: { title } }))
+    if (await db.query.post.findFirst({ where: { title } }))
       return {
         message: `Erreur : le titre "${title}" existe déjà`,
         isError: true,
       };
-
-    const data = createSculptureData(formData);
-    const newId = (await db.insert(sculpture).values(data))[0].insertId;
+    const data = createPostData(formData);
+    const newId = await db.insert(post).values(data).$returningId();
 
     const fileInfos = await handleAddAndRemoveFiles(type, formData);
     if (fileInfos) {
       const images = fileInfos.map((fileInfo) => {
-        return { ...fileInfo, sculptureId: newId };
+        return { ...fileInfo, postId: newId[0].id };
       });
-      await db.insert(sculptureImage).values(images);
+      await db.insert(postImage).values(images);
     }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
-    return { message: `Sculpture ajoutée`, isError: false };
+    return { message: `Post ajouté`, isError: false };
   } catch (e) {
     return { message: `Erreur à l'enregistrement : ${e}`, isError: true };
   }
 }
 
-export async function updateSculpture(initialState: any, formData: FormData) {
+export async function updatePost(initialState: any, formData: FormData) {
   const rawFormData = Object.fromEntries(formData);
-  const type = Type.SCULPTURE;
+  const type = TYPE.POST;
   const id = Number(rawFormData.id as string);
   const title = rawFormData.title as string;
 
   try {
-    const sculptureToUpdate = await db.query.sculpture.findFirst({
+    const postToUpdate = await db.query.post.findFirst({
       where: { id },
-      with: { sculptureImage: true },
+      with: { images: true },
     });
 
-    if (!sculptureToUpdate)
-      return { message: `Sculpture introuvable`, isError: true };
+    if (!postToUpdate) return { message: `Post introuvable`, isError: true };
 
-    if (sculptureToUpdate.title !== title) {
-      const titleAlreadyExists = await db.query.sculpture.findFirst({
+    if (postToUpdate.title !== title) {
+      const titleAlreadyExists = await db.query.post.findFirst({
         where: { title },
       });
       if (titleAlreadyExists)
@@ -78,113 +65,46 @@ export async function updateSculpture(initialState: any, formData: FormData) {
         };
     }
 
-    const isChangingCategory = !!formData.get("oldCategoryId");
-    if (isChangingCategory) {
-      for await (const image of sculptureToUpdate.sculptureImage) {
-        await handleImagesInCategory(image.filename);
-      }
-    }
-
-    const fileInfos = await handleAddAndRemoveFiles(type, formData);
-    const data = createPaintingData(formData, fileInfos);
-    await db.update(sculpture).set(data).where(eq(sculpture.id, id));
+    await handleAddAndRemoveFiles(type, formData);
+    const data = createPostData(formData);
+    await db.update(post).set(data).where(eq(post.id, id));
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
-    return { message: "Sculpture modifiée", isError: false };
+    return { message: "Post modifié", isError: false };
   } catch (e) {
-    return { message: `Erreur à l'enregistrement : ${e}`, isError: true };
+    return { message: `Erreur à l'enregistrement`, isError: true };
   }
 }
 
-export async function deleteSculpture(id: number) {
-  const type = Type.SCULPTURE;
+export async function deletePost(id: number) {
+  const type = TYPE.POST;
 
   try {
-    const itemToDelete = await db.query.sculpture.findFirst({
+    const postToDelete = await db.query.post.findFirst({
       where: { id },
-      with: { sculptureImage: true },
+      with: { images: true },
     });
 
-    if (!itemToDelete)
-      return { message: `Sculpture introuvable`, isError: true };
+    if (!postToDelete) return { message: `Post introuvable`, isError: true };
 
-    const images = await db.query.sculptureImage.findMany({
-      where: { sculptureId: id },
-    });
-    await db.delete(sculpture).where(eq(sculpture.id, id));
-    await handleRemoveFiles(type, [itemToDelete.imageFilename]);
+    await db.delete(post).where(eq(post.id, id));
+    await handleRemoveFiles(
+      type,
+      postToDelete.images.map((image) => image.filename),
+    );
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
-    return { message: `Sculpture supprimée`, isError: false };
+    return { message: `Post supprimé`, isError: false };
   } catch (e) {
     return { message: `Erreur à la suppression`, isError: true };
   }
 }
 
-export const getSculptureCategories = async (): Promise<AdminCategory[]> => {
-  const categories = await db
-    .select({
-      id: sculptureCategory.id,
-      key: sculptureCategory.key,
-      value: sculptureCategory.value,
-      categoryContentId: sculptureCategory.categoryContentId,
-      content: {
-        id: categoryContent.id,
-        title: categoryContent.title,
-        text: categoryContent.text,
-        imageFilename: categoryContent.imageFilename,
-        imageWidth: categoryContent.imageWidth,
-        imageHeight: categoryContent.imageHeight,
-      },
-    })
-    .from(sculptureCategory)
-    .innerJoin(
-      categoryContent,
-      eq(sculptureCategory.categoryContentId, categoryContent.id),
-    )
-    .orderBy(desc(sculptureCategory.value));
-
-  const sculptures = await db
-    .select({
-      id: sculpture.id,
-      title: sculpture.title,
-      date: sculpture.date,
-      technique: sculpture.technique,
-      description: sculpture.description,
-      height: sculpture.height,
-      width: sculpture.width,
-      length: sculpture.length,
-      createdAt: sculpture.createdAt,
-      categoryId: sculpture.categoryId,
-      isToSell: sculpture.isToSell,
-      price: sculpture.price,
-      sold: sculpture.sold,
-      type: sculpture.type,
-      isOut: sculpture.isOut,
-      outInformation: sculpture.outInformation,
-      images: {
-        id: sculptureImage.id,
-        filename: sculptureImage.filename,
-        width: sculptureImage.width,
-        height: sculptureImage.height,
-        isMain: sculptureImage.isMain,
-        sculptureId: sculpture.id,
-      },
-    })
-    .from(sculpture)
-    .innerJoin(sculptureImage, eq(sculpture.id, sculptureImage.sculptureId));
-
-  return createAdminCategoryObjects(categories, sculptures, Type.SCULPTURE);
-};
-
-export const getSculptureWorks = async (): Promise<Work[]> => {
-  const sculptures = await db
-    .select()
-    .from(sculpture)
-    .orderBy(desc(sculpture.date));
-  return sculptures.map((sculpture) => {
-    return { ...createWorkObjectFromSculpture(sculpture) };
+export const getPosts = async (): Promise<Post[]> => {
+  return await db.query.post.findMany({
+    with: { images: true },
+    orderBy: { date: "desc" },
   });
 };

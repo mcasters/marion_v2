@@ -1,17 +1,17 @@
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { Type } from "@/lib/type";
 import ItemLayoutForm from "@/components/admin/item/form/itemLayoutForm.tsx";
-import {
-  getAdminCategories,
-  getAdminWorks,
-} from "@/app/actions/item-post/admin.ts";
 import WorkManagement from "@/components/admin/item/workManagement.tsx";
+import {
+  getSculptureCategories,
+  getSculptureWorks,
+} from "@/app/admin/sculptures/action.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export default async function Sculptures() {
-  const type = Type.SCULPTURE;
-  const categories = await getAdminCategories(type);
-  const works = await getAdminWorks(type);
+  const type = TYPE.SCULPTURE;
+  const works = await getSculptureWorks();
+  const categories = await getSculptureCategories(works);
 
   return (
     <div className={s.container}>

@@ -2,18 +2,18 @@
 
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { Type } from "@/lib/type";
 import ItemLayoutForm from "@/components/admin/item/form/itemLayoutForm.tsx";
-import {
-  getAdminCategories,
-  getAdminWorks,
-} from "@/app/actions/item-post/admin.ts";
 import WorkManagement from "@/components/admin/item/workManagement.tsx";
+import {
+  getPaintingAdminCategories,
+  getPaintingWorks,
+} from "@/app/admin/peintures/action.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export default async function Peintures() {
-  const type = Type.PAINTING;
-  const categories = await getAdminCategories(type);
-  const works = await getAdminWorks(type);
+  const type = TYPE.PAINTING;
+  const works = await getPaintingWorks();
+  const categories = await getPaintingAdminCategories(works);
 
   return (
     <div className={s.container}>
