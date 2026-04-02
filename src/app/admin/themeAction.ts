@@ -1,14 +1,18 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { THEME } from "@/constants/admin";
-import { NewTheme, OnlyString, PresetColor, Theme } from "@/lib/type";
+import { NewTheme, OnlyString, PresetColor, Theme } from "@/lib/type.ts";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
 import {
   presetColor as presetColorTable,
   theme as themeTable,
-} from "@/db/schema";
+} from "@/db/schema.ts";
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { THEME } from "@/constants/admin.ts";
+import {
+  getBasePresetColorData,
+  getBaseThemeData,
+} from "@/lib/utils/themeUtils.ts";
 
 export async function createTheme(newTheme: NewTheme) {
   try {
@@ -286,4 +290,50 @@ export async function deletePresetColor(id: number): Promise<{
       updatedThemes: null,
     };
   }
-}
+} // For admin
+export const getActiveTheme = async (): Promise<Theme> => {
+  let theme = (
+    await db.select().from(themeTable).where(eq(themeTable.isActive, true))
+  )[0];
+
+  if (!theme) {
+    theme = (
+      await db
+        .select()
+        .from(themeTable)
+        .where(eq(themeTable.name, THEME.BASE_THEME_NAME))
+    )[0];
+
+    if (!theme) {
+      await db.insert(themeTable).values({ ...getBaseThemeData() });
+      theme = (
+        await db
+          .select()
+          .from(themeTable)
+          .where(eq(themeTable.name, THEME.BASE_THEME_NAME))
+      )[0];
+    }
+  }
+
+  if (!theme.isActive) {
+    await db
+      .update(themeTable)
+      .set({ isActive: true })
+      .where(eq(themeTable.name, THEME.BASE_THEME_NAME));
+    theme = (
+      await db.select().from(themeTable).where(eq(themeTable.isActive, true))
+    )[0];
+  }
+  return theme;
+};
+export const getPresetColors = async (): Promise<PresetColor[]> => {
+  const presetColors = await db.select().from(presetColorTable);
+  if (presetColors.length === 0) {
+    await db.insert(presetColorTable).values({ ...getBasePresetColorData() });
+    const defaultPresetColor = (await db.select().from(presetColorTable))[0];
+    presetColors.push(defaultPresetColor);
+  }
+  return presetColors;
+};
+export const getThemes = async (): Promise<Theme[]> =>
+  await db.select().from(themeTable);

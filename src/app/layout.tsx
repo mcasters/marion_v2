@@ -6,13 +6,13 @@ import "@/styles/globals-specific.css";
 import { getIntroText, getMetaMap } from "@/lib/utils/commonUtils";
 import React from "react";
 import StyledJsxRegistry from "./registry";
-import { getSession } from "@/app/actions/auth/utils.ts";
-import { getContentsFull } from "@/app/actions/contents";
-import { getActiveTheme, getPresetColors } from "@/app/actions/theme";
-import { getMetas } from "@/app/actions/meta";
 import { Cormorant_SC, EB_Garamond } from "next/font/google";
 import { KEY_META } from "@/constants/admin";
 import { getStructHexaTheme } from "@/lib/utils/serverUtils";
+import { getMetas } from "@/app/admin/meta/action.ts";
+import { getActiveTheme, getPresetColors } from "@/app/admin/themeAction.ts";
+import { getContentsFull } from "@/app/admin/contentAction.ts";
+import { getSession } from "@/app/admin/authAction.ts";
 
 const garamond = EB_Garamond({
   subsets: ["latin"],

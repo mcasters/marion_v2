@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import { useAlert } from "@/app/context/alertProvider";
-import { createTheme } from "@/app/actions/theme/admin";
+
+import { createTheme } from "@/app/admin/themeAction.ts";
 
 export default function ThemeAdd() {
   const { workTheme, setWorkTheme, setIsSaved, themes, setThemes } =

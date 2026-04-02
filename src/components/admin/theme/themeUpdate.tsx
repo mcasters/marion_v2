@@ -4,7 +4,8 @@ import React from "react";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import { useAlert } from "@/app/context/alertProvider";
 import { THEME } from "@/constants/admin";
-import { updateTheme } from "@/app/actions/theme/admin";
+
+import { updateTheme } from "@/app/admin/themeAction.ts";
 
 export default function ThemeUpdate() {
   const { workTheme, isSaved, setIsSaved, themes, setThemes } =

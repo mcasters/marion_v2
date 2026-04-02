@@ -6,14 +6,14 @@ import Modal from "@/components/admin/common/modal.tsx";
 import { PresetColor } from "@@/prisma/generated/client";
 import DeleteIcon from "@/components/icons/deleteIcon";
 import { useAlert } from "@/app/context/alertProvider";
-import {
-  deletePresetColor,
-  updatePresetColor,
-} from "@/app/actions/theme/admin";
 import { BASE_PRESET_COLOR } from "@/constants/specific";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import PresetColorPicker from "@/components/admin/theme/dashboard/presetColor/presetColorPicker";
 import useModal from "@/components/hooks/useModal.ts";
+import {
+  deletePresetColor,
+  updatePresetColor,
+} from "@/app/admin/themeAction.ts";
 
 interface Props {
   presetColor: PresetColor;

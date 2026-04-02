@@ -5,7 +5,8 @@ import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import { useAlert } from "@/app/context/alertProvider";
 import { THEME } from "@/constants/admin";
 import { Theme } from "@@/prisma/generated/client";
-import { deleteTheme } from "@/app/actions/theme/admin";
+
+import { deleteTheme } from "@/app/admin/themeAction.ts";
 
 export default function ThemeDelete() {
   const alert = useAlert();
