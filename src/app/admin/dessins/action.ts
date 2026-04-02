@@ -7,9 +7,8 @@ import { revalidatePath } from "next/cache";
 import { drawing, drawingCategory, TYPE } from "@/db/schema.ts";
 import {
   handleAddAndRemoveFiles,
-  handleImagesInCategory,
   handleRemoveFiles,
-} from "@/app/admin/utils/itemActionUtils.ts";
+} from "@/app/admin/utils/adminActionHelper.ts";
 import {
   createAdminCategoryObjects,
   createCategoryData,
@@ -62,7 +61,12 @@ export async function updateDrawing(initialState: any, formData: FormData) {
     }
 
     if (!!formData.get("oldCategoryId"))
-      await handleImagesInCategory(itemToUpdate.imageFilename);
+      await db
+        .update(drawingCategory)
+        .set({
+          imageFilename: "",
+        })
+        .where(eq(drawingCategory.imageFilename, itemToUpdate.imageFilename));
 
     const fileInfos = await handleAddAndRemoveFiles(type, formData);
     const data = createDrawingData(formData, fileInfos);
@@ -98,7 +102,7 @@ export async function deleteDrawing(id: number) {
 }
 
 export const getDrawingWorks = async (): Promise<Work[]> => {
-  const drawings = await db.query.painting.findMany({
+  const drawings = await db.query.drawing.findMany({
     orderBy: { date: "desc" },
   });
   return drawings.map((drawing) => {

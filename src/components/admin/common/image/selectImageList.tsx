@@ -7,22 +7,23 @@ import { TYPE } from "@/db/schema.ts";
 
 type Props = {
   filenames: string[];
-  selectedFilename: string;
+  categoryFilename: string;
   onChange: (filename: string) => void;
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 };
 
 export default function SelectImageList({
   filenames,
-  selectedFilename,
+  categoryFilename,
   onChange,
   type,
 }: Props) {
-  const [filename, setFilename] = useState<string>(selectedFilename);
+  const [selectedFilename, setSelectedFilename] =
+    useState<string>(categoryFilename);
   const isEmpty = filenames.length === 1 && filenames[0] === "";
 
-  const onSelectImage = (filename: string) => {
-    setFilename(filename);
+  const onSelectFilename = (filename: string) => {
+    setSelectedFilename(filename);
     onChange(filename);
   };
 
@@ -31,21 +32,24 @@ export default function SelectImageList({
       <span className="label">Image de la catégorie (facultative)</span>
       <div className={s.selectList}>
         <div
-          onClick={() => onSelectImage("")}
-          className={`${s.option} ${filename === "" ? "selected" : undefined}`}
+          onClick={() => onSelectFilename("")}
+          className={
+            selectedFilename === "" ? `${s.selectedOption} selected` : s.option
+          }
         >
           -- Aucune image --
         </div>
         {!isEmpty &&
           filenames.map((filename: string) => {
-            const isCategoryImage = filename === filename;
             return (
               <div
                 key={filename}
                 className={
-                  isCategoryImage ? `${s.selectedOption} selected` : s.option
+                  selectedFilename === filename
+                    ? `${s.selectedOption} selected`
+                    : s.option
                 }
-                onClick={() => onSelectImage(filename)}
+                onClick={() => onSelectFilename(filename)}
               >
                 <Image
                   src={`/images/${type}/sm/${filename}`}

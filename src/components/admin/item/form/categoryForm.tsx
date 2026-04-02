@@ -81,7 +81,7 @@ export default function CategoryForm({ adminCategory, onClose }: Props) {
       </label>
       <SelectImageList
         filenames={adminCategory.filenames}
-        selectedFilename={workCategory.imageFilename}
+        categoryFilename={workCategory.imageFilename}
         onChange={(filename) => setFilename(filename)}
         type={adminCategory.workType}
       />

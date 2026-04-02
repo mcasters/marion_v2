@@ -12,9 +12,8 @@ import {
 } from "@/db/schema.ts";
 import {
   handleAddAndRemoveFiles,
-  handleImagesInCategory,
   handleRemoveFiles,
-} from "@/app/admin/utils/itemActionUtils.ts";
+} from "@/app/admin/utils/adminActionHelper.ts";
 import {
   createAdminCategoryObjects,
   createCategoryData,
@@ -58,15 +57,15 @@ export async function updateSculpture(initialState: any, formData: FormData) {
   const title = rawFormData.title as string;
 
   try {
-    const sculptureToUpdate = await db.query.sculpture.findFirst({
+    const itemToUpdate = await db.query.sculpture.findFirst({
       where: { id },
       with: { images: true },
     });
 
-    if (!sculptureToUpdate)
+    if (!itemToUpdate)
       return { message: `Sculpture introuvable`, isError: true };
 
-    if (sculptureToUpdate.title !== title) {
+    if (itemToUpdate.title !== title) {
       const titleAlreadyExists = await db.query.sculpture.findFirst({
         where: { title },
       });
@@ -77,11 +76,15 @@ export async function updateSculpture(initialState: any, formData: FormData) {
         };
     }
 
-    if (!!formData.get("oldCategoryId")) {
-      for await (const image of sculptureToUpdate.images) {
-        await handleImagesInCategory(image.filename);
+    if (!!formData.get("oldCategoryId"))
+      for await (const image of itemToUpdate.images) {
+        await db
+          .update(sculptureCategory)
+          .set({
+            imageFilename: "",
+          })
+          .where(eq(sculptureCategory.imageFilename, image.filename));
       }
-    }
 
     await handleAddAndRemoveFiles(type, formData);
     const data = createSculptureData(formData);

@@ -32,8 +32,11 @@ export default function ItemHome({ categories, type, years }: Props) {
                     <Image
                       src={`/images/${type}/sm/${category.imageFilename}`}
                       alt=""
+                      width={250}
+                      height={250}
                       priority
                       unoptimized
+                      style={{ objectFit: "cover" }}
                       className={s.image}
                     />
                     <p>{category.value}</p>

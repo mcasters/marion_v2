@@ -225,21 +225,23 @@ export const createAdminCategoryObjects = (
   categories.forEach((category) => {
     categoryMap.set(category.id, {
       ...category,
-      images: [],
+      filenames: [],
       count: 0,
     });
   });
   categoryMap.set(0, {
     ...getNoCategory(type),
-    images: [],
+    filenames: [],
     count: 0,
   });
   items.forEach((item) => {
-    const categoryId = item.categoryId === null ? 0 : item.categoryId;
-    const category = categoryMap.get(categoryId);
+    const itemCategoryId = item.categoryId === null ? 0 : item.categoryId;
+    const category = categoryMap.get(itemCategoryId);
     category.count += 1;
-    category.images = category.images.concat(item.images);
-    categoryMap.set(categoryId, category);
+    item.images.forEach((image) => {
+      category.filenames = category.filenames.concat(image.filename);
+    });
+    categoryMap.set(itemCategoryId, category);
   });
   if (categoryMap.get(0).count === 0) categoryMap.delete(0);
   return [...categoryMap.values()];

@@ -7,9 +7,8 @@ import { revalidatePath } from "next/cache";
 import { painting, paintingCategory, TYPE } from "@/db/schema.ts";
 import {
   handleAddAndRemoveFiles,
-  handleImagesInCategory,
   handleRemoveFiles,
-} from "@/app/admin/utils/itemActionUtils.ts";
+} from "@/app/admin/utils/adminActionHelper.ts";
 import {
   createAdminCategoryObjects,
   createCategoryData,
@@ -63,7 +62,12 @@ export async function updatePainting(initialState: any, formData: FormData) {
     }
 
     if (!!formData.get("oldCategoryId"))
-      await handleImagesInCategory(itemToUpdate.imageFilename);
+      await db
+        .update(paintingCategory)
+        .set({
+          imageFilename: "",
+        })
+        .where(eq(paintingCategory.imageFilename, itemToUpdate.imageFilename));
 
     const fileInfos = await handleAddAndRemoveFiles(type, formData);
     const data = createPaintingData(formData, fileInfos);

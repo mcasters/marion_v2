@@ -30,12 +30,6 @@
   overflow: hidden;
 }
 
-.image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-}
-
 .categoryLink p {
   position: absolute;
   left: 0;
@@ -71,8 +65,6 @@
   }
 
   .image {
-    width: 250px;
-    height: 250px;
     transition: transform 0.4s ease-out;
   }
 

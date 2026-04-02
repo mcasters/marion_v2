@@ -8,7 +8,7 @@ import { post, postImage, TYPE } from "@/db/schema.ts";
 import {
   handleAddAndRemoveFiles,
   handleRemoveFiles,
-} from "@/app/admin/utils/itemActionUtils.ts";
+} from "@/app/admin/utils/adminActionHelper.ts";
 import { createPostData } from "@/lib/utils/actionUtils.ts";
 
 export async function createPost(initialState: any, formData: FormData) {
