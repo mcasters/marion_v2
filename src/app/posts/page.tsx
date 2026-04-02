@@ -1,7 +1,6 @@
 import React, { Fragment } from "react";
 import { Post } from "@/lib/type";
 
-import { getPosts } from "@/app/actions/item-post";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { getMetas } from "@/app/actions/meta";
@@ -10,6 +9,7 @@ import s from "@/styles/page.module.css";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import Gallery from "@/components/image/gallery/gallery.tsx";
 import { getPostPhotoTab } from "@/lib/utils/imageUtils.ts";
+import { getPosts } from "@/app/admin/posts/action.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());

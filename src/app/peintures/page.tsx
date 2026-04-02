@@ -1,10 +1,13 @@
-import { Type } from "@/lib/type";
 import ItemHome from "@/components/item/itemHome.tsx";
-import { getCategories, getYears } from "@/app/actions/item-post";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
+import {
+  getPaintingCategories,
+  getPaintingYears,
+} from "@/app/peintures/action.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
@@ -25,14 +28,13 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
 }
 
 export default async function Page() {
-  const type = Type.PAINTING;
-  const categories = await getCategories(type);
-  const years = await getYears(type);
+  const categories = await getPaintingCategories();
+  const years = await getPaintingYears();
 
   return (
     <>
       <h1 className="hidden">Les peintures</h1>
-      <ItemHome type={type} categories={categories} years={years} />
+      <ItemHome type={TYPE.PAINTING} categories={categories} years={years} />
     </>
   );
 }

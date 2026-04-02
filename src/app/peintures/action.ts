@@ -1,18 +1,18 @@
 import { db } from "@/db";
-import { drawing, TYPE } from "@/db/schema.ts";
+import { painting, TYPE } from "@/db/schema.ts";
 import { asc } from "drizzle-orm";
-import { DrawingCategory, Work } from "@/lib/type.ts";
+import { PaintingCategory, Work } from "@/lib/type.ts";
 import { getNoCategory } from "@/lib/utils/commonUtils.ts";
-import { createWorkObject } from "@/app/actions/item-post/utils.ts";
 import { notFound } from "next/dist/client/components/not-found";
+import { createWorkObject } from "@/lib/utils/actionUtils.ts";
 
-export async function getDrawingYears(): Promise<number[]> {
+export async function getPaintingYears(): Promise<number[]> {
   const dbData = await db
     .selectDistinct({
-      date: drawing.date,
+      date: painting.date,
     })
-    .from(drawing)
-    .orderBy(asc(drawing.date));
+    .from(painting)
+    .orderBy(asc(painting.date));
 
   const years: number[] = [];
   dbData.forEach((item) => years.push(new Date(item.date).getFullYear()));
@@ -20,23 +20,23 @@ export async function getDrawingYears(): Promise<number[]> {
   return [...new Set(years)];
 }
 
-export const getDrawingCategories = async (): Promise<DrawingCategory[]> => {
-  const categories = await db.query.drawingCategory.findMany({
-    where: { drawings: true },
+export const getPaintingCategories = async (): Promise<PaintingCategory[]> => {
+  const categories = await db.query.paintingCategory.findMany({
+    where: { paintings: true },
     orderBy: { value: "desc" },
   });
 
-  const drawingWithNoCategory = await db.query.drawing.findFirst({
+  const paintingWithNoCategory = await db.query.painting.findFirst({
     where: { categoryId: undefined },
   });
 
-  if (drawingWithNoCategory)
-    categories.push(getNoCategory(TYPE.DRAWING) as DrawingCategory);
+  if (paintingWithNoCategory)
+    categories.push(getNoCategory(TYPE.PAINTING) as PaintingCategory);
   return categories;
 };
 
-export async function getDrawingWorksByYear(year: string): Promise<Work[]> {
-  const dbData = await db.query.drawing.findMany({
+export async function getPaintingWorksByYear(year: string): Promise<Work[]> {
+  const dbData = await db.query.painting.findMany({
     where: {
       date: {
         gte: new Date(`${year}-01-01`),
@@ -46,30 +46,30 @@ export async function getDrawingWorksByYear(year: string): Promise<Work[]> {
     orderBy: { date: "desc" },
   });
 
-  return dbData.map((data) => createWorkObject(data, TYPE.DRAWING));
+  return dbData.map((data) => createWorkObject(data, TYPE.PAINTING));
 }
 
-export async function getDrawingCategory(
+export async function getPaintingCategory(
   categoryKey: string,
-): Promise<DrawingCategory | null> {
+): Promise<PaintingCategory | null> {
   if (categoryKey === "no-category")
-    return getNoCategory(TYPE.DRAWING) as DrawingCategory;
+    return getNoCategory(TYPE.PAINTING) as PaintingCategory;
 
-  const category = await db.query.drawingCategory.findFirst({
+  const category = await db.query.paintingCategory.findFirst({
     where: { key: categoryKey },
   });
   return !category ? notFound() : category;
 }
 
-export async function getDrawingWorksByCategory(
+export async function getPaintingWorksByCategory(
   categoryKey: string,
 ): Promise<Work[]> {
-  const res = await db.query.drawingCategory.findFirst({
+  const res = await db.query.paintingCategory.findFirst({
     columns: {},
     where: { key: categoryKey === "no-category" ? undefined : categoryKey },
-    with: { drawings: { orderBy: { date: "desc" } } },
+    with: { paintings: { orderBy: { date: "desc" } } },
   });
   return res
-    ? res.drawings.map((data) => createWorkObject(data, TYPE.DRAWING))
+    ? res.paintings.map((data) => createWorkObject(data, TYPE.PAINTING))
     : notFound();
 }
