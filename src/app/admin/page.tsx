@@ -1,4 +1,3 @@
-import { getMessages } from "@/app/actions/messages";
 import { Metadata } from "next";
 import s from "@/components/admin/admin.module.css";
 import style from "@/components/admin/admin.module.css";
@@ -6,9 +5,10 @@ import AdminTheme from "@/components/admin/theme/adminTheme.tsx";
 import ChatMessages from "@/components/admin/chatMessage/chatMessages.tsx";
 import React from "react";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
-import { getMetas, updateMeta } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
 import InputForm from "@/components/admin/text/inputForm.tsx";
+import { getMetas, updateMeta } from "@/app/admin/meta/action.ts";
+import { getMessages } from "@/app/admin/messageAction.ts";
 
 export const metadata: Metadata = {
   title: "",

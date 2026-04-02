@@ -3,7 +3,6 @@
 import React, { useActionState, useRef, useState } from "react";
 import style from "@/components/admin/admin.module.css";
 import s from "./chatMessage.module.css";
-import { addMessage, updateMessage } from "@/app/actions/messages";
 import { useSession } from "@/app/context/sessionProvider";
 import { useTheme } from "@/app/context/themeProvider";
 import { Message } from "@/lib/type";
@@ -11,6 +10,7 @@ import ChatMessage from "@/components/admin/chatMessage/chatMessage";
 import { getEmptyMessage } from "@/lib/utils/commonUtils.ts";
 import useMenuManagement from "@/components/hooks/useMenuManagement.ts";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { addMessage, updateMessage } from "@/app/admin/messageAction.ts";
 
 type Props = {
   dbMessages: Message[];

@@ -5,7 +5,7 @@ import {
   getActiveTheme,
   getPresetColors,
   getThemes,
-} from "@/app/actions/theme";
+} from "@/app/admin/themeAction.ts";
 
 export default async function layout({ children }: { children: ReactNode }) {
   const themes = await getThemes();

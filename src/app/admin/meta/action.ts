@@ -1,11 +1,12 @@
 "use server";
-import {KEY_META} from "@/constants/admin.ts";
-import {revalidatePath} from "next/cache";
-import {meta} from "@/db/schema.ts"
-import {db} from "@/db";
-import {eq} from "drizzle-orm";
 
-export const getMetas = async (): Promise<typeof meta.$inferSelect[]> =>
+import { KEY_META } from "@/constants/admin.ts";
+import { db } from "@/db";
+import { meta } from "@/db/schema.ts";
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+
+export const getMetas = async (): Promise<(typeof meta.$inferSelect)[]> =>
   await db.select().from(meta);
 
 export async function updateMeta(
@@ -26,19 +27,15 @@ export async function updateMeta(
       text = `${layout},${darkBackground}`;
     } else text = formData.get("text") as string;
 
-    const metaFind = await db.select()
-      .from(meta)
-      .where(eq(meta.key, key));
+    const metaFind = await db.select().from(meta).where(eq(meta.key, key));
 
     if (!metaFind) {
       await db.insert(meta).values({
-          key,
-          text,
+        key,
+        text,
       });
     } else {
-      await db.update(meta)
-        .set({text})
-        .where(eq(meta.key, key));
+      await db.update(meta).set({ text }).where(eq(meta.key, key));
     }
 
     revalidatePath("/admin");

@@ -5,9 +5,9 @@ import s from "@/components/admin/admin.module.css";
 import { Image, KeyContent } from "@/lib/type";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import useActionResult from "@/components/hooks/useActionResult.ts";
-import { updateImageContent } from "@/app/actions/contents/admin.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
+import { updateImageContent } from "@/app/admin/contentAction.ts";
 
 type Props = {
   images: Image[];

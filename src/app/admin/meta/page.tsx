@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
-import { getMetas, updateMeta } from "@/app/actions/meta";
 import { KEY_META, SEO } from "@/constants/admin.ts";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import InputForm from "@/components/admin/text/inputForm.tsx";
 import { KeyMeta } from "@/lib/type.ts";
+import { getMetas, updateMeta } from "@/app/admin/meta/action.ts";
 
 export default async function Page() {
   const metaMap = getMetaMap(await getMetas());

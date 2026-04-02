@@ -4,7 +4,8 @@ import { useTheme } from "@/app/context/themeProvider";
 import { Message } from "@/lib/type";
 import MoreIcon from "@/components/icons/moreIcon";
 import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
-import { deleteMessage } from "@/app/actions/messages";
+
+import { deleteMessage } from "@/app/admin/messageAction.ts";
 
 type Props = {
   message: Message;
