@@ -4,9 +4,12 @@
 import { JSX } from "react";
 import { KEY_META } from "@/constants/admin.ts";
 import {
+  content,
+  contentImage,
   drawing,
   drawingCategory,
   LABEL,
+  meta,
   painting,
   paintingCategory,
   post,
@@ -89,6 +92,8 @@ export interface User {
   isAdmin: boolean;
 }
 
+export type Meta = typeof meta.$inferSelect;
+
 export type Session = {
   user: User;
 };
@@ -122,11 +127,8 @@ export type KeyContent = (typeof LABEL)[keyof typeof LABEL];
 
 export type KeyMeta = (typeof KEY_META)[keyof typeof KEY_META];
 
-export type ContentFull = {
-  label: KeyContent;
-  title: string | null;
-  text: string;
-  images: Image[];
+export type ContentFull = typeof content.$inferSelect & {
+  images: (typeof contentImage.$inferSelect)[];
 };
 
 export interface Photo {

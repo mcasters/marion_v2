@@ -1,28 +1,30 @@
 "use server";
 
+import { ContentFull, KeyContent } from "@/lib/type.ts";
+import { revalidatePath } from "next/cache";
+import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
+import { db } from "@/db";
+import { content, contentImage, LABEL } from "@/db/schema.ts";
+import { eq } from "drizzle-orm";
 import {
   deleteFile,
   getMiscellaneousDir,
   resizeAndSaveImage,
-} from "@/lib/utils/serverUtils";
-import prisma from "@/lib/prisma.ts";
-import { revalidatePath } from "next/cache";
-import { KeyContent } from "@/lib/type";
-import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
-import { LABEL } from "@/db/schema.ts";
+} from "@/lib/utils/serverUtils.ts";
+
+export const getContentsFull = async (): Promise<ContentFull[]> => {
+  return await db.query.content.findMany({ with: { images: true } });
+};
 
 export async function updateContent(
   initialState: any,
   formData: FormData,
 ): Promise<{ message: string; isError: boolean }> {
-  const label = formData.get("key") as KeyContent;
+  const label = formData.get("key") as LABEL;
   const text = formData.get("text") as string;
 
   try {
-    await prisma.content.update({
-      where: { label },
-      data: { text },
-    });
+    await db.update(content).set({ text }).where(eq(content.label, label));
 
     revalidatePath(`${RouteLabel[label]}`);
     return { message: "Enregistré", isError: false };
@@ -35,7 +37,7 @@ export async function updateImageContent(
   initialState: any,
   formData: FormData,
 ) {
-  const label = formData.get("key") as KeyContent;
+  const label = formData.get("key") as LABEL;
 
   try {
     if (label === LABEL.SLIDER) await updateImageSlider(formData);
@@ -51,7 +53,7 @@ export async function updateImageContent(
   }
 }
 
-async function updateImageSlider(formData: FormData) {
+const updateImageSlider = async (formData: FormData) => {
   const filesToAdd = formData.getAll("filesToAdd") as File[];
   const filenamesToDelete = formData.get("filenamesToDelete") as string;
 
@@ -63,16 +65,13 @@ async function updateImageSlider(formData: FormData) {
 
   if (filenamesToDelete !== "")
     for await (const filename of filenamesToDelete.split(",")) {
-      await deleteImageContent(LABEL.SLIDER, filename);
+      await deleteImageContent(filename);
     }
-}
+};
 
-async function updateImagePresentation(formData: FormData) {
+const updateImagePresentation = async (formData: FormData) => {
   const filesToAdd = formData.getAll("filesToAdd") as File[];
   const filenamesToDelete = formData.get("filenamesToDelete") as string;
-
-  if (filenamesToDelete !== "")
-    await deleteImageContent(LABEL.PRESENTATION, filenamesToDelete);
 
   if (filesToAdd.length > 0)
     await saveContentImage(
@@ -81,7 +80,9 @@ async function updateImagePresentation(formData: FormData) {
       "presentation",
       false,
     );
-}
+
+  if (filenamesToDelete !== "") await deleteImageContent(filenamesToDelete);
+};
 
 const saveContentImage = async (
   label: KeyContent,
@@ -89,6 +90,22 @@ const saveContentImage = async (
   title: string,
   isMain: boolean,
 ) => {
+  let contentToUpdateId = (
+    await db.query.content.findFirst({ where: { label } })
+  )?.id;
+
+  if (!contentToUpdateId) {
+    const newContent = await db
+      .insert(content)
+      .values({
+        label,
+        text: "",
+        title: "",
+      })
+      .$returningId();
+    contentToUpdateId = newContent[0].id;
+  }
+
   for await (const file of filesToAdd) {
     if (file.size > 0) {
       const fileInfo = await resizeAndSaveImage(
@@ -96,33 +113,19 @@ const saveContentImage = async (
         title,
         getMiscellaneousDir(),
       );
-      if (fileInfo) {
-        await prisma.content.update({
-          where: { label },
-          data: {
-            images: {
-              create: {
-                filename: fileInfo.filename,
-                width: fileInfo.width,
-                height: fileInfo.height,
-                isMain,
-              },
-            },
-          },
+      if (fileInfo)
+        await db.insert(contentImage).values({
+          filename: fileInfo.filename,
+          width: fileInfo.width,
+          height: fileInfo.height,
+          isMain,
+          contentId: contentToUpdateId,
         });
-      }
     }
   }
 };
 
-const deleteImageContent = async (label: KeyContent, filename: string) => {
+const deleteImageContent = async (filename: string) => {
   deleteFile(getMiscellaneousDir(), filename);
-  await prisma.content.update({
-    where: { label },
-    data: {
-      images: {
-        delete: { filename: filename },
-      },
-    },
-  });
+  await db.delete(contentImage).where(eq(contentImage.filename, filename));
 };

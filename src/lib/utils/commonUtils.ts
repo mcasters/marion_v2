@@ -1,5 +1,3 @@
-import { Meta } from "@@/prisma/generated/client";
-import { Label } from "@@/prisma/generated/enums";
 import {
   AdminCategory,
   Category,
@@ -11,11 +9,12 @@ import {
   ItemDarkBackground,
   Layout,
   Message,
+  Meta,
   Post,
   Work,
 } from "@/lib/type.ts";
 import { KEY_META } from "@/constants/admin.ts";
-import { TYPE } from "@/db/schema.ts";
+import { LABEL, TYPE } from "@/db/schema.ts";
 
 export const transformValueToKey = (value: string): string =>
   value
@@ -41,37 +40,37 @@ export const createNestedObject = (obj, key, ...keys) => {
 };
 
 export const getSliderContent = (contents: ContentFull[]): ContentFull | null =>
-  contents?.filter((c) => c.label === Label.SLIDER)[0] || null;
+  contents?.filter((c) => c.label === LABEL.SLIDER)[0] || null;
 
 export const getPresentation = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.PRESENTATION)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.text || "";
 
 export const getPresentationImage = (contents: ContentFull[]): Image[] =>
-  contents?.filter((c) => c.label === Label.PRESENTATION)[0]?.images || [];
+  contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
 
 export const getDemarche = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.DEMARCHE)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.DEMARCHE)[0]?.text || "";
 
 export const getInspiration = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.INSPIRATION)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.INSPIRATION)[0]?.text || "";
 
 export const getIntroText = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.INTRO)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.INTRO)[0]?.text || "";
 
 export const getSliders = (contents: ContentFull[]): Image[] | [] =>
-  contents?.filter((c) => c.label === Label.SLIDER)[0]?.images || [];
+  contents?.filter((c) => c.label === LABEL.SLIDER)[0]?.images || [];
 
 export const getAddress = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.ADDRESS)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.ADDRESS)[0]?.text || "";
 
 export const getPhone = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.PHONE)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.PHONE)[0]?.text || "";
 
 export const getEmail = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.EMAIL)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.EMAIL)[0]?.text || "";
 
 export const getContactText = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.TEXT_CONTACT)[0]?.text || "";
+  contents?.filter((c) => c.label === LABEL.TEXT_CONTACT)[0]?.text || "";
 
 export const getMetaMap = (metas: Meta[]): Map<string, string> => {
   const map = new Map();

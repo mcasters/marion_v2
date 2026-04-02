@@ -6,12 +6,12 @@ import {
   getMetaMap,
   getPhone,
 } from "@/lib/utils/commonUtils";
-import { getContentsFull } from "@/app/actions/contents";
 import InstagramIcon from "@/components/icons/instagramIcon";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin";
 import { Metadata } from "next";
 import s from "@/styles/page.module.css";
+import { getMetas } from "@/app/admin/meta/action.ts";
+import { getContentsFull } from "@/app/admin/contentAction.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());

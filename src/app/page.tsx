@@ -1,7 +1,7 @@
-import { getContentsFull } from "@/app/actions/contents";
 import { getSliderPhotoTab } from "@/lib/utils/imageUtils";
 import Slideshow from "@/components/image/slideshow/slideshow.tsx";
 import React from "react";
+import { getContentsFull } from "@/app/admin/contentAction.ts";
 
 export default async function Page() {
   const contents = await getContentsFull();

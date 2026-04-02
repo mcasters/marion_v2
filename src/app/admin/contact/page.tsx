@@ -8,9 +8,8 @@ import s from "@/components/admin/admin.module.css";
 import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import React from "react";
 import InputForm from "@/components/admin/text/inputForm.tsx";
-import { getContentsFull } from "@/app/actions/contents";
-import { updateContent } from "@/app/actions/contents/admin.ts";
 import { LABEL } from "@/db/schema.ts";
+import { getContentsFull, updateContent } from "@/app/admin/contentAction.ts";
 
 export default async function Contact() {
   const contents = await getContentsFull();

@@ -5,13 +5,13 @@ import {
   getPresentation,
   getPresentationImage,
 } from "@/lib/utils/commonUtils";
-import { getContentsFull } from "@/app/actions/contents";
 import { Metadata } from "next";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import { getPhotoTabFromImages } from "@/lib/utils/imageUtils.ts";
 import s from "@/styles/page.module.css";
+import { getMetas } from "@/app/admin/meta/action.ts";
+import { getContentsFull } from "@/app/admin/contentAction.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
