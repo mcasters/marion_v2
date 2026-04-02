@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
-import { Theme } from "@@/prisma/generated/client";
+import { Theme } from "@/lib/type.ts";
 
 export default function ThemeSelect() {
   const { workTheme, setWorkTheme, themes } = useAdminWorkThemeContext();

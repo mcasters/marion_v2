@@ -5,9 +5,9 @@ import s from "@/components/admin/admin.module.css";
 import Image from "next/image";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import { useMetas } from "@/app/context/metaProvider.tsx";
-import { updateMeta } from "@/app/actions/meta";
 import useActionResult from "@/components/hooks/useActionResult.ts";
 import { TYPE } from "@/db/schema.ts";
+import { updateMeta } from "@/app/admin/meta/action.ts";
 
 type Props = {
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;

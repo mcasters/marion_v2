@@ -3,7 +3,6 @@
 import s from "@/components/admin/theme/adminTheme.module.css";
 import React from "react";
 import Modal from "@/components/admin/common/modal.tsx";
-import { PresetColor } from "@@/prisma/generated/client";
 import DeleteIcon from "@/components/icons/deleteIcon";
 import { useAlert } from "@/app/context/alertProvider";
 import { BASE_PRESET_COLOR } from "@/constants/specific";
@@ -14,6 +13,7 @@ import {
   deletePresetColor,
   updatePresetColor,
 } from "@/app/admin/themeAction.ts";
+import { PresetColor } from "@/lib/type.ts";
 
 interface Props {
   presetColor: PresetColor;

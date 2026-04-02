@@ -1,10 +1,9 @@
 "use client";
 
-import { Theme } from "@@/prisma/generated/client";
 import React, { useRef } from "react";
 import s from "@/components/admin/theme/adminTheme.module.css";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
-import { OnlyString } from "@/lib/type";
+import { OnlyString, Theme } from "@/lib/type";
 import ColorPicker from "@/components/admin/theme/dashboard/colorPicker";
 import Modal from "@/components/admin/common/modal.tsx";
 import { useAlert } from "@/app/context/alertProvider";

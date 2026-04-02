@@ -2,9 +2,9 @@
 
 import React from "react";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
-import { Theme } from "@@/prisma/generated/client";
 import { useAlert } from "@/app/context/alertProvider";
 import { activateTheme } from "@/app/admin/themeAction.ts";
+import { Theme } from "@/lib/type.ts";
 
 export default function ThemeActivate() {
   const { workTheme, setWorkTheme, themes, setThemes } =

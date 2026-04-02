@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useActionState, useState } from "react";
-import { Image, Post, Type } from "@/lib/type.ts";
+import { Image, Post } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
@@ -25,7 +25,7 @@ export default function PostForm({ post, onClose }: Props) {
 
   return (
     <form action={action}>
-      <input type="hidden" name="type" value={Type.POST} />
+      <input type="hidden" name="type" value={TYPE.POST} />
       <input name="id" type="hidden" value={post.id} />
       <input
         onChange={(e) => setWorkPost({ ...workPost, title: e.target.value })}
@@ -58,7 +58,7 @@ export default function PostForm({ post, onClose }: Props) {
       <ImageInput
         filesPath={workPost.images
           .filter((i) => i.isMain)
-          .map((i: Image) => `/images/${Type.POST}/sm/${i.filename}`)}
+          .map((i: Image) => `/images/${TYPE.POST}/sm/${i.filename}`)}
         smallImageOption={true}
         title="Image principale - une seule image (facultative)"
         isMain={true}
@@ -66,7 +66,7 @@ export default function PostForm({ post, onClose }: Props) {
       <ImageInput
         filesPath={workPost.images
           .filter((i) => !i.isMain)
-          .map((i: Image) => `/images/${Type.POST}/sm/${i.filename}`)}
+          .map((i: Image) => `/images/${TYPE.POST}/sm/${i.filename}`)}
         isMultiple={true}
         smallImageOption={true}
         title="Album d'images (facultatif)"

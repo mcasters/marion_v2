@@ -15,9 +15,8 @@ export default function ThemeAdd() {
   const handleAdd = async () => {
     if (themeName === "") alert("Le nom du nouveau thème est manquant", true);
     else {
-      const { id, ...rest } = workTheme;
       const { theme, message, isError } = await createTheme({
-        ...rest,
+        ...workTheme,
         name: themeName,
         isActive: false,
       });

@@ -2,18 +2,20 @@
 
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { Post, Type } from "@/lib/type.ts";
+import { Post } from "@/lib/type.ts";
 import AddButton from "@/components/admin/common/button/addButton.tsx";
 import { getEmptyPost, getThumbnailSrc } from "@/lib/utils/commonUtils.ts";
-import { deleteItem } from "@/app/actions/item-post/admin.ts";
 import SelectableList from "@/components/admin/common/selectableList/selectableList.tsx";
 import SelectableListRow from "@/components/admin/common/selectableList/selectableListRow.tsx";
 import PostForm from "@/components/admin/item/form/postForm.tsx";
+import { getDeleteAction } from "@/lib/utils/actionUtils.ts";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
   posts: Post[];
 }
 export default function PostManagement({ posts }: Props) {
+  const deleteAction = getDeleteAction(TYPE.POST);
   return (
     <>
       <h2 className={s.title2}>Liste des posts</h2>
@@ -24,7 +26,7 @@ export default function PostManagement({ posts }: Props) {
             part1={post.title}
             part2={new Date(post.date).getFullYear().toString()}
             imageSrc={getThumbnailSrc(post)}
-            deleteAction={() => deleteItem(post.id, Type.POST)}
+            deleteAction={() => deleteAction(post.id)}
           />
         )}
         formToRender={(post, handleClose) => (

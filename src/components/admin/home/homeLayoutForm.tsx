@@ -5,9 +5,9 @@ import s from "@/components/admin/admin.module.css";
 import Image from "next/image";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import { getHomeLayout } from "@/lib/utils/commonUtils.ts";
-import { updateMeta } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { updateMeta } from "@/app/admin/meta/action.ts";
 
 export default function HomeLayoutForm() {
   const metas = useMetas();

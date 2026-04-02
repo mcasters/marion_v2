@@ -3,12 +3,13 @@
 import React, { useActionState, useState } from "react";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
-import { KeyContent, KeyMeta } from "@/lib/type.ts";
+import { KeyMeta } from "@/lib/type.ts";
 import s from "../admin.module.css";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { LABEL } from "@/db/schema.ts";
 
 interface Props {
-  dbKey: KeyContent | KeyMeta;
+  dbKey: LABEL | KeyMeta;
   text: string;
   updateAction: (
     initialState: any,

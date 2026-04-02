@@ -2,17 +2,18 @@
 
 import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { Image, KeyContent } from "@/lib/type";
+import { Image } from "@/lib/type";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import useActionResult from "@/components/hooks/useActionResult.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import { updateImageContent } from "@/app/admin/contentAction.ts";
+import { LABEL } from "@/db/schema.ts";
 
 type Props = {
   images: Image[];
   isMultiple: boolean;
-  label: KeyContent;
+  label: LABEL;
   acceptSmallImage: boolean;
   title?: string;
   isMain?: boolean;

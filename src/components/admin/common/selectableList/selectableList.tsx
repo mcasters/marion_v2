@@ -1,13 +1,14 @@
 "use client";
 
 import React, { ReactElement, useEffect, useState } from "react";
-import { Admin, Type } from "@/lib/type.ts";
+import { Admin } from "@/lib/type.ts";
 import s from "@/components/admin/common/selectableList/adminList.module.css";
 import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
 import useListSelection from "@/components/hooks/useListSelection.ts";
 import useKeyboard from "@/components/hooks/useKeyboard.ts";
 import Modal from "@/components/admin/common/modal.tsx";
 import { MESSAGE } from "@/constants/admin.ts";
+import { TYPE } from "@/db/schema.ts";
 
 interface SelectableListProps<T extends Admin> {
   items: T[];
@@ -31,7 +32,7 @@ export default function SelectableList<T extends Admin>({
   useKeyboard("ArrowDown", increase, !isOutside);
   const [editedItem, setEditedItem] = useState<T | null>(null);
   const [itemsToDisplay, setItemsToDisplay] = useState<T[]>(items);
-  const isCategory = items[0]?.type === Type.CATEGORY;
+  const isCategory = items[0]?.type === TYPE.CATEGORY;
 
   useEffect(() => {
     if (!renderFilter) setItemsToDisplay(items);

@@ -1,12 +1,11 @@
 "use client";
 
-import { PresetColor } from "@@/prisma/generated/client";
 import { useAdminWorkThemeContext } from "@/app/context/adminWorkThemeProvider";
 import PresetColorSwatch from "@/components/admin/theme/dashboard/presetColor/presetColorSwatch";
 import DragList from "@/components/admin/common/dragList/dragList.tsx";
 import s from "@/components/admin/theme/adminTheme.module.css";
 import { useAlert } from "@/app/context/alertProvider.tsx";
-import { DragListElement } from "@/lib/type.ts";
+import { DragListElement, PresetColor } from "@/lib/type.ts";
 import { updatePresetColorsOrder } from "@/app/admin/themeAction.ts";
 
 export default function PresetColorDashboard() {
