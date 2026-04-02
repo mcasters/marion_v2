@@ -1,13 +1,14 @@
 "use client";
 
-import { Category, Type } from "@/lib/type";
+import { Category } from "@/lib/type";
 import React from "react";
 import s from "@/components/item/itemHome.module.css";
 import Image from "next/image";
 import Link from "next/link";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
-  type: Type;
+  type: TYPE;
   categories: Category[];
   years: number[];
 }
@@ -17,9 +18,8 @@ export default function ItemHome({ categories, type, years }: Props) {
       <p className={`${s.tagTitle}`}>Par séries :</p>
       <ul className={s.ul}>
         {categories.map((category) => {
-          const content = category.content;
           const noImage =
-            category.key === "no-category" || content.image.filename === "";
+            category.key === "no-category" || category.imageFilename === "";
           return (
             <li key={category.key}>
               <Link
@@ -30,13 +30,8 @@ export default function ItemHome({ categories, type, years }: Props) {
                 {!noImage && (
                   <>
                     <Image
-                      src={`/images/${type}/sm/${content.image.filename}`}
-                      width={content.image.width}
-                      height={content.image.height}
+                      src={`/images/${type}/sm/${category.imageFilename}`}
                       alt=""
-                      style={{
-                        objectFit: "cover",
-                      }}
                       priority
                       unoptimized
                       className={s.image}

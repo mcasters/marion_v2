@@ -1,5 +1,5 @@
 export const THEME = {
-  BASE_THEME: "Thème de base",
+  BASE_THEME_NAME: "Thème de base",
 };
 
 export const THEME_LABEL = {
@@ -30,22 +30,10 @@ export const THEME_TARGET_LABEL = {
   linkHover: "Lien pointé*",
 };
 
-export const KEY_LABEL = {
-  INTRO: "INTRO",
-  SLIDER: "SLIDER",
-  ADDRESS: "ADDRESS",
-  PHONE: "PHONE",
-  EMAIL: "EMAIL",
-  TEXT_CONTACT: "TEXT_CONTACT",
-  PRESENTATION: "PRESENTATION",
-  DEMARCHE: "DEMARCHE",
-  INSPIRATION: "INSPIRATION",
-} as const;
-
 export const COOKIE_NAME = "adminSession";
 
 export const KEY_META = {
-  SITE_TITLE: "siteTitle",
+  OWNER: "owner",
   SITE_EMAIL: "siteEmail",
   FOOTER: "footerContent",
   INSTAGRAM: "instagram",

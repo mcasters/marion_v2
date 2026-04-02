@@ -22,7 +22,7 @@ export default function ThemeDelete() {
 
   return (
     <button
-      disabled={workTheme.name === THEME.BASE_THEME}
+      disabled={workTheme.name === THEME.BASE_THEME_NAME}
       onClick={handleDelete}
       className="adminButton"
     >

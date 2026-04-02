@@ -9,12 +9,14 @@ export default function useActionResult(
     isError: boolean;
   } | null,
   callbackOnSuccess?: () => void,
+  triggerAlert: boolean = true,
+
   timeout: number = 3000,
 ) {
-  const alert = useAlert();
+  const alert = triggerAlert ? useAlert() : undefined;
   useEffect(() => {
     if (state) {
-      alert(state.message, state.isError, timeout);
+      if (alert) alert(state.message, state.isError, timeout);
       if (callbackOnSuccess && !state.isError) callbackOnSuccess();
     }
   }, [state]);

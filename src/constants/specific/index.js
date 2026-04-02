@@ -1,7 +1,7 @@
 import { THEME } from "../admin";
 
 export const BASE_THEME = {
-  name: THEME.BASE_THEME,
+  name: THEME.BASE_THEME_NAME,
   isActive: true,
   general_lineColor: "#be2d01",
   general_titleColor: "#333",

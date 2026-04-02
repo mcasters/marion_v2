@@ -28,8 +28,8 @@ export default function PresetColorDashboard() {
   const handleChangeOrder = async (map: Map<number, number>) => {
     const { message, isError, updatedPresetColors } =
       await updatePresetColorsOrder(map);
-    if (isError) alert(message, isError);
-    else if (updatedPresetColors) setPresetColors(updatedPresetColors);
+    if (!isError && updatedPresetColors) setPresetColors(updatedPresetColors);
+    alert(message, isError);
   };
 
   return (

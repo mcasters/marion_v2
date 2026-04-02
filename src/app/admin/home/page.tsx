@@ -9,8 +9,8 @@ import {
 } from "@/lib/utils/imageUtils";
 import HomeLayoutForm from "@/components/admin/home/homeLayoutForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm.tsx";
-import { KEY_LABEL } from "@/constants/admin.ts";
 import { updateContent } from "@/app/actions/contents/admin.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export default async function Home() {
   const contents = await getContentsFull();
@@ -24,7 +24,7 @@ export default async function Home() {
       <h2 className={s.title2}>{`Texte d'accueil (facultatif)`}</h2>
       <TextAreaForm
         text={getIntroText(contents)}
-        dbKey={KEY_LABEL.INTRO}
+        dbKey={LABEL.INTRO}
         updateAction={updateContent}
       />
       <div className="separate" />
@@ -37,7 +37,7 @@ export default async function Home() {
       <ImagesForm
         images={getSliderPortraitImages(contents)}
         isMultiple={true}
-        label={KEY_LABEL.SLIDER}
+        label={LABEL.SLIDER}
         acceptSmallImage={false}
         isMain={true}
       />
@@ -51,7 +51,7 @@ export default async function Home() {
       <ImagesForm
         images={getSliderLandscapeImages(contents)}
         isMultiple={true}
-        label={KEY_LABEL.SLIDER}
+        label={LABEL.SLIDER}
         acceptSmallImage={false}
         isMain={false}
       />

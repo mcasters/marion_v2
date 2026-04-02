@@ -2,8 +2,6 @@ import { Meta } from "@@/prisma/generated/client";
 import { Label } from "@@/prisma/generated/enums";
 import {
   AdminCategory,
-  AdminPost,
-  AdminWork,
   Category,
   ContentFull,
   DragListElement,
@@ -13,10 +11,11 @@ import {
   ItemDarkBackground,
   Layout,
   Message,
-  Type,
+  Post,
   Work,
 } from "@/lib/type.ts";
 import { KEY_META } from "@/constants/admin.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export const transformValueToKey = (value: string): string =>
   value
@@ -80,18 +79,16 @@ export const getMetaMap = (metas: Meta[]): Map<string, string> => {
   return map;
 };
 
-export const getThumbnailSrc = (
-  item: AdminCategory | AdminWork | AdminPost,
-) => {
+export const getThumbnailSrc = (item: AdminCategory | Work | Post) => {
   if (item.id === 0) return "";
 
   switch (item.type) {
-    case Type.CATEGORY: {
-      return item.content.image.filename !== ""
-        ? `/images/${item.workType}/sm/${item.content.image.filename}`
+    case TYPE.CATEGORY: {
+      return item.imageFilename !== ""
+        ? `/images/${item.workType}/sm/${item.imageFilename}`
         : "";
     }
-    case Type.POST: {
+    case TYPE.POST: {
       let image = item.images.find((i: Image) => i.isMain);
       if (!image) image = item.images[0];
       return image && image.filename !== ""
@@ -107,8 +104,8 @@ export const getThumbnailSrc = (
 };
 
 export const getEmptyWork = (
-  type: Type.SCULPTURE | Type.DRAWING | Type.PAINTING,
-): AdminWork => {
+  type: TYPE.SCULPTURE | TYPE.DRAWING | TYPE.PAINTING,
+): Work => {
   return {
     id: 0,
     type,
@@ -126,26 +123,26 @@ export const getEmptyWork = (
     categoryId: null,
     isOut: false,
     outInformation: "",
-    modifiable: true,
   };
 };
 
-export const getEmptyPost = (): AdminPost => {
+export const getEmptyPost = (): Post => {
   return {
     id: 0,
-    type: Type.POST,
+    type: TYPE.POST,
     title: "",
     date: new Date(),
+    createdAt: new Date(),
     text: "",
-    images: [] as Image[],
+    images: [{ ...getEmptyImage(), postId: 0 }],
     published: false,
     viewCount: 0,
-    modifiable: true,
   };
 };
 
 export const getEmptyImage = (): Image => {
   return {
+    id: 0,
     filename: "",
     width: 0,
     height: 0,
@@ -153,36 +150,35 @@ export const getEmptyImage = (): Image => {
   };
 };
 
-export const getEmptyCategory = (
-  workType: Type.PAINTING | Type.DRAWING | Type.SCULPTURE,
+export const getEmptyAdminCategory = (
+  workType: TYPE.PAINTING | TYPE.DRAWING | TYPE.SCULPTURE,
 ): AdminCategory => {
   return {
     id: 0,
-    type: Type.CATEGORY,
-    workType,
     key: "",
     value: "",
-    content: {
-      title: "",
-      text: "",
-      image: getEmptyImage(),
-    },
+    type: TYPE.CATEGORY,
+    workType,
+    title: "",
+    text: "",
+    imageFilename: "",
+    filenames: [],
     count: 0,
-    images: [getEmptyImage()],
-    modifiable: true,
   };
 };
 
-export const getNoCategory = (): Category => {
+export const getNoCategory = (
+  workType: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
+): Category => {
   return {
     id: 0,
     key: "no-category",
     value: "Sans catégorie",
-    content: {
-      title: "",
-      text: "",
-      image: getEmptyImage(),
-    },
+    type: TYPE.CATEGORY,
+    workType,
+    title: "",
+    text: "",
+    imageFilename: "",
   };
 };
 
@@ -202,12 +198,12 @@ export const getEmptyMessage = (): Message => {
 
 export const getWorkLayout = (
   metas: Map<string, string>,
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING,
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
 ): [Layout, ItemDarkBackground] => {
   const metaLayout =
-    type === Type.PAINTING
+    type === TYPE.PAINTING
       ? metas.get(KEY_META.PAINTING_LAYOUT) || "1,1"
-      : type === Type.SCULPTURE
+      : type === TYPE.SCULPTURE
         ? metas.get(KEY_META.SCULPTURE_LAYOUT) || "3,1"
         : metas.get(KEY_META.DRAWING_LAYOUT) || "1,1";
 
@@ -233,7 +229,7 @@ const dotToComma = (number: number): string =>
   number.toString().replace(".", ",");
 
 export const getSizeText = (item: Work): string =>
-  item.type === Type.SCULPTURE
+  item.type === TYPE.SCULPTURE
     ? `${dotToComma(item.height)} x ${dotToComma(item.width)} x ${dotToComma(item.length)} cm`
     : `${dotToComma(item.height)} x ${dotToComma(item.width)} cm`;
 
@@ -246,25 +242,22 @@ export const sortDragList = (
   return dragList.toSorted(compare);
 };
 
-export const filterWorks = (
-  works: AdminWork[],
-  filter: Filter,
-): AdminWork[] => {
-  function filterByCategory(list: AdminWork[]) {
+export const filterWorks = (works: Work[], filter: Filter): Work[] => {
+  function filterByCategory(list: Work[]) {
     return filter.categoryFilter === -1
       ? list
       : filter.categoryFilter === 0
         ? list.filter((i) => !i.categoryId)
         : list.filter((i) => i.categoryId === filter.categoryFilter);
   }
-  function filterByYear(list: AdminWork[]) {
+  function filterByYear(list: Work[]) {
     return filter.yearFilter === -1
       ? list
       : list.filter(
           (i) => new Date(i.date).getFullYear() === filter.yearFilter,
         );
   }
-  function filterByIsOut(list: AdminWork[]) {
+  function filterByIsOut(list: Work[]) {
     return filter.isOutFilter === -1
       ? list
       : filter.isOutFilter === 0

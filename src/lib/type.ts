@@ -1,9 +1,23 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 /* eslint-disable  @typescript-eslint/no-empty-object-type */
 
-import { Prisma, User } from "@@/prisma/generated/client";
 import { JSX } from "react";
-import { KEY_LABEL, KEY_META } from "@/constants/admin.ts";
+import { KEY_META } from "@/constants/admin.ts";
+import {
+  drawing,
+  drawingCategory,
+  LABEL,
+  painting,
+  paintingCategory,
+  post,
+  postImage,
+  presetColor,
+  sculpture,
+  sculptureCategory,
+  sculptureImage,
+  theme,
+  TYPE,
+} from "@/db/schema.ts";
 
 type StringKeys<T> = {
   [k in keyof T]: T[k] extends string ? k : never;
@@ -18,27 +32,41 @@ export enum Type {
   CATEGORY = "catégorie",
 }
 
+export interface Admin {
+  id: number;
+  type: TYPE;
+}
+
+export type Painting = typeof painting.$inferSelect;
+export type Sculpture = typeof sculpture.$inferSelect & {
+  images: (typeof sculptureImage.$inferSelect)[];
+};
+export type Drawing = typeof drawing.$inferSelect;
+export type Post = typeof post.$inferSelect & {
+  images: (typeof postImage.$inferSelect)[];
+};
+
+export type PaintingCategory = typeof paintingCategory.$inferSelect;
+export type SculptureCategory = typeof sculptureCategory.$inferSelect;
+export type DrawingCategory = typeof drawingCategory.$inferSelect;
+export type Category = PaintingCategory | SculptureCategory | DrawingCategory;
+
+export type AdminCategory = Category & {
+  filenames: string[];
+  count: number;
+};
+
 export interface Image {
+  id: number;
   filename: string;
   width: number;
   height: number;
   isMain: boolean;
 }
 
-export interface Category {
-  id: number;
-  key: string;
-  value: string;
-  content: {
-    title: string;
-    text: string;
-    image: Image;
-  };
-}
-
 export interface Work {
   id: number;
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
   title: string;
   date: Date;
   technique: string;
@@ -55,47 +83,22 @@ export interface Work {
   outInformation: string;
 }
 
-export interface Post {
+export interface User {
   id: number;
-  type: Type.POST;
-  title: string;
-  date: Date;
-  text: string;
-  published: boolean;
-  viewCount: number;
-  images: Image[];
+  email: string;
+  isAdmin: boolean;
 }
 
-export interface Admin {
-  id: number;
-  type: Type;
-  modifiable: boolean;
-}
-
-export interface AdminCategory extends Category {
-  type: Type.CATEGORY;
-  workType: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
-  images: Image[];
-  count: number;
-  modifiable: boolean;
-}
-
-export interface AdminWork extends Work {
-  modifiable: boolean;
-}
-
-export interface AdminPost extends Post {
-  modifiable: boolean;
-}
+export type Session = {
+  user: User;
+};
 
 export interface Message {
   id: number;
   date: Date;
   dateUpdated: Date | null;
   text: string;
-  author: Prisma.UserGetPayload<{
-    omit: { password: true };
-  }>;
+  author: User;
 }
 
 export enum Layout {
@@ -115,7 +118,7 @@ export enum HomeLayout {
   NAV,
 }
 
-export type KeyContent = (typeof KEY_LABEL)[keyof typeof KEY_LABEL];
+export type KeyContent = (typeof LABEL)[keyof typeof LABEL];
 
 export type KeyMeta = (typeof KEY_META)[keyof typeof KEY_META];
 
@@ -150,10 +153,6 @@ export type PhotoTabEnhanced = {
   sm: PhotoEnhanced[];
   md: PhotoEnhanced[];
   lg: PhotoEnhanced[];
-};
-
-export type Session = {
-  user: User;
 };
 
 export type ThemeTarget = {
@@ -202,3 +201,8 @@ export type Filter = {
   yearFilter: number;
   isOutFilter: number;
 };
+
+export type Theme = typeof theme.$inferSelect;
+export type NewTheme = typeof theme.$inferInsert;
+
+export type PresetColor = typeof presetColor.$inferSelect;

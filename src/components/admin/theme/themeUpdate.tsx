@@ -27,7 +27,7 @@ export default function ThemeUpdate() {
     <button
       onClick={handleUpdate}
       className="adminButton"
-      disabled={workTheme.name === THEME.BASE_THEME || isSaved}
+      disabled={workTheme.name === THEME.BASE_THEME_NAME || isSaved}
     >
       {`Sauvegarder le thème "${workTheme.name}"`}
     </button>

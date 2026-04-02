@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 
-import { MENU_2 } from "@/constants/specific/routes.ts";
+import {MENU_2} from "@/constants/specific/routes.ts";
 import s from "@/components/layout/nav_2/nav_2.module.css";
-import { useTheme } from "@/app/context/themeProvider.tsx";
-import { useMetas } from "@/app/context/metaProvider.tsx";
-import { KEY_META } from "@/constants/admin.ts";
+import {useTheme} from "@/app/context/themeProvider.tsx";
+import {useMetas} from "@/app/context/metaProvider.tsx";
+import {KEY_META} from "@/constants/admin.ts";
 import React from "react";
 import LogoIconT from "@/components/icons/logoIconT.tsx";
 import LogoIconM from "@/components/icons/logoIconM.tsx";
@@ -19,7 +19,7 @@ interface Props {
 export default function Nav_2({ fixed, themePage }: Props) {
   const theme = useTheme();
   const metas = useMetas();
-  const owner = metas.get(KEY_META.SITE_TITLE);
+  const owner = metas.get(KEY_META.OWNER);
 
   return (
     <nav

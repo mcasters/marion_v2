@@ -1,17 +1,17 @@
-import { Type } from "@/lib/type";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
 import ItemLayoutForm from "@/components/admin/item/form/itemLayoutForm.tsx";
-import {
-  getAdminCategories,
-  getAdminWorks,
-} from "@/app/actions/item-post/admin.ts";
 import WorkManagement from "@/components/admin/item/workManagement.tsx";
+import {
+  getDrawingAdminCategories,
+  getDrawingWorks,
+} from "@/app/admin/dessins/action.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export default async function Dessins() {
-  const type = Type.DRAWING;
-  const categories = await getAdminCategories(type);
-  const works = await getAdminWorks(type);
+  const type = TYPE.DRAWING;
+  const works = await getDrawingWorks();
+  const categories = await getDrawingAdminCategories(works);
 
   return (
     <div className={s.container}>

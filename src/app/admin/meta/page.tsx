@@ -8,7 +8,7 @@ import { KeyMeta } from "@/lib/type.ts";
 
 export default async function Page() {
   const metaMap = getMetaMap(await getMetas());
-  const isM = metaMap.get(KEY_META.SITE_TITLE)?.startsWith("M");
+  const isM = metaMap.get(KEY_META.OWNER)?.startsWith("M");
 
   return (
     <>

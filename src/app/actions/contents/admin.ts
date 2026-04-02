@@ -9,7 +9,7 @@ import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
 import { KeyContent } from "@/lib/type";
 import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
-import { KEY_LABEL } from "@/constants/admin.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export async function updateContent(
   initialState: any,
@@ -38,7 +38,7 @@ export async function updateImageContent(
   const label = formData.get("key") as KeyContent;
 
   try {
-    if (label === KEY_LABEL.SLIDER) await updateImageSlider(formData);
+    if (label === LABEL.SLIDER) await updateImageSlider(formData);
     else {
       await updateImagePresentation(formData);
     }
@@ -58,12 +58,12 @@ async function updateImageSlider(formData: FormData) {
   if (filesToAdd.length > 0) {
     const isMain = formData.get("isMain") === "true";
     const title = isMain ? "mobileSlider" : "desktopSlider";
-    await saveContentImage(KEY_LABEL.SLIDER, filesToAdd, title, isMain);
+    await saveContentImage(LABEL.SLIDER, filesToAdd, title, isMain);
   }
 
   if (filenamesToDelete !== "")
     for await (const filename of filenamesToDelete.split(",")) {
-      await deleteImageContent(KEY_LABEL.SLIDER, filename);
+      await deleteImageContent(LABEL.SLIDER, filename);
     }
 }
 
@@ -72,11 +72,11 @@ async function updateImagePresentation(formData: FormData) {
   const filenamesToDelete = formData.get("filenamesToDelete") as string;
 
   if (filenamesToDelete !== "")
-    await deleteImageContent(KEY_LABEL.PRESENTATION, filenamesToDelete);
+    await deleteImageContent(LABEL.PRESENTATION, filenamesToDelete);
 
   if (filesToAdd.length > 0)
     await saveContentImage(
-      KEY_LABEL.PRESENTATION,
+      LABEL.PRESENTATION,
       filesToAdd,
       "presentation",
       false,

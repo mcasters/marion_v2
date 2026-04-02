@@ -14,10 +14,12 @@ export default function ThemeAdd() {
   const handleAdd = async () => {
     if (themeName === "") alert("Le nom du nouveau thème est manquant", true);
     else {
-      const { theme, message, isError } = await createTheme(
-        workTheme,
-        themeName,
-      );
+      const { id, ...rest } = workTheme;
+      const { theme, message, isError } = await createTheme({
+        ...rest,
+        name: themeName,
+        isActive: false,
+      });
       if (theme) {
         setThemes([...themes, theme]);
         setWorkTheme(theme);

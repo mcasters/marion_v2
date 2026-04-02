@@ -83,7 +83,7 @@ export default function Layout({ introduction, children }: Props) {
       ) : isHome ? (
         <HomeHeader
           isPlainHomeLayout={isPlainHomeLayout}
-          title={metas.get(KEY_META.SITE_TITLE) || ""}
+          title={metas.get(KEY_META.OWNER) || ""}
           introduction={introduction}
         />
       ) : (

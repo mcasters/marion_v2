@@ -2,27 +2,32 @@
 
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { AdminCategory, AdminWork, Type } from "@/lib/type.ts";
+import { AdminCategory, Work } from "@/lib/type.ts";
 import AddButton from "@/components/admin/common/button/addButton.tsx";
 import {
-  getEmptyCategory,
+  getEmptyAdminCategory,
   getEmptyWork,
   getThumbnailSrc,
 } from "@/lib/utils/commonUtils.ts";
+import {
+  getDeleteAction,
+  getDeleteCategoryAction,
+} from "@/lib/utils/actionUtils.ts";
 import SelectableList from "@/components/admin/common/selectableList/selectableList.tsx";
 import SelectableListRow from "@/components/admin/common/selectableList/selectableListRow.tsx";
-import { deleteCategory } from "@/app/actions/item-post/categories/admin.ts";
 import CategoryForm from "@/components/admin/item/form/categoryForm.tsx";
 import FilterWorkListComponent from "@/components/admin/common/selectableList/filterWorkListComponent.tsx";
-import { deleteItem } from "@/app/actions/item-post/admin.ts";
 import WorkForm from "@/components/admin/item/form/workForm.tsx";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
-  works: AdminWork[];
+  works: Work[];
   categories: AdminCategory[];
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 }
 export default function WorkManagement({ works, categories, type }: Props) {
+  const deleteAction = getDeleteAction(type);
+  const deleteCategoryAction = getDeleteCategoryAction(type);
   return (
     <>
       <SelectableList
@@ -37,7 +42,7 @@ export default function WorkManagement({ works, categories, type }: Props) {
             part3={new Date(work.date).getFullYear().toString()}
             part4={work.isOut ? "sortie" : "Non sortie"}
             imageSrc={getThumbnailSrc(work)}
-            deleteAction={() => deleteItem(work.id, work.type)}
+            deleteAction={() => deleteAction(work.id)}
           />
         )}
         renderFilter={(getFilteredItems) => (
@@ -48,7 +53,7 @@ export default function WorkManagement({ works, categories, type }: Props) {
             type={type}
           />
         )}
-        updateForm={(work, handleClose) => (
+        formToRender={(work, handleClose) => (
           <WorkForm work={work} categories={categories} onClose={handleClose} />
         )}
       />
@@ -72,19 +77,22 @@ export default function WorkManagement({ works, categories, type }: Props) {
             part2={`${category.count} ${category.workType}(s)`}
             imageSrc={getThumbnailSrc(category)}
             deleteAction={
-              !category.modifiable || category.count > 0
+              category.id === 0 || category.count > 0
                 ? undefined
-                : () => deleteCategory(category.id, type)
+                : () => deleteCategoryAction(category.id)
             }
           />
         )}
-        updateForm={(category, handleClose) => (
-          <CategoryForm category={category} onClose={handleClose} />
+        formToRender={(category, handleClose) => (
+          <CategoryForm adminCategory={category} onClose={handleClose} />
         )}
       />
       <AddButton
         renderForm={(toggle) => (
-          <CategoryForm category={getEmptyCategory(type)} onClose={toggle} />
+          <CategoryForm
+            adminCategory={getEmptyAdminCategory(type)}
+            onClose={toggle}
+          />
         )}
         modalWidth={700}
       />

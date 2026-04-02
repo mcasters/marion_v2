@@ -1,0 +1,110 @@
+"use server";
+
+import { Post } from "@/lib/type.ts";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { post, postImage, TYPE } from "@/db/schema.ts";
+import {
+  handleAddAndRemoveFiles,
+  handleRemoveFiles,
+} from "@/app/admin/utils/itemActionUtils.ts";
+import { createPostData } from "@/lib/utils/actionUtils.ts";
+
+export async function createPost(initialState: any, formData: FormData) {
+  const title = formData.get("title") as string;
+  const type = TYPE.POST;
+
+  try {
+    if (await db.query.post.findFirst({ where: { title } }))
+      return {
+        message: `Erreur : le titre "${title}" existe déjà`,
+        isError: true,
+      };
+    const data = createPostData(formData);
+    const newId = await db.insert(post).values(data).$returningId();
+
+    const fileInfos = await handleAddAndRemoveFiles(type, formData);
+    if (fileInfos) {
+      const images = fileInfos.map((fileInfo) => {
+        return { ...fileInfo, postId: newId[0].id };
+      });
+      await db.insert(postImage).values(images);
+    }
+
+    revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
+    return { message: `Post ajouté`, isError: false };
+  } catch (e) {
+    return { message: `Erreur à l'enregistrement : ${e}`, isError: true };
+  }
+}
+
+export async function updatePost(initialState: any, formData: FormData) {
+  const rawFormData = Object.fromEntries(formData);
+  const type = TYPE.POST;
+  const id = Number(rawFormData.id as string);
+  const title = rawFormData.title as string;
+
+  try {
+    const postToUpdate = await db.query.post.findFirst({
+      where: { id },
+      with: { images: true },
+    });
+
+    if (!postToUpdate) return { message: `Post introuvable`, isError: true };
+
+    if (postToUpdate.title !== title) {
+      const titleAlreadyExists = await db.query.post.findFirst({
+        where: { title },
+      });
+      if (titleAlreadyExists)
+        return {
+          message: `Erreur : le titre "${title}" existe déjà`,
+          isError: true,
+        };
+    }
+
+    await handleAddAndRemoveFiles(type, formData);
+    const data = createPostData(formData);
+    await db.update(post).set(data).where(eq(post.id, id));
+
+    revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
+    return { message: "Post modifié", isError: false };
+  } catch (e) {
+    return { message: `Erreur à l'enregistrement`, isError: true };
+  }
+}
+
+export async function deletePost(id: number) {
+  const type = TYPE.POST;
+
+  try {
+    const postToDelete = await db.query.post.findFirst({
+      where: { id },
+      with: { images: true },
+    });
+
+    if (!postToDelete) return { message: `Post introuvable`, isError: true };
+
+    await db.delete(post).where(eq(post.id, id));
+    await handleRemoveFiles(
+      type,
+      postToDelete.images.map((image) => image.filename),
+    );
+
+    revalidatePath(`/admin/${type}s`);
+    revalidatePath(`/${type}s`);
+    return { message: `Post supprimé`, isError: false };
+  } catch (e) {
+    return { message: `Erreur à la suppression`, isError: true };
+  }
+}
+
+export const getPosts = async (): Promise<Post[]> => {
+  return await db.query.post.findMany({
+    with: { images: true },
+    orderBy: { date: "desc" },
+  });
+};

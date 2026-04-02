@@ -36,7 +36,7 @@ export default async function Contact() {
   const metas = getMetaMap(await getMetas());
   const email = getEmail(contents);
   const contactText = getContactText(contents);
-  const owner = metas.get(KEY_META.SITE_TITLE);
+  const owner = metas.get(KEY_META.OWNER);
   const instagram = metas.get(KEY_META.INSTAGRAM);
 
   return (

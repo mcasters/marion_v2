@@ -1,10 +1,10 @@
 import ItemPage from "@/components/item/itemPage.tsx";
-import { Type } from "@/lib/type";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin";
-import { getWorksByYear } from "@/app/actions/item-post";
+import { getDrawingWorksByYear } from "@/app/dessins/action.ts";
+import { TYPE } from "@/db/schema.ts";
 
 type Props = {
   params: Promise<{ year: string }>;
@@ -32,9 +32,8 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: Props) {
-  const type = Type.DRAWING;
   const { year } = await params;
-  const works = await getWorksByYear(year, type);
+  const works = await getDrawingWorksByYear(year);
 
-  return <ItemPage tag={year} works={works} type={type} />;
+  return <ItemPage tag={year} works={works} type={TYPE.DRAWING} />;
 }

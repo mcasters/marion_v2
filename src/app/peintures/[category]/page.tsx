@@ -1,10 +1,13 @@
-import { getCategory, getWorksByCategory } from "@/app/actions/item-post";
-import { Type } from "@/lib/type";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { getMetas } from "@/app/actions/meta";
 import ItemPage from "@/components/item/itemPage.tsx";
 import { KEY_META } from "@/constants/admin";
+import { TYPE } from "@/db/schema.ts";
+import {
+  getPaintingCategory,
+  getPaintingWorksByCategory,
+} from "@/app/peintures/action.ts";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -15,7 +18,7 @@ export async function generateMetadata({
 }: Props): Promise<Metadata | undefined> {
   const categoryKey = (await params).category;
   const metas = getMetaMap(await getMetas());
-  const category = await getCategory(categoryKey, Type.PAINTING);
+  const category = await getPaintingCategory(categoryKey);
 
   if (metas && category) {
     const text =
@@ -38,10 +41,9 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: Props) {
-  const type = Type.PAINTING;
   const categoryKey = (await params).category;
-  const category = await getCategory(categoryKey, type);
-  const works = await getWorksByCategory(categoryKey, type);
+  const category = await getPaintingCategory(categoryKey);
+  const works = await getPaintingWorksByCategory(categoryKey);
 
   return (
     <>
@@ -50,7 +52,7 @@ export default async function Page({ params }: Props) {
           tag={category.value}
           category={category}
           works={works}
-          type={type}
+          type={TYPE.PAINTING}
         />
       )}
     </>

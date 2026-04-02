@@ -2,15 +2,15 @@
 
 import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { Type } from "@/lib/type.ts";
 import Image from "next/image";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import { useMetas } from "@/app/context/metaProvider.tsx";
 import { updateMeta } from "@/app/actions/meta";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { TYPE } from "@/db/schema.ts";
 
 type Props = {
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 };
 
 export default function ItemLayoutForm({ type }: Props) {
@@ -29,9 +29,9 @@ export default function ItemLayoutForm({ type }: Props) {
         type="hidden"
         name="key"
         value={
-          type === Type.PAINTING
+          type === TYPE.PAINTING
             ? "paintingLayout"
-            : type === Type.SCULPTURE
+            : type === TYPE.SCULPTURE
               ? "sculptureLayout"
               : "drawingLayout"
         }
@@ -42,7 +42,7 @@ export default function ItemLayoutForm({ type }: Props) {
         name="darkBackground"
         value={darkBackground ? "1" : "0"}
       />
-      {(type === Type.PAINTING || type === Type.DRAWING) && (
+      {(type === TYPE.PAINTING || type === TYPE.DRAWING) && (
         <>
           <p className={s.layoutLabel}>
             <button
@@ -93,7 +93,7 @@ export default function ItemLayoutForm({ type }: Props) {
           </p>
         </>
       )}
-      {type === Type.SCULPTURE && (
+      {type === TYPE.SCULPTURE && (
         <p className={s.layoutLabel}>
           <button
             onClick={() => setLayout("3")}

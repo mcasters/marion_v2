@@ -1,33 +1,42 @@
 "use server";
 
-import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
-import { PresetColor, Theme } from "@@/prisma/generated/client";
 import { THEME } from "@/constants/admin";
-import { OnlyString } from "@/lib/type";
+import { NewTheme, OnlyString, PresetColor, Theme } from "@/lib/type";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
+import {
+  presetColor as presetColorTable,
+  theme as themeTable,
+} from "@/db/schema";
 
-export async function createTheme(theme: Theme, newName: string) {
+export async function createTheme(newTheme: NewTheme) {
   try {
-    const alreadyTheme = await prisma.theme.findUnique({
-      where: { name: newName },
-    });
-    if (alreadyTheme)
+    const existant = (
+      await db
+        .select()
+        .from(themeTable)
+        .where(eq(themeTable.name, newTheme.name))
+    )[0];
+
+    if (existant)
       return {
         message: "Nom du thème déjà existant",
         isError: true,
         theme: undefined,
       };
-    const { id, isActive, name, ...rest } = theme;
-    const newTheme = await prisma.theme.create({
-      data: {
-        name: newName,
-        isActive: false,
-        ...rest,
-      },
-    });
+
+    await db.insert(themeTable).values(newTheme);
+
+    const savedTheme = (
+      await db
+        .select()
+        .from(themeTable)
+        .where(eq(themeTable.name, newTheme.name))
+    )[0];
 
     revalidatePath("/*");
-    return { message: "Thème ajouté", isError: false, theme: newTheme };
+    return { message: "Thème ajouté", isError: false, theme: savedTheme };
   } catch (e) {
     return {
       message: `Erreur à l'enregistrement : ${e}`,
@@ -40,14 +49,12 @@ export async function createTheme(theme: Theme, newName: string) {
 export async function updateTheme(theme: Theme) {
   try {
     const { id, ...rest } = theme;
-    await prisma.theme.update({
-      where: {
-        id,
-      },
-      data: {
-        ...rest,
-      },
-    });
+
+    await db
+      .update(themeTable)
+      .set({ ...rest })
+      .where(eq(themeTable.id, id));
+
     revalidatePath("/*");
     return { message: `Theme "${theme.name}" modifié`, isError: false };
   } catch (e) {
@@ -61,35 +68,27 @@ export async function deleteTheme(id: number): Promise<{
   updatedThemes: Theme[] | null;
 }> {
   try {
-    const themeToDelete = await prisma.theme.findUnique({
-      where: {
-        id,
-      },
-    });
+    const themeToDelete = (
+      await db.select().from(themeTable).where(eq(themeTable.id, id))
+    )[0];
 
     if (themeToDelete) {
-      if (themeToDelete.name === THEME.BASE_THEME) {
+      if (themeToDelete.name === THEME.BASE_THEME_NAME) {
         return {
           message: "le thème par défaut ne peut pas être supprimé",
           isError: true,
           updatedThemes: null,
         };
       }
-      if (themeToDelete.isActive) {
-        await prisma.theme.update({
-          where: {
-            name: THEME.BASE_THEME,
-          },
-          data: {
-            isActive: true,
-          },
-        });
-      }
-      await prisma.theme.delete({
-        where: { id },
-      });
+      if (themeToDelete.isActive)
+        await db
+          .update(themeTable)
+          .set({ isActive: true })
+          .where(eq(themeTable.name, THEME.BASE_THEME_NAME));
+
+      await db.delete(themeTable).where(eq(themeTable.id, id));
     }
-    const updatedThemes = await prisma.theme.findMany();
+    const updatedThemes = await db.select().from(themeTable);
 
     revalidatePath("/*");
     return { message: "Thème supprimé", isError: false, updatedThemes };
@@ -104,25 +103,15 @@ export async function deleteTheme(id: number): Promise<{
 
 export async function activateTheme(id: number) {
   try {
-    const activatedTheme = await prisma.theme.update({
-      where: {
-        id,
-      },
-      data: {
-        isActive: true,
-      },
-    });
-    await prisma.theme.updateMany({
-      where: {
-        isActive: true,
-        NOT: { id },
-      },
-      data: {
-        isActive: false,
-      },
-    });
+    await db.update(themeTable).set({ isActive: false });
+
+    await db
+      .update(themeTable)
+      .set({ isActive: true })
+      .where(eq(themeTable.id, id));
+
     revalidatePath("/*");
-    return { message: `Thème "${activatedTheme.name}" activé`, isError: false };
+    return { message: `Thème activé`, isError: false };
   } catch (e) {
     return { message: "Erreur à l'activation'", isError: true };
   }
@@ -137,27 +126,38 @@ export async function createPresetColor(
   isError: boolean;
   newPresetColor: PresetColor | null;
 }> {
-  const alreadyExist = await prisma.presetColor.findUnique({ where: { name } });
-  if (alreadyExist)
-    return {
-      message: "Nom de la couleur déjà utilisé",
-      isError: true,
-      newPresetColor: null,
-    };
-
   try {
-    const newPresetColor = await prisma.presetColor.create({
-      data: {
-        name,
-        color,
-        displayOrder,
-      },
+    const alreadyExist = (
+      await db
+        .select()
+        .from(presetColorTable)
+        .where(eq(presetColorTable.name, name))
+    )[0];
+    if (alreadyExist)
+      return {
+        message: "Nom de la couleur déjà utilisé",
+        isError: true,
+        newPresetColor: null,
+      };
+
+    await db.insert(presetColorTable).values({
+      name,
+      color,
+      displayOrder,
     });
+
+    const newPresetColor = (
+      await db
+        .select()
+        .from(presetColorTable)
+        .where(eq(presetColorTable.name, name))
+    )[0];
+
     revalidatePath("/*");
     return { message: "Couleur perso ajoutée", isError: false, newPresetColor };
   } catch (e) {
     return {
-      message: "Erreur à la création de la couleur perso",
+      message: `Erreur à la création de la couleur perso : ${e}`,
       isError: true,
       newPresetColor: null,
     };
@@ -166,14 +166,13 @@ export async function createPresetColor(
 
 export async function updatePresetColor(presetColor: PresetColor) {
   try {
-    await prisma.presetColor.update({
-      where: {
-        id: presetColor.id,
-      },
-      data: {
+    await db
+      .update(presetColorTable)
+      .set({
         color: presetColor.color,
-      },
-    });
+      })
+      .where(eq(presetColorTable.id, presetColor.id));
+
     revalidatePath("/*");
     return { message: "Couleur perso modifiée", isError: false };
   } catch (e) {
@@ -185,23 +184,24 @@ export async function updatePresetColor(presetColor: PresetColor) {
 }
 
 export async function updatePresetColorsOrder(map: Map<number, number>) {
-  const presetColors = await prisma.presetColor.findMany();
-
   try {
+    const presetColors = await db.select().from(presetColorTable);
     for await (const p of presetColors) {
-      await prisma.presetColor.update({
-        where: {
-          id: p.id,
-        },
-        data: {
+      await db
+        .update(presetColorTable)
+        .set({
           displayOrder: map.get(p.id),
-        },
-      });
+        })
+        .where(eq(presetColorTable.id, p.id));
     }
-    const updatedPresetColors = await prisma.presetColor.findMany();
+    const updatedPresetColors = await db.select().from(presetColorTable);
 
     revalidatePath("/*");
-    return { message: "", isError: false, updatedPresetColors };
+    return {
+      message: "Ré-ordonnancement enregistré",
+      isError: false,
+      updatedPresetColors,
+    };
   } catch (e) {
     return {
       message: `Erreur à l'ordonnancement de la couleur perso : ${e}`,
@@ -218,69 +218,66 @@ export async function deletePresetColor(id: number): Promise<{
   updatedThemes: Theme[] | null;
 }> {
   try {
-    const presetColorToDelete = await prisma.presetColor.findUnique({
-      where: {
-        id,
-      },
-    });
+    const presetColorToDelete = (
+      await db
+        .select()
+        .from(presetColorTable)
+        .where(eq(presetColorTable.id, id))
+    )[0];
 
     if (!presetColorToDelete)
       return {
-        message: "Couleur perso introuvable",
+        message: "Erreur à la suppression",
         isError: true,
         updatedPresetColors: null,
         updatedThemes: null,
       };
-
-    const themes: Theme[] = await prisma.theme.findMany();
-    for await (const theme of themes) {
-      const updatedTheme = theme;
-      let isModified = false;
-      for await (const [key, value] of Object.entries(theme)) {
-        if (
-          value === presetColorToDelete.name &&
-          key !== "name" &&
-          key !== "isActive"
-        ) {
-          isModified = true;
-          updatedTheme[key as keyof OnlyString<Theme>] =
-            presetColorToDelete.color;
+    else {
+      const themes: Theme[] = await db.select().from(themeTable);
+      for await (const theme of themes) {
+        const updatedTheme = theme;
+        let isModified = false;
+        for await (const [key, value] of Object.entries(theme)) {
+          if (
+            value === presetColorToDelete.name &&
+            key !== "name" &&
+            key !== "isActive"
+          ) {
+            isModified = true;
+            updatedTheme[key as keyof OnlyString<Theme>] =
+              presetColorToDelete.color;
+          }
+        }
+        if (isModified) {
+          const { id, ...rest } = updatedTheme;
+          await db
+            .update(themeTable)
+            .set({ ...rest })
+            .where(eq(themeTable.id, id));
         }
       }
-      if (isModified) {
-        const { id, ...rest } = updatedTheme;
-        await prisma.theme.update({
-          where: {
-            id,
-          },
-          data: { ...rest },
-        });
+
+      await db.delete(presetColorTable).where(eq(presetColorTable.id, id));
+
+      const presetColors = await db.select().from(presetColorTable);
+      for await (const p of presetColors) {
+        if (p.displayOrder > presetColorToDelete.displayOrder)
+          await db
+            .update(presetColorTable)
+            .set({ displayOrder: p.displayOrder - 1 })
+            .where(eq(presetColorTable.id, p.id));
       }
+
+      const updatedThemes = await db.select().from(themeTable);
+      const updatedPresetColors = await db.select().from(presetColorTable);
+      revalidatePath("/*");
+      return {
+        message: "Couleur perso supprimée",
+        isError: false,
+        updatedPresetColors,
+        updatedThemes,
+      };
     }
-
-    await prisma.presetColor.delete({
-      where: { id },
-    });
-
-    const presetColors = await prisma.presetColor.findMany();
-    for await (const p of presetColors) {
-      if (p.displayOrder > presetColorToDelete.displayOrder)
-        await prisma.presetColor.update({
-          where: { id: p.id },
-          data: { displayOrder: p.displayOrder - 1 },
-        });
-    }
-
-    const updatedThemes = await prisma.theme.findMany();
-    const updatedPresetColors = await prisma.presetColor.findMany();
-
-    revalidatePath("/*");
-    return {
-      message: "Couleur perso supprimée",
-      isError: false,
-      updatedPresetColors,
-      updatedThemes,
-    };
   } catch (e) {
     return {
       message: "Erreur à la suppression",

@@ -81,8 +81,9 @@
   transition: background-color ease-out 0.3s;
 }
 
-.textArea {
+.editArea {
   width: 70%;
+  margin: auto;
   line-height: unset;
 }
 

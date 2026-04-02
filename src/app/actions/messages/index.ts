@@ -1,76 +1,68 @@
 "use server";
-import prisma from "@/lib/prisma.ts";
 import { revalidatePath } from "next/cache";
 import { Message } from "@/lib/type";
+import { db } from "@/db";
+import { desc, eq } from "drizzle-orm";
+import { message, user } from "@/db/schema.ts";
 
 export const getMessages = async (): Promise<Message[]> =>
-  await prisma.message.findMany({
-    include: { author: true },
-    orderBy: { date: "desc" },
-  });
+  await db
+    .select({
+      id: message.id,
+      date: message.date,
+      dateUpdated: message.dateUpdated,
+      text: message.text,
+      author: {
+        id: user.id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    })
+    .from(message)
+    .innerJoin(user, eq(user.id, message.userId))
+    .orderBy(desc(message.date));
 
-export const addMessage = async (formData: FormData) => {
+export const addMessage = async (initialState: any, formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
-  if (rawFormData.id === "0") {
-    const text = rawFormData.text as string;
-    const userEmail = rawFormData.userEmail as string;
+  const text = rawFormData.text as string;
+  const userId = Number(rawFormData.userId as string);
+  try {
+    await db.insert(message).values({
+      date: new Date(),
+      text,
+      userId,
+    });
 
-    try {
-      await prisma.message.create({
-        data: {
-          date: new Date(),
-          text,
-          author: { connect: { email: userEmail } },
-        },
-      });
-      revalidatePath(`/admin`);
-      return { message: "Message ajouté", isError: false };
-    } catch (e) {
-      return { message: `Erreur à l'enregistrement`, isError: true };
-    }
+    revalidatePath(`/admin`);
+    return { message: "Message ajouté", isError: false };
+  } catch (e) {
+    return { message: `Erreur à l'enregistrement`, isError: true };
   }
 };
 
-export const updateMessage = async (formData: FormData) => {
+export const updateMessage = async (initialState: any, formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
-  const id = Number(rawFormData.id);
+  const id = Number(rawFormData.id as string);
   const text = rawFormData.text as string;
+  try {
+    await db
+      .update(message)
+      .set({
+        text,
+        dateUpdated: new Date(),
+      })
+      .where(eq(message.id, id));
 
-  const messageToUpdate = await prisma.message.findUnique({
-    where: { id },
-  });
-
-  if (messageToUpdate) {
-    const date = new Date();
-    const dateUpdated =
-      messageToUpdate.date.getFullYear() === date.getFullYear() &&
-      messageToUpdate.date.getMonth() === date.getMonth() &&
-      messageToUpdate.date.getDay() === date.getDay()
-        ? null
-        : date;
-
-    try {
-      await prisma.message.update({
-        where: { id },
-        data: {
-          text,
-          dateUpdated,
-        },
-      });
-      revalidatePath(`/admin`);
-      return { message: "Message modifié", isError: false };
-    } catch (e) {
-      return { message: `Erreur à l'enregistrement`, isError: true };
-    }
+    revalidatePath(`/admin`);
+    return { message: "Message modifié", isError: false };
+  } catch (e) {
+    return { message: `Erreur à l'enregistrement`, isError: true };
   }
-  return { message: `Erreur à l'enregistrement`, isError: true };
 };
 
 export const deleteMessage = async (id: number) => {
   try {
-    await prisma.message.delete({
-      where: { id },
-    });
+    await db.delete(message).where(eq(message.id, id));
     revalidatePath(`/admin`);
   } catch (e) {}
 };
