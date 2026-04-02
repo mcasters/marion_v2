@@ -1,16 +1,17 @@
-import {rmSync} from "fs";
+import { rmSync } from "fs";
 import sharp from "sharp";
-import {join} from "path";
-import {transformValueToKey} from "@/lib/utils/commonUtils.ts";
-import {IMAGE} from "@/constants/image.ts";
-import {StructTheme, Type} from "@/lib/type.ts";
-import {PresetColor, Theme} from "@@/prisma/generated/client";
-import {getStructuredTheme, themeToHexa} from "@/lib/utils/themeUtils.ts";
+import { join } from "path";
+import { transformValueToKey } from "@/lib/utils/commonUtils.ts";
+import { IMAGE } from "@/constants/image.ts";
+import { StructTheme } from "@/lib/type.ts";
+import { PresetColor, Theme } from "@@/prisma/generated/client";
+import { getStructuredTheme, themeToHexa } from "@/lib/utils/themeUtils.ts";
+import { TYPE } from "@/db/schema.ts";
 
 const serverLibraryPath = process.env.PHOTOS_PATH;
 const copyright = process.env.TITLE || "";
 
-export const getDir = (type: Type) => {
+export const getDir = (type: TYPE) => {
   return join(`${serverLibraryPath}`, type);
 };
 
@@ -37,7 +38,7 @@ export const resizeAndSaveImage = async (
           Copyright: copyright,
         },
       })
-      .jpeg({ quality: 80})
+      .jpeg({ quality: 80 })
       .toFile(`${dir}/${newFilename}`),
   );
   promises.push(
@@ -53,7 +54,7 @@ export const resizeAndSaveImage = async (
           Copyright: copyright,
         },
       })
-      .jpeg({ quality: 80})
+      .jpeg({ quality: 80 })
       .toFile(`${dir}/md/${newFilename}`),
   );
   promises.push(
@@ -69,7 +70,7 @@ export const resizeAndSaveImage = async (
           Copyright: copyright,
         },
       })
-      .jpeg({ quality: 80})
+      .jpeg({ quality: 80 })
       .toFile(`${dir}/sm/${newFilename}`),
   );
 

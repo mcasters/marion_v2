@@ -12,12 +12,14 @@ import {
 
 export async function createTheme(newTheme: NewTheme) {
   try {
-    const existants = await db
-      .select()
-      .from(themeTable)
-      .where(eq(themeTable.name, newTheme.name));
+    const existant = (
+      await db
+        .select()
+        .from(themeTable)
+        .where(eq(themeTable.name, newTheme.name))
+    )[0];
 
-    if (existants.length > 0)
+    if (existant)
       return {
         message: "Nom du thème déjà existant",
         isError: true,

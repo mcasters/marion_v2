@@ -10,8 +10,8 @@ import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm";
 import { getContentsFull } from "@/app/actions/contents";
 
-import { KEY_LABEL } from "@/constants/admin.ts";
 import { updateContent } from "@/app/actions/contents/admin.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export default async function Presentation() {
   const contents = await getContentsFull();
@@ -22,28 +22,28 @@ export default async function Presentation() {
       <ImagesForm
         images={getPresentationImage(contents)}
         isMultiple={false}
-        label={KEY_LABEL.PRESENTATION}
+        label={LABEL.PRESENTATION}
         acceptSmallImage={true}
         title="Image de présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         text={getPresentation(contents)}
-        dbKey={KEY_LABEL.PRESENTATION}
+        dbKey={LABEL.PRESENTATION}
         updateAction={updateContent}
         title="Présentation (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         text={getDemarche(contents)}
-        dbKey={KEY_LABEL.DEMARCHE}
+        dbKey={LABEL.DEMARCHE}
         updateAction={updateContent}
         title="Démarche artistique (facultatif)"
       />
       <div className="separate" />
       <TextAreaForm
         text={getInspiration(contents)}
-        dbKey={KEY_LABEL.INSPIRATION}
+        dbKey={LABEL.INSPIRATION}
         updateAction={updateContent}
         title="Inspiration (facultatif)"
       />

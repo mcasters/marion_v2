@@ -10,7 +10,7 @@ import React from "react";
 import InputForm from "@/components/admin/text/inputForm.tsx";
 import { getContentsFull } from "@/app/actions/contents";
 import { updateContent } from "@/app/actions/contents/admin.ts";
-import { KEY_LABEL } from "@/constants/admin.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export default async function Contact() {
   const contents = await getContentsFull();
@@ -20,13 +20,13 @@ export default async function Contact() {
       <h1 className={s.title1}>Contenus de la page contact</h1>
       <TextAreaForm
         text={getAddress(contents)}
-        dbKey={KEY_LABEL.ADDRESS}
+        dbKey={LABEL.ADDRESS}
         updateAction={updateContent}
         title="Adresse"
       />
       <div className="separate" />
       <InputForm
-        dbKey={KEY_LABEL.PHONE}
+        dbKey={LABEL.PHONE}
         text={getPhone(contents)}
         updateAction={updateContent}
         title="Téléphone"
@@ -34,7 +34,7 @@ export default async function Contact() {
       />
       <div className="separate" />
       <InputForm
-        dbKey={KEY_LABEL.EMAIL}
+        dbKey={LABEL.EMAIL}
         text={getEmail(contents)}
         updateAction={updateContent}
         title="E-mail"
@@ -43,7 +43,7 @@ export default async function Contact() {
       <div className="separate" />
       <TextAreaForm
         text={getContactText(contents)}
-        dbKey={KEY_LABEL.TEXT_CONTACT}
+        dbKey={LABEL.TEXT_CONTACT}
         updateAction={updateContent}
         title="Texte d'accompagnement (facultatif)"
       />

@@ -26,8 +26,6 @@ export const addMessage = async (initialState: any, formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);
   const text = rawFormData.text as string;
   const userId = Number(rawFormData.userId as string);
-
-  console.log("/// ", formData);
   try {
     await db.insert(message).values({
       date: new Date(),
