@@ -7,53 +7,46 @@ import {
   longtext,
   mysqlEnum,
   mysqlTable,
-  primaryKey,
   unique,
   varchar,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
-export const categoryContent = mysqlTable(
-  "CategoryContent",
-  {
-    id: int().autoincrement().notNull(),
-    title: varchar({ length: 191 }).default("").notNull(),
-    text: longtext().notNull(),
-    imageFilename: varchar({ length: 191 }).default("").notNull(),
-    imageWidth: int().default(0).notNull(),
-    imageHeight: int().default(0).notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.id], name: "CategoryContent_id" })],
-);
+export enum TYPE {
+  PAINTING = "peinture",
+  SCULPTURE = "sculpture",
+  POST = "post",
+  DRAWING = "dessin",
+  CATEGORY = "catégorie",
+}
+
+export enum LABEL {
+  INTRO = "INTRO",
+  SLIDER = "SLIDER",
+  ADDRESS = "ADDRESS",
+  PHONE = "PHONE",
+  EMAIL = "EMAIL",
+  TEXT_CONTACT = "TEXT_CONTACT",
+  PRESENTATION = "PRESENTATION",
+  DEMARCHE = "DEMARCHE",
+  INSPIRATION = "INSPIRATION",
+}
 
 export const content = mysqlTable(
   "Content",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     text: longtext().notNull(),
-    label: mysqlEnum([
-      "INTRO",
-      "SLIDER",
-      "ADDRESS",
-      "PHONE",
-      "EMAIL",
-      "TEXT_CONTACT",
-      "PRESENTATION",
-      "DEMARCHE",
-      "INSPIRATION",
-    ]).notNull(),
+    label: mysqlEnum(LABEL),
     title: varchar({ length: 191 }),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "Content_id" }),
-    unique("Content_label_key").on(table.label),
-  ],
+  (table) => [unique("Content_label_key").on(table.label)],
 );
 
 export const contentImage = mysqlTable(
   "ContentImage",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     filename: varchar({ length: 191 }).notNull(),
     width: int().notNull(),
     height: int().notNull(),
@@ -65,7 +58,6 @@ export const contentImage = mysqlTable(
   },
   (table) => [
     index("ContentImage_contentId_fkey").on(table.contentId),
-    primaryKey({ columns: [table.id], name: "ContentImage_id" }),
     unique("ContentImage_filename_key").on(table.filename),
   ],
 );
@@ -73,7 +65,7 @@ export const contentImage = mysqlTable(
 export const drawing = mysqlTable(
   "Drawing",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     title: varchar({ length: 191 }).notNull(),
     date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
@@ -83,7 +75,6 @@ export const drawing = mysqlTable(
     createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => drawingCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -94,13 +85,15 @@ export const drawing = mysqlTable(
     isToSell: boolean().default(false).notNull(),
     price: int(),
     sold: boolean().default(false).notNull(),
-    type: varchar({ length: 191 }).default("dessin").notNull(),
+    type: varchar({ length: 191 })
+      .$type<TYPE.DRAWING>()
+      .default(TYPE.DRAWING)
+      .notNull(),
     isOut: boolean().default(false).notNull(),
     outInformation: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
     index("Drawing_categoryId_fkey").on(table.categoryId),
-    primaryKey({ columns: [table.id], name: "Drawing_id" }),
     unique("Drawing_title_key").on(table.title),
   ],
 );
@@ -108,55 +101,51 @@ export const drawing = mysqlTable(
 export const drawingCategory = mysqlTable(
   "DrawingCategory",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     key: varchar({ length: 191 }).notNull(),
     value: varchar({ length: 191 }).notNull(),
-    categoryContentId: int()
-      .notNull()
-      .references(() => categoryContent.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
+    type: varchar({ length: 191 })
+      .$type<TYPE.CATEGORY>()
+      .default(TYPE.CATEGORY)
+      .notNull(),
+    workType: varchar({ length: 191 })
+      .$type<TYPE.DRAWING>()
+      .default(TYPE.DRAWING)
+      .notNull(),
+    title: varchar({ length: 191 }).default("").notNull(),
+    text: longtext().notNull(),
+    imageFilename: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.id], name: "DrawingCategory_id" }),
     unique("DrawingCategory_key_key").on(table.key),
     unique("DrawingCategory_value_key").on(table.value),
-    unique("DrawingCategory_categoryContentId_key").on(table.categoryContentId),
   ],
 );
 
-export const message = mysqlTable(
-  "Message",
-  {
-    id: int().autoincrement().notNull(),
-    date: datetime({ mode: "date", fsp: 3 }).notNull(),
-    text: longtext().notNull(),
-    userId: int()
-      .notNull()
-      .references(() => user.id, { onDelete: "restrict", onUpdate: "cascade" }),
-    dateUpdated: datetime({ mode: "date", fsp: 3 }),
-  },
-  (table) => [primaryKey({ columns: [table.id], name: "Message_id" })],
-);
+export const message = mysqlTable("Message", {
+  id: int().autoincrement().primaryKey(),
+  date: datetime({ mode: "date", fsp: 3 }).notNull(),
+  text: longtext().notNull(),
+  userId: int()
+    .notNull()
+    .references(() => user.id, { onDelete: "restrict", onUpdate: "cascade" }),
+  dateUpdated: datetime({ mode: "date", fsp: 3 }),
+});
 
 export const meta = mysqlTable(
   "Meta",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     key: varchar({ length: 191 }).notNull(),
     text: longtext().notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "Meta_id" }),
-    unique("Meta_key_key").on(table.key),
-  ],
+  (table) => [unique("Meta_key_key").on(table.key)],
 );
 
 export const painting = mysqlTable(
   "Painting",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     title: varchar({ length: 191 }).notNull(),
     date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
@@ -166,7 +155,6 @@ export const painting = mysqlTable(
     createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => paintingCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -177,13 +165,15 @@ export const painting = mysqlTable(
     isToSell: boolean().default(false).notNull(),
     price: int(),
     sold: boolean().default(false).notNull(),
-    type: varchar({ length: 191 }).default("peinture").notNull(),
+    type: varchar({ length: 191 })
+      .$type<TYPE.PAINTING>()
+      .default(TYPE.PAINTING)
+      .notNull(),
     isOut: boolean().default(false).notNull(),
     outInformation: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
     index("Painting_categoryId_fkey").on(table.categoryId),
-    primaryKey({ columns: [table.id], name: "Painting_id" }),
     unique("Painting_title_key").on(table.title),
   ],
 );
@@ -191,51 +181,51 @@ export const painting = mysqlTable(
 export const paintingCategory = mysqlTable(
   "PaintingCategory",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     key: varchar({ length: 191 }).notNull(),
     value: varchar({ length: 191 }).notNull(),
-    categoryContentId: int()
-      .notNull()
-      .references(() => categoryContent.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
+    type: varchar({ length: 191 })
+      .$type<TYPE.CATEGORY>()
+      .default(TYPE.CATEGORY)
+      .notNull(),
+    workType: varchar({ length: 191 })
+      .$type<TYPE.PAINTING>()
+      .default(TYPE.PAINTING)
+      .notNull(),
+    title: varchar({ length: 191 }).default("").notNull(),
+    text: longtext().notNull(),
+    imageFilename: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.id], name: "PaintingCategory_id" }),
     unique("PaintingCategory_key_key").on(table.key),
     unique("PaintingCategory_value_key").on(table.value),
-    unique("PaintingCategory_categoryContentId_key").on(
-      table.categoryContentId,
-    ),
   ],
 );
 
 export const post = mysqlTable(
   "Post",
   {
-    id: int().autoincrement().notNull(),
-    type: varchar({ length: 191 }).default("post").notNull(),
+    id: int().autoincrement().primaryKey(),
+    type: varchar({ length: 191 })
+      .$type<TYPE.POST>()
+      .default(TYPE.POST)
+      .notNull(),
     title: varchar({ length: 191 }).notNull(),
     date: datetime({ mode: "date", fsp: 3 }).notNull(),
     createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     text: longtext().notNull(),
     published: boolean().default(false).notNull(),
     viewCount: int().default(0).notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "Post_id" }),
-    unique("Post_title_key").on(table.title),
-  ],
+  (table) => [unique("Post_title_key").on(table.title)],
 );
 
 export const postImage = mysqlTable(
   "PostImage",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     filename: varchar({ length: 191 }).notNull(),
     width: int().notNull(),
     height: int().notNull(),
@@ -247,7 +237,6 @@ export const postImage = mysqlTable(
   },
   (table) => [
     index("PostImage_postId_fkey").on(table.postId),
-    primaryKey({ columns: [table.id], name: "PostImage_id" }),
     unique("PostImage_filename_key").on(table.filename),
   ],
 );
@@ -255,21 +244,18 @@ export const postImage = mysqlTable(
 export const presetColor = mysqlTable(
   "PresetColor",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     name: varchar({ length: 191 }).notNull(),
     color: varchar({ length: 191 }).notNull(),
     displayOrder: int().default(1).notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "PresetColor_id" }),
-    unique("PresetColor_name_key").on(table.name),
-  ],
+  (table) => [unique("PresetColor_name_key").on(table.name)],
 );
 
 export const sculpture = mysqlTable(
   "Sculpture",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     title: varchar({ length: 191 }).notNull(),
     date: datetime({ mode: "date", fsp: 3 }).notNull(),
     technique: longtext().notNull(),
@@ -280,7 +266,6 @@ export const sculpture = mysqlTable(
     createdAt: datetime({ mode: "date", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime({ mode: "date", fsp: 3 }).notNull(),
     categoryId: int().references(() => sculptureCategory.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -288,13 +273,15 @@ export const sculpture = mysqlTable(
     isToSell: boolean().default(false).notNull(),
     price: int(),
     sold: boolean().default(false).notNull(),
-    type: varchar({ length: 191 }).default("sculpture").notNull(),
+    type: varchar({ length: 191 })
+      .$type<TYPE.SCULPTURE>()
+      .default(TYPE.SCULPTURE)
+      .notNull(),
     isOut: boolean().default(false).notNull(),
     outInformation: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
     index("Sculpture_categoryId_fkey").on(table.categoryId),
-    primaryKey({ columns: [table.id], name: "Sculpture_id" }),
     unique("Sculpture_title_key").on(table.title),
   ],
 );
@@ -302,30 +289,31 @@ export const sculpture = mysqlTable(
 export const sculptureCategory = mysqlTable(
   "SculptureCategory",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     key: varchar({ length: 191 }).notNull(),
     value: varchar({ length: 191 }).notNull(),
-    categoryContentId: int()
-      .notNull()
-      .references(() => categoryContent.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
+    type: varchar({ length: 191 })
+      .$type<TYPE.CATEGORY>()
+      .default(TYPE.CATEGORY)
+      .notNull(),
+    workType: varchar({ length: 191 })
+      .$type<TYPE.SCULPTURE>()
+      .default(TYPE.SCULPTURE)
+      .notNull(),
+    title: varchar({ length: 191 }).default("").notNull(),
+    text: longtext().notNull(),
+    imageFilename: varchar({ length: 191 }).default("").notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.id], name: "SculptureCategory_id" }),
     unique("SculptureCategory_key_key").on(table.key),
     unique("SculptureCategory_value_key").on(table.value),
-    unique("SculptureCategory_categoryContentId_key").on(
-      table.categoryContentId,
-    ),
   ],
 );
 
 export const sculptureImage = mysqlTable(
   "SculptureImage",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     filename: varchar({ length: 191 }).notNull(),
     width: int().notNull(),
     height: int().notNull(),
@@ -337,7 +325,6 @@ export const sculptureImage = mysqlTable(
   },
   (table) => [
     index("SculptureImage_sculptureId_fkey").on(table.sculptureId),
-    primaryKey({ columns: [table.id], name: "SculptureImage_id" }),
     unique("SculptureImage_filename_key").on(table.filename),
   ],
 );
@@ -345,7 +332,7 @@ export const sculptureImage = mysqlTable(
 export const theme = mysqlTable(
   "Theme",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     name: varchar({ length: 191 }).notNull(),
     isActive: boolean().default(false).notNull(),
     general_lineColor: varchar({ length: 191 }).notNull(),
@@ -453,22 +440,16 @@ export const theme = mysqlTable(
       length: 191,
     }).notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "Theme_id" }),
-    unique("Theme_name_key").on(table.name),
-  ],
+  (table) => [unique("Theme_name_key").on(table.name)],
 );
 
 export const user = mysqlTable(
   "User",
   {
-    id: int().autoincrement().notNull(),
+    id: int().autoincrement().primaryKey(),
     email: varchar({ length: 191 }).notNull(),
     password: varchar({ length: 191 }).notNull(),
     isAdmin: boolean().default(true).notNull(),
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "User_id" }),
-    unique("User_email_key").on(table.email),
-  ],
+  (table) => [unique("User_email_key").on(table.email)],
 );

@@ -39,7 +39,6 @@ model Post {
   title     String      @unique
   date      DateTime
   createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
   text      String      @db.LongText
   published Boolean     @default(false)
   viewCount Int         @default(0)
@@ -96,7 +95,6 @@ model Painting {
   height         Float
   width          Float
   createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
   isToSell       Boolean           @default(false)
   price          Int?
   sold           Boolean           @default(false)
@@ -120,7 +118,6 @@ model Sculpture {
   width          Float
   length         Float
   createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
   isToSell       Boolean            @default(false)
   price          Int?
   sold           Boolean            @default(false)
@@ -151,7 +148,6 @@ model Drawing {
   height         Float
   width          Float
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
   isToSell       Boolean          @default(false)
   price          Int?
   sold           Boolean          @default(false)
