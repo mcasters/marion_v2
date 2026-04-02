@@ -1,10 +1,10 @@
 import ItemHome from "@/components/item/itemHome.tsx";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
 import { getDrawingCategories, getDrawingYears } from "@/app/dessins/action.ts";
 import { TYPE } from "@/db/schema.ts";
+import { getMetas } from "@/app/admin/meta/action.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());

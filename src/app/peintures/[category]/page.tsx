@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
-import { getMetas } from "@/app/actions/meta";
 import ItemPage from "@/components/item/itemPage.tsx";
 import { KEY_META } from "@/constants/admin";
 import { TYPE } from "@/db/schema.ts";
@@ -8,6 +7,7 @@ import {
   getPaintingCategory,
   getPaintingWorksByCategory,
 } from "@/app/peintures/action.ts";
+import { getMetas } from "@/app/admin/meta/action.ts";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -42,8 +42,7 @@ export async function generateMetadata({
 
 export default async function Page({ params }: Props) {
   const categoryKey = (await params).category;
-  const category = await getPaintingCategory(categoryKey);
-  const works = await getPaintingWorksByCategory(categoryKey);
+  const { category, works } = await getPaintingWorksByCategory(categoryKey);
 
   return (
     <>

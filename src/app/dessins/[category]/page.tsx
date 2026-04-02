@@ -1,13 +1,13 @@
 import ItemPage from "@/components/item/itemPage.tsx";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin";
 import {
   getDrawingCategory,
   getDrawingWorksByCategory,
 } from "@/app/dessins/action.ts";
 import { TYPE } from "@/db/schema.ts";
+import { getMetas } from "@/app/admin/meta/action.ts";
 
 type Props = {
   params: Promise<{ category: string }>;
@@ -42,8 +42,7 @@ export async function generateMetadata({
 
 export default async function Page({ params }: Props) {
   const categoryKey = (await params).category;
-  const category = await getDrawingCategory(categoryKey);
-  const works = await getDrawingWorksByCategory(categoryKey);
+  const { category, works } = await getDrawingWorksByCategory(categoryKey);
 
   return (
     <>

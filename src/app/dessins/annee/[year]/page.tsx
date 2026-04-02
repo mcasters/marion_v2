@@ -1,10 +1,10 @@
 import ItemPage from "@/components/item/itemPage.tsx";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin";
 import { getDrawingWorksByYear } from "@/app/dessins/action.ts";
 import { TYPE } from "@/db/schema.ts";
+import { getMetas } from "@/app/admin/meta/action.ts";
 
 type Props = {
   params: Promise<{ year: string }>;

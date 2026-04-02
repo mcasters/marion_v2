@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/db";
 import { drawing, TYPE } from "@/db/schema.ts";
 import { asc } from "drizzle-orm";
@@ -27,7 +29,7 @@ export const getDrawingCategories = async (): Promise<DrawingCategory[]> => {
   });
 
   const drawingWithNoCategory = await db.query.drawing.findFirst({
-    where: { categoryId: undefined },
+    where: { categoryId: { isNull: true } },
   });
 
   if (drawingWithNoCategory)
@@ -63,13 +65,31 @@ export async function getDrawingCategory(
 
 export async function getDrawingWorksByCategory(
   categoryKey: string,
-): Promise<Work[]> {
-  const res = await db.query.drawingCategory.findFirst({
-    columns: {},
-    where: { key: categoryKey === "no-category" ? undefined : categoryKey },
-    with: { drawings: { orderBy: { date: "desc" } } },
-  });
-  return res
-    ? res.drawings.map((data) => createWorkObject(data, TYPE.DRAWING))
-    : notFound();
+): Promise<{ category: DrawingCategory; works: Work[] }> {
+  if (categoryKey === "no-category") {
+    const category = getNoCategory(TYPE.DRAWING) as DrawingCategory;
+    const drawings = await db.query.drawing.findMany({
+      where: { categoryId: { isNull: true } },
+      orderBy: { date: "desc" },
+    });
+    const works = drawings.map((data) => createWorkObject(data, TYPE.DRAWING));
+    return { category, works };
+  } else {
+    const result = await db.query.drawingCategory.findFirst({
+      where: { key: categoryKey },
+      with: {
+        drawings: {
+          orderBy: { date: "desc" },
+        },
+      },
+    });
+    if (result) {
+      const { drawings, ...rest } = result;
+      return {
+        category: rest,
+        works: drawings.map((data) => createWorkObject(data, TYPE.DRAWING)),
+      };
+    }
+  }
+  return notFound();
 }

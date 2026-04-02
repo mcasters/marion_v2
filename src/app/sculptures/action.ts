@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/db";
 import { sculpture, TYPE } from "@/db/schema.ts";
 import { asc } from "drizzle-orm";
@@ -28,7 +30,7 @@ export const getSculptureCategories = async (): Promise<
   });
 
   const sculptureWithNoCategory = await db.query.sculpture.findFirst({
-    where: { categoryId: undefined },
+    where: { categoryId: { isNull: true } },
   });
 
   if (sculptureWithNoCategory)
@@ -63,16 +65,29 @@ export async function getSculptureCategory(
 
 export async function getSculptureWorksByCategory(
   categoryKey: string,
-): Promise<Work[]> {
-  const res = await db.query.sculptureCategory.findFirst({
-    columns: {},
-    where: { key: categoryKey === "no-category" ? undefined : categoryKey },
-    with: {
-      sculptures: {
-        with: { images: true },
-        orderBy: { date: "desc" },
+): Promise<{ category: SculptureCategory; works: Work[] }> {
+  if (categoryKey === "no-category") {
+    const category = getNoCategory(TYPE.SCULPTURE) as SculptureCategory;
+    const works = await db.query.sculpture.findMany({
+      with: { images: true },
+      where: { categoryId: { isNull: true } },
+      orderBy: { date: "desc" },
+    });
+    return { category, works };
+  } else {
+    const result = await db.query.sculptureCategory.findFirst({
+      where: { key: categoryKey },
+      with: {
+        sculptures: {
+          with: { images: true },
+          orderBy: { date: "desc" },
+        },
       },
-    },
-  });
-  return res?.sculptures ?? notFound();
+    });
+    if (result) {
+      const { sculptures, ...rest } = result;
+      return { category: rest, works: sculptures };
+    }
+  }
+  return notFound();
 }

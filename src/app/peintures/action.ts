@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/db";
 import { painting, TYPE } from "@/db/schema.ts";
 import { asc } from "drizzle-orm";
@@ -27,7 +29,7 @@ export const getPaintingCategories = async (): Promise<PaintingCategory[]> => {
   });
 
   const paintingWithNoCategory = await db.query.painting.findFirst({
-    where: { categoryId: undefined },
+    where: { categoryId: { isNull: true } },
   });
 
   if (paintingWithNoCategory)
@@ -63,13 +65,33 @@ export async function getPaintingCategory(
 
 export async function getPaintingWorksByCategory(
   categoryKey: string,
-): Promise<Work[]> {
-  const res = await db.query.paintingCategory.findFirst({
-    columns: {},
-    where: { key: categoryKey === "no-category" ? undefined : categoryKey },
-    with: { paintings: { orderBy: { date: "desc" } } },
-  });
-  return res
-    ? res.paintings.map((data) => createWorkObject(data, TYPE.PAINTING))
-    : notFound();
+): Promise<{ category: PaintingCategory; works: Work[] }> {
+  if (categoryKey === "no-category") {
+    const category = getNoCategory(TYPE.PAINTING) as PaintingCategory;
+    const paintings = await db.query.painting.findMany({
+      where: { categoryId: { isNull: true } },
+      orderBy: { date: "desc" },
+    });
+    const works = paintings.map((data) =>
+      createWorkObject(data, TYPE.PAINTING),
+    );
+    return { category, works };
+  } else {
+    const result = await db.query.paintingCategory.findFirst({
+      where: { key: categoryKey },
+      with: {
+        paintings: {
+          orderBy: { date: "desc" },
+        },
+      },
+    });
+    if (result) {
+      const { paintings, ...rest } = result;
+      return {
+        category: rest,
+        works: paintings.map((data) => createWorkObject(data, TYPE.PAINTING)),
+      };
+    }
+  }
+  return notFound();
 }
