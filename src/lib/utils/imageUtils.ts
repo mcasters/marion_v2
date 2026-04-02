@@ -1,16 +1,16 @@
 import {
-  ContentFull,
+  Content,
   Image,
   PhotoTab,
   PhotoTabEnhanced,
   Post,
-  Type,
   Work,
 } from "@/lib/type.ts";
 import { FILE_TYPES, IMAGE } from "@/constants/image.ts";
 import { getSliderContent, getSliders } from "@/lib/utils/commonUtils.ts";
 import { MESSAGE } from "@/constants/admin.ts";
 import Resizer from "react-image-file-resizer";
+import { TYPE } from "@/db/schema.ts";
 
 const getEmptyPhotoTab = (): PhotoTab => {
   return { sm: [], md: [], lg: [] };
@@ -99,9 +99,9 @@ const createPhotoTabEnhanced = (
   photos: PhotoTabEnhanced,
 ): PhotoTabEnhanced => {
   const folder =
-    item.type === Type.PAINTING
+    item.type === TYPE.PAINTING
       ? "peinture"
-      : item.type === Type.SCULPTURE
+      : item.type === TYPE.SCULPTURE
         ? "sculpture"
         : "dessin";
 
@@ -162,7 +162,7 @@ export const getPhotoTabFromImages = (
 };
 
 export const getSliderPhotoTab = (
-  contents: ContentFull[],
+  contents: Content[],
 ): { mainPhotos: PhotoTab; photos: PhotoTab } => {
   const content = getSliderContent(contents);
   if (content) {
@@ -191,9 +191,9 @@ export const getPostPhotoTab = (
 
 export const getItemPhotoTab = (item: Work, alt: string): PhotoTab => {
   const folder =
-    item.type === Type.PAINTING
+    item.type === TYPE.PAINTING
       ? "peinture"
-      : item.type === Type.SCULPTURE
+      : item.type === TYPE.SCULPTURE
         ? "sculpture"
         : "dessin";
   return getPhotoTabFromImages(item.images, folder, alt, item.title, item.date);
@@ -210,12 +210,12 @@ export const getPhotoTabEnhanced = (
   return photosEnhanced;
 };
 
-export const getSliderLandscapeImages = (contents: ContentFull[]): Image[] => {
+export const getSliderLandscapeImages = (contents: Content[]): Image[] => {
   const images: Image[] = getSliders(contents);
   return images.filter((i) => !i.isMain);
 };
 
-export const getSliderPortraitImages = (contents: ContentFull[]): Image[] => {
+export const getSliderPortraitImages = (contents: Content[]): Image[] => {
   const images: Image[] = getSliders(contents);
   return images.filter((i) => i.isMain);
 };

@@ -1,6 +1,6 @@
 "use server";
 
-import { ContentFull, KeyContent } from "@/lib/type.ts";
+import { Content } from "@/lib/type.ts";
 import { revalidatePath } from "next/cache";
 import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
 import { db } from "@/db";
@@ -12,7 +12,7 @@ import {
   resizeAndSaveImage,
 } from "@/lib/utils/serverUtils.ts";
 
-export const getContentsFull = async (): Promise<ContentFull[]> => {
+export const getContentsFull = async (): Promise<Content[]> => {
   return await db.query.content.findMany({ with: { images: true } });
 };
 
@@ -85,7 +85,7 @@ const updateImagePresentation = async (formData: FormData) => {
 };
 
 const saveContentImage = async (
-  label: KeyContent,
+  label: LABEL,
   filesToAdd: File[],
   title: string,
   isMain: boolean,

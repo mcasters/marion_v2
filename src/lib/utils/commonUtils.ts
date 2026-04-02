@@ -1,7 +1,7 @@
 import {
   AdminCategory,
   Category,
-  ContentFull,
+  Content,
   DragListElement,
   Filter,
   HomeLayout,
@@ -39,37 +39,37 @@ export const createNestedObject = (obj, key, ...keys) => {
     : obj;
 };
 
-export const getSliderContent = (contents: ContentFull[]): ContentFull | null =>
+export const getSliderContent = (contents: Content[]): Content | null =>
   contents?.filter((c) => c.label === LABEL.SLIDER)[0] || null;
 
-export const getPresentation = (contents: ContentFull[]): string =>
+export const getPresentation = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.text || "";
 
-export const getPresentationImage = (contents: ContentFull[]): Image[] =>
+export const getPresentationImage = (contents: Content[]): Image[] =>
   contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
 
-export const getDemarche = (contents: ContentFull[]): string =>
+export const getDemarche = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.DEMARCHE)[0]?.text || "";
 
-export const getInspiration = (contents: ContentFull[]): string =>
+export const getInspiration = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.INSPIRATION)[0]?.text || "";
 
-export const getIntroText = (contents: ContentFull[]): string =>
+export const getIntroText = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.INTRO)[0]?.text || "";
 
-export const getSliders = (contents: ContentFull[]): Image[] | [] =>
+export const getSliders = (contents: Content[]): Image[] | [] =>
   contents?.filter((c) => c.label === LABEL.SLIDER)[0]?.images || [];
 
-export const getAddress = (contents: ContentFull[]): string =>
+export const getAddress = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.ADDRESS)[0]?.text || "";
 
-export const getPhone = (contents: ContentFull[]): string =>
+export const getPhone = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.PHONE)[0]?.text || "";
 
-export const getEmail = (contents: ContentFull[]): string =>
+export const getEmail = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.EMAIL)[0]?.text || "";
 
-export const getContactText = (contents: ContentFull[]): string =>
+export const getContactText = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.TEXT_CONTACT)[0]?.text || "";
 
 export const getMetaMap = (metas: Meta[]): Map<string, string> => {

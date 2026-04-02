@@ -8,7 +8,6 @@ import {
   contentImage,
   drawing,
   drawingCategory,
-  LABEL,
   meta,
   painting,
   paintingCategory,
@@ -27,19 +26,6 @@ type StringKeys<T> = {
 }[keyof T];
 export type OnlyString<T> = { [k in StringKeys<T>]: boolean };
 
-export enum Type {
-  PAINTING = "peinture",
-  SCULPTURE = "sculpture",
-  POST = "post",
-  DRAWING = "dessin",
-  CATEGORY = "catégorie",
-}
-
-export interface Admin {
-  id: number;
-  type: TYPE;
-}
-
 export type Painting = typeof painting.$inferSelect;
 export type Sculpture = typeof sculpture.$inferSelect & {
   images: (typeof sculptureImage.$inferSelect)[];
@@ -54,6 +40,20 @@ export type SculptureCategory = typeof sculptureCategory.$inferSelect;
 export type DrawingCategory = typeof drawingCategory.$inferSelect;
 export type Category = PaintingCategory | SculptureCategory | DrawingCategory;
 
+export type Theme = typeof theme.$inferSelect;
+export type PresetColor = typeof presetColor.$inferSelect;
+
+export type Content = typeof content.$inferSelect & {
+  images: (typeof contentImage.$inferSelect)[];
+};
+
+export type Meta = typeof meta.$inferSelect;
+
+export interface Admin {
+  id: number;
+  type: TYPE;
+}
+
 export type AdminCategory = Category & {
   filenames: string[];
   count: number;
@@ -66,6 +66,13 @@ export interface Image {
   height: number;
   isMain: boolean;
 }
+
+export type FileInfo = {
+  filename: string;
+  width: number;
+  height: number;
+  isMain: boolean;
+};
 
 export interface Work {
   id: number;
@@ -91,8 +98,6 @@ export interface User {
   email: string;
   isAdmin: boolean;
 }
-
-export type Meta = typeof meta.$inferSelect;
 
 export type Session = {
   user: User;
@@ -123,13 +128,7 @@ export enum HomeLayout {
   NAV,
 }
 
-export type KeyContent = (typeof LABEL)[keyof typeof LABEL];
-
 export type KeyMeta = (typeof KEY_META)[keyof typeof KEY_META];
-
-export type ContentFull = typeof content.$inferSelect & {
-  images: (typeof contentImage.$inferSelect)[];
-};
 
 export interface Photo {
   src: string;
@@ -191,20 +190,8 @@ export type DragListElement = {
   order: number;
 };
 
-export type FileInfo = {
-  filename: string;
-  width: number;
-  height: number;
-  isMain: boolean;
-};
-
 export type Filter = {
   categoryFilter: number;
   yearFilter: number;
   isOutFilter: number;
 };
-
-export type Theme = typeof theme.$inferSelect;
-export type NewTheme = typeof theme.$inferInsert;
-
-export type PresetColor = typeof presetColor.$inferSelect;

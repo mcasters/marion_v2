@@ -3,13 +3,13 @@ import { Post } from "@/lib/type";
 
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
-import { getMetas } from "@/app/actions/meta";
 import { KEY_META } from "@/constants/admin.ts";
 import s from "@/styles/page.module.css";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import Gallery from "@/components/image/gallery/gallery.tsx";
 import { getPostPhotoTab } from "@/lib/utils/imageUtils.ts";
 import { getPosts } from "@/app/admin/posts/action.ts";
+import { getMetas } from "@/app/admin/meta/action.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());

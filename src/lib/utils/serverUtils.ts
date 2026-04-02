@@ -3,9 +3,6 @@ import sharp from "sharp";
 import { join } from "path";
 import { transformValueToKey } from "@/lib/utils/commonUtils.ts";
 import { IMAGE } from "@/constants/image.ts";
-import { StructTheme } from "@/lib/type.ts";
-import { PresetColor, Theme } from "@@/prisma/generated/client";
-import { getStructuredTheme, themeToHexa } from "@/lib/utils/themeUtils.ts";
 import { TYPE } from "@/db/schema.ts";
 
 const serverLibraryPath = process.env.PHOTOS_PATH;
@@ -107,8 +104,3 @@ export const deleteFile = (dir: string, filename: string) => {
   rmSync(`${dir}/md/${filename}`, { force: true });
   rmSync(`${dir}/${filename}`, { force: true });
 };
-
-export const getStructHexaTheme = (
-  theme: Theme,
-  presetColors: PresetColor[],
-): StructTheme => getStructuredTheme(themeToHexa(theme, presetColors));
