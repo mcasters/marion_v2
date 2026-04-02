@@ -1,13 +1,43 @@
 "use server";
 
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 import { JWTPayload, jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { User } from "@@/prisma/generated/client";
-import { Session } from "@/lib/type.ts";
+import { Session, User } from "@/lib/type.ts";
 import { COOKIE_NAME } from "@/constants/admin.ts";
+import { db } from "@/db";
 
 const secretKey = process.env.AUTH_SECRET;
 const key = new TextEncoder().encode(secretKey);
+
+export async function loginAction(
+  prevState: { error: string } | undefined,
+  formData: FormData,
+) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  try {
+    const user = await db.query.user.findFirst({
+      where: { email },
+    });
+    if (!user) return { error: "Erreur d'authentification" };
+
+    const res = await bcrypt.compare(password, user.password);
+    if (!res) return { error: "Erreur d'authentification" };
+
+    await setCookie(user);
+  } catch (e) {
+    return { error: `Erreur d'authentification` };
+  }
+  redirect("/admin");
+}
+
+export async function logoutAction() {
+  await removeCookie();
+  redirect("/");
+}
 
 export async function encrypt(payload: JWTPayload) {
   return await new SignJWT(payload)

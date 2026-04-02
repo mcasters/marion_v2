@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import s from "./authentication.module.css";
-import { loginAction } from "@/app/actions/auth";
+import { loginAction } from "@/app/admin/authAction.ts";
 
 export default function LoginForm() {
   const [state, action] = useActionState(loginAction, undefined);

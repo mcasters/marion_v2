@@ -5,7 +5,7 @@ import Link from "next/link";
 import s from "./authentication.module.css";
 import { ROUTES } from "@/constants/specific/routes";
 import React from "react";
-import { logoutAction } from "@/app/actions/auth";
+import { logoutAction } from "@/app/admin/authAction.ts";
 
 type Props = {
   email: string;
