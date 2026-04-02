@@ -2,14 +2,15 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { AdminCategory, AdminWork, Type } from "@/lib/type.ts";
+import { AdminCategory, Work } from "@/lib/type.ts";
 import { filterWorks, getYearsFromWorks } from "@/lib/utils/commonUtils.ts";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
-  works: AdminWork[];
+  works: Work[];
   categories: AdminCategory[];
-  onFilter: (filteredItems: AdminWork[]) => void;
-  type: Type.PAINTING | Type.SCULPTURE | Type.DRAWING;
+  onFilter: (filteredItems: Work[]) => void;
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 }
 export default function FilterWorkListComponent({
   works,

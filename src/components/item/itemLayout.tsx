@@ -25,7 +25,7 @@ export default function ItemLayout({ item, layout, priority }: Props) {
     () =>
       getItemPhotoTab(
         item,
-        `${item.title} - ${item.type} de ${metas.get(KEY_META.SITE_TITLE)}`,
+        `${item.title} - ${item.type} de ${metas.get(KEY_META.OWNER)}`,
       ),
     [item],
   );

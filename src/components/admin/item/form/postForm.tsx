@@ -1,23 +1,24 @@
 "use client";
 
 import React, { useActionState, useState } from "react";
-import { AdminPost, Image, Post, Type } from "@/lib/type.ts";
+import { Image, Post, Type } from "@/lib/type.ts";
 import s from "@/components/admin/admin.module.css";
-import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { getCreateAction, getUpdateAction } from "@/lib/utils/actionUtils.ts";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
-  post: AdminPost;
+  post: Post;
   onClose: () => void;
 }
 
 export default function PostForm({ post, onClose }: Props) {
   const [workPost, setWorkPost] = useState<Post>(post);
   const [state, action] = useActionState(
-    post.id !== 0 ? updateItem : createItem,
+    post.id !== 0 ? getUpdateAction(TYPE.POST) : getCreateAction(TYPE.POST),
     null,
   );
   useActionResult(state, onClose);

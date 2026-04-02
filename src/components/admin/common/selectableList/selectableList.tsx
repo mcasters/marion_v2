@@ -15,14 +15,14 @@ interface SelectableListProps<T extends Admin> {
   renderFilter?: (
     getFilteredItems: (filteredItems: T[]) => void,
   ) => React.ReactNode;
-  updateForm: (item: T, handleClose: () => void) => React.ReactNode;
+  formToRender: (item: T, handleClose: () => void) => React.ReactNode;
 }
 
 export default function SelectableList<T extends Admin>({
   items,
   renderItem,
   renderFilter,
-  updateForm,
+  formToRender,
 }: SelectableListProps<T>): ReactElement {
   const { ref, isOutside } = useOnClickOutside();
   const { selectedIndex, decrease, increase, setSelectedIndex } =
@@ -46,23 +46,24 @@ export default function SelectableList<T extends Admin>({
       >
         <ul>
           {itemsToDisplay.map((item, i) => {
+            const isModifiable = item.id !== 0;
             return (
               <li
                 key={item.id}
                 className={`${i === selectedIndex ? "selected" : ""} ${s.itemList}`}
                 style={{
                   opacity: isOutside && i === selectedIndex ? "60%" : undefined,
-                  cursor: item.modifiable ? "pointer" : undefined,
+                  cursor: isModifiable ? "pointer" : undefined,
                 }}
                 onDoubleClick={() =>
-                  item.modifiable ? setEditedItem(item) : undefined
+                  isModifiable ? setEditedItem(item) : undefined
                 }
                 title={
-                  item.modifiable
+                  isModifiable
                     ? "Double-click pour modifier"
                     : "Ne peut pas être modifié"
                 }
-                role={item.modifiable ? "button" : undefined}
+                role={isModifiable ? "button" : undefined}
                 onClick={() => setSelectedIndex(i)}
               >
                 {renderItem(item, i)}
@@ -72,13 +73,15 @@ export default function SelectableList<T extends Admin>({
         </ul>
       </div>
       {isCategory && <h5>{MESSAGE.category}</h5>}
-      <Modal
-        isOpen={editedItem !== null}
-        title="Modification"
-        width={isCategory ? 700 : 900}
-      >
-        {editedItem && updateForm(editedItem, () => setEditedItem(null))}
-      </Modal>
+      {editedItem && (
+        <Modal
+          isOpen={true}
+          title="Modification"
+          width={isCategory ? 700 : 900}
+        >
+          {formToRender(editedItem, () => setEditedItem(null))}
+        </Modal>
+      )}
     </div>
   );
 }

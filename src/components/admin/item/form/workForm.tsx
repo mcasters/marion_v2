@@ -2,13 +2,14 @@
 
 import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { Category, Image, Type, Work } from "@/lib/type.ts";
+import { Category, Image, Work } from "@/lib/type.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
-import { createItem, updateItem } from "@/app/actions/item-post/admin.ts";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
 import { format } from "date-fns/format";
 import useActionResult from "@/components/hooks/useActionResult.ts";
+import { getCreateAction, getUpdateAction } from "@/lib/utils/actionUtils.ts";
+import { TYPE } from "@/db/schema.ts";
 
 interface Props {
   work: Work;
@@ -17,10 +18,11 @@ interface Props {
 }
 
 export default function WorkForm({ work, onClose, categories }: Props) {
-  const isSculpture = work.type === Type.SCULPTURE;
+  const type = work.type;
+  const isSculpture = type === TYPE.SCULPTURE;
   const [workItem, setWorkItem] = useState<Work>(work);
   const [state, action] = useActionState(
-    work.id !== 0 ? updateItem : createItem,
+    work.id === 0 ? getCreateAction(type) : getUpdateAction(type),
     null,
   );
   useActionResult(state, onClose);
@@ -124,14 +126,10 @@ export default function WorkForm({ work, onClose, categories }: Props) {
             Catégorie
             <select
               name="categoryId"
-              value={workItem.categoryId?.toString()}
-              onChange={(e) => {
-                setWorkItem(
-                  Object.assign({}, workItem, {
-                    categoryId: e.target.value,
-                  }),
-                );
-              }}
+              value={workItem.categoryId ?? 0}
+              onChange={(e) =>
+                setWorkItem({ ...workItem, categoryId: Number(e.target.value) })
+              }
             >
               <option value={0}>-- Aucune catégorie --</option>
               {categories &&
@@ -180,11 +178,7 @@ export default function WorkForm({ work, onClose, categories }: Props) {
                 name="price"
                 type="number"
                 placeholder="Prix (facultatif)"
-                value={
-                  !workItem.price || workItem.price === 0
-                    ? ""
-                    : workItem.price.toString()
-                }
+                value={!workItem.price ? "" : workItem.price}
                 onChange={(e) =>
                   setWorkItem({ ...workItem, price: Number(e.target.value) })
                 }
@@ -215,11 +209,7 @@ export default function WorkForm({ work, onClose, categories }: Props) {
                 name="price"
                 type="number"
                 placeholder="Prix (facultatif)"
-                value={
-                  !workItem.price || workItem.price === 0
-                    ? ""
-                    : workItem.price.toString()
-                }
+                value={!workItem.price ? "" : workItem.price}
                 onChange={(e) =>
                   setWorkItem({ ...workItem, price: Number(e.target.value) })
                 }

@@ -5,28 +5,31 @@ import React, { useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
-import { AdminCategory, Category, Image } from "@/lib/type.ts";
+import { AdminCategory } from "@/lib/type.ts";
 import { useAlert } from "@/app/context/alertProvider.tsx";
 import SelectImageList from "@/components/admin/common/image/selectImageList.tsx";
-
-import {
-  createCategory,
-  updateCategory,
-} from "@/app/actions/item-post/categories/admin.ts";
 import { MESSAGE } from "@/constants/admin.ts";
+import {
+  getCreateCategoryAction,
+  getUpdateCategoryAction,
+} from "@/lib/utils/actionUtils.ts";
 
 interface Props {
-  category: AdminCategory;
+  adminCategory: AdminCategory;
   onClose: () => void;
 }
-export default function CategoryForm({ category, onClose }: Props) {
-  const isUpdate = category.id !== 0;
-  const [workCategory, setWorkCategory] = useState<Category>(category);
-  const [image, setImage] = useState<Image>(category.content.image);
+export default function CategoryForm({ adminCategory, onClose }: Props) {
+  const isUpdate = adminCategory.id !== 0;
+  const type = adminCategory.workType;
+  const [workCategory, setWorkCategory] =
+    useState<AdminCategory>(adminCategory);
+  const [filename, setFilename] = useState<string>(adminCategory.imageFilename);
   const alert = useAlert();
 
   const submit = async (formData: FormData) => {
-    const action = isUpdate ? updateCategory : createCategory;
+    const action = isUpdate
+      ? getUpdateCategoryAction(type)
+      : getCreateCategoryAction(type);
     const { message, isError } = await action(formData);
     if (!isError) onClose();
     alert(message, isError);
@@ -34,11 +37,9 @@ export default function CategoryForm({ category, onClose }: Props) {
 
   return (
     <form action={submit}>
-      <input type="hidden" name="id" value={category.id} />
-      <input type="hidden" name="type" value={category.workType} />
-      <input type="hidden" name="filename" value={image.filename} />
-      <input type="hidden" name="width" value={image.width} />
-      <input type="hidden" name="height" value={image.height} />
+      <input type="hidden" name="id" value={adminCategory.id} />
+      <input type="hidden" name="type" value={adminCategory.workType} />
+      <input type="hidden" name="filename" value={filename} />
       <label>
         Nom de la catégorie
         <input
@@ -61,12 +62,9 @@ export default function CategoryForm({ category, onClose }: Props) {
         <input
           name="title"
           type="text"
-          value={workCategory.content.title}
+          value={workCategory.title}
           onChange={(e) =>
-            setWorkCategory({
-              ...workCategory,
-              content: { ...workCategory.content, title: e.target.value },
-            })
+            setWorkCategory({ ...workCategory, title: e.target.value })
           }
         />
       </label>
@@ -75,20 +73,17 @@ export default function CategoryForm({ category, onClose }: Props) {
         <textarea
           name="text"
           rows={5}
-          value={workCategory.content.text}
+          value={workCategory.text}
           onChange={(e) =>
-            setWorkCategory({
-              ...workCategory,
-              content: { ...workCategory.content, text: e.target.value },
-            })
+            setWorkCategory({ ...workCategory, text: e.target.value })
           }
         />
       </label>
       <SelectImageList
-        itemsImages={category.images}
-        selectedImage={workCategory.content.image}
-        onChange={(image) => setImage(image)}
-        type={category.workType}
+        filenames={adminCategory.filenames}
+        selectedFilename={workCategory.imageFilename}
+        onChange={(filename) => setFilename(filename)}
+        type={adminCategory.workType}
       />
       <div className={s.buttonSection}>
         <SubmitButton />

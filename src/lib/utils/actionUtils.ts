@@ -1,36 +1,26 @@
-import { Meta } from "@@/prisma/generated/client";
-import { Label } from "@@/prisma/generated/enums";
-import {
-  AdminCategory,
-  ContentFull,
-  DragListElement,
-  DrawingCategory,
-  Filter,
-  HomeLayout,
-  Image,
-  ItemDarkBackground,
-  Layout,
-  Message,
-  PaintingCategory,
-  Post,
-  SculptureCategory,
-  Work,
-} from "@/lib/type.ts";
-import { KEY_META } from "@/constants/admin.ts";
 import {
   createPainting,
+  createPaintingCategory,
   deletePainting,
+  deletePaintingCategory,
   updatePainting,
+  updatePaintingCategory,
 } from "@/app/admin/peintures/action.ts";
 import {
   createSculpture,
+  createSculptureCategory,
   deleteSculpture,
+  deleteSculptureCategory,
   updateSculpture,
+  updateSculptureCategory,
 } from "@/app/admin/sculptures/action.ts";
 import {
   createDrawing,
+  createDrawingCategory,
   deleteDrawing,
+  deleteDrawingCategory,
   updateDrawing,
+  updateDrawingCategory,
 } from "@/app/admin/dessins/action.ts";
 import {
   createPost,
@@ -38,268 +28,15 @@ import {
   updatePost,
 } from "@/app/admin/posts/action.ts";
 import { TYPE } from "@/db/schema.ts";
-
-export const transformValueToKey = (value: string): string =>
-  value
-    .toLowerCase()
-    .split(" ")
-    .join("_")
-    .replace(/[`~!@#$%^&*()'”‘|+\-=?;:",.<>{}\[\]\\\/]/gi, "")
-    .replace(/à/gi, "a")
-    .replace(/é/gi, "e")
-    .replace(/è/gi, "e")
-    .replace(/ê/gi, "e")
-    .replace(/ù/gi, "u")
-    .replace(/ç/gi, "c")
-    .replace(/î/gi, "i")
-    .replace(/ë/gi, "e");
-
-// @ts-expect-error: any return function
-export const createNestedObject = (obj, key, ...keys) => {
-  return key != undefined
-    ? // @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.
-      createNestedObject(obj[key] || (obj[key] = {}), ...keys)
-    : obj;
-};
-
-export const getSliderContent = (contents: ContentFull[]): ContentFull | null =>
-  contents?.filter((c) => c.label === Label.SLIDER)[0] || null;
-
-export const getPresentation = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.PRESENTATION)[0]?.text || "";
-
-export const getPresentationImage = (contents: ContentFull[]): Image[] =>
-  contents?.filter((c) => c.label === Label.PRESENTATION)[0]?.images || [];
-
-export const getDemarche = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.DEMARCHE)[0]?.text || "";
-
-export const getInspiration = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.INSPIRATION)[0]?.text || "";
-
-export const getIntroText = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.INTRO)[0]?.text || "";
-
-export const getSliders = (contents: ContentFull[]): Image[] | [] =>
-  contents?.filter((c) => c.label === Label.SLIDER)[0]?.images || [];
-
-export const getAddress = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.ADDRESS)[0]?.text || "";
-
-export const getPhone = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.PHONE)[0]?.text || "";
-
-export const getEmail = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.EMAIL)[0]?.text || "";
-
-export const getContactText = (contents: ContentFull[]): string =>
-  contents?.filter((c) => c.label === Label.TEXT_CONTACT)[0]?.text || "";
-
-export const getMetaMap = (metas: Meta[]): Map<string, string> => {
-  const map = new Map();
-  metas.forEach((meta) => map.set(meta.key, meta.text));
-  return map;
-};
-
-export const getThumbnailSrc = (item: AdminCategory | Work | Post) => {
-  if (item.id === 0) return "";
-
-  switch (item.type) {
-    case TYPE.CATEGORY: {
-      return item.content?.imageFilename !== ""
-        ? `/images/${item.workType}/sm/${item.content?.imageFilename}`
-        : "";
-    }
-    case TYPE.POST: {
-      let image = item.images.find((i: Image) => i.isMain);
-      if (!image) image = item.images[0];
-      return image && image.filename !== ""
-        ? `/images/post/${image.filename}`
-        : "";
-    }
-    default: {
-      return item.images[0] && item.images[0].filename !== ""
-        ? `/images/${item.type}/${item.images[0].filename}`
-        : "";
-    }
-  }
-};
-
-export const getEmptyWork = (
-  type: TYPE.SCULPTURE | TYPE.DRAWING | TYPE.PAINTING,
-): Work => {
-  return {
-    id: 0,
-    type,
-    title: "",
-    date: new Date(),
-    technique: "",
-    description: "",
-    height: 0,
-    width: 0,
-    length: 0,
-    isToSell: false,
-    price: null,
-    sold: false,
-    images: [],
-    categoryId: null,
-    isOut: false,
-    outInformation: "",
-  };
-};
-
-export const getEmptyPost = (): Post => {
-  return {
-    id: 0,
-    type: TYPE.POST,
-    title: "",
-    date: new Date(),
-    createdAt: new Date(),
-    text: "",
-    images: [{ ...getEmptyImage(), postId: 0 }],
-    published: false,
-    viewCount: 0,
-  };
-};
-
-export const getEmptyImage = (): Image => {
-  return {
-    id: 0,
-    filename: "",
-    width: 0,
-    height: 0,
-    isMain: false,
-  };
-};
-
-export const getEmptyAdminCategory = (
-  workType: TYPE.PAINTING | TYPE.DRAWING | TYPE.SCULPTURE,
-): AdminCategory => {
-  return {
-    id: 0,
-    key: "",
-    value: "",
-    type: TYPE.CATEGORY,
-    workType,
-    categoryContentId: 0,
-    content: {
-      id: 0,
-      title: "",
-      text: "",
-      imageFilename: "",
-      imageWidth: 0,
-      imageHeight: 0,
-    },
-    filenames: [],
-    count: 0,
-  };
-};
-
-export const getNoCategory = (
-  workType: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
-): PaintingCategory | SculptureCategory | DrawingCategory => {
-  return {
-    id: 0,
-    key: "no-category",
-    value: "Sans catégorie",
-    type: TYPE.CATEGORY,
-    workType,
-    categoryContentId: 0,
-    content: {
-      id: 0,
-      title: "",
-      text: "",
-      imageFilename: "",
-      imageWidth: 0,
-      imageHeight: 0,
-    },
-  };
-};
-
-export const getEmptyMessage = (): Message => {
-  return {
-    id: 0,
-    date: new Date(),
-    dateUpdated: null,
-    text: "",
-    author: {
-      id: 0,
-      email: "",
-      isAdmin: false,
-    },
-  };
-};
-
-export const getWorkLayout = (
-  metas: Map<string, string>,
-  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
-): [Layout, ItemDarkBackground] => {
-  const metaLayout =
-    type === TYPE.PAINTING
-      ? metas.get(KEY_META.PAINTING_LAYOUT) || "1,1"
-      : type === TYPE.SCULPTURE
-        ? metas.get(KEY_META.SCULPTURE_LAYOUT) || "3,1"
-        : metas.get(KEY_META.DRAWING_LAYOUT) || "1,1";
-
-  const strings = metaLayout.split(",");
-  return [parseInt(strings[0]), parseInt(strings[1])];
-};
-
-export const getHomeLayout = (metas: Map<string, string>): HomeLayout => {
-  return parseInt(metas.get(KEY_META.HOME_LAYOUT) || "0");
-};
-
-export const getYearsFromWorks = (items: Work[]): number[] => {
-  const years: number[] = [];
-  items.forEach((item) => {
-    const date = new Date(item.date);
-    years.push(date.getFullYear());
-  });
-
-  return [...new Set(years)];
-};
-
-const dotToComma = (number: number): string =>
-  number.toString().replace(".", ",");
-
-export const getSizeText = (item: Work): string =>
-  item.type === TYPE.SCULPTURE
-    ? `${dotToComma(item.height)} x ${dotToComma(item.width)} x ${dotToComma(item.length)} cm`
-    : `${dotToComma(item.height)} x ${dotToComma(item.width)} cm`;
-
-export const sortDragList = (
-  dragList: DragListElement[],
-): DragListElement[] => {
-  function compare(a: DragListElement, b: DragListElement) {
-    return a.order - b.order;
-  }
-  return dragList.toSorted(compare);
-};
-
-export const filterWorks = (works: Work[], filter: Filter): Work[] => {
-  function filterByCategory(list: Work[]) {
-    return filter.categoryFilter === -1
-      ? list
-      : filter.categoryFilter === 0
-        ? list.filter((i) => !i.categoryId)
-        : list.filter((i) => i.categoryId === filter.categoryFilter);
-  }
-  function filterByYear(list: Work[]) {
-    return filter.yearFilter === -1
-      ? list
-      : list.filter(
-          (i) => new Date(i.date).getFullYear() === filter.yearFilter,
-        );
-  }
-  function filterByIsOut(list: Work[]) {
-    return filter.isOutFilter === -1
-      ? list
-      : filter.isOutFilter === 0
-        ? list.filter((i) => !i.isOut)
-        : list.filter((i) => i.isOut);
-  }
-  return filterByCategory(filterByYear(filterByIsOut(works)));
-};
+import {
+  AdminCategory,
+  Category,
+  Drawing,
+  FileInfo,
+  Painting,
+  Work,
+} from "@/lib/type.ts";
+import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
 
 export const getCreateAction = (
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING | TYPE.POST,
@@ -344,4 +81,166 @@ export const getDeleteAction = (
     case TYPE.POST:
       return deletePost;
   }
+};
+
+export const getCreateCategoryAction = (
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
+) => {
+  switch (type) {
+    case TYPE.PAINTING:
+      return createPaintingCategory;
+    case TYPE.SCULPTURE:
+      return createSculptureCategory;
+    case TYPE.DRAWING:
+      return createDrawingCategory;
+  }
+};
+
+export const getUpdateCategoryAction = (
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
+) => {
+  switch (type) {
+    case TYPE.PAINTING:
+      return updatePaintingCategory;
+    case TYPE.SCULPTURE:
+      return updateSculptureCategory;
+    case TYPE.DRAWING:
+      return updateDrawingCategory;
+  }
+};
+
+export const getDeleteCategoryAction = (
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
+) => {
+  switch (type) {
+    case TYPE.PAINTING:
+      return deletePaintingCategory;
+    case TYPE.SCULPTURE:
+      return deleteSculptureCategory;
+    case TYPE.DRAWING:
+      return deleteDrawingCategory;
+  }
+};
+export const createPaintingData = (
+  formData: FormData,
+  fileInfos: FileInfo[] | null,
+) => getCommonData(formData, fileInfos);
+export const createDrawingData = (
+  formData: FormData,
+  fileInfos: FileInfo[] | null,
+) => getCommonData(formData, fileInfos);
+export const createSculptureData = (formData: FormData) => {
+  const rawFormData = Object.fromEntries(formData);
+  const common = getCommonData(formData, null);
+  return {
+    ...common,
+    length: Number(rawFormData.length as string),
+  };
+};
+const getCommonData = (formData: FormData, fileInfos: FileInfo[] | null) => {
+  const rawFormData = Object.fromEntries(formData);
+  const categoryId = Number(rawFormData.categoryId as string);
+  const price = rawFormData.price as string;
+
+  const file = fileInfos
+    ? {
+        imageFilename: fileInfos[0].filename,
+        imageHeight: fileInfos[0].height,
+        imageWidth: fileInfos[0].width,
+      }
+    : {};
+  return {
+    title: rawFormData.title as string,
+    date: new Date(rawFormData.date as string),
+    technique: rawFormData.technique as string,
+    description: rawFormData.description as string,
+    height: Number(rawFormData.height as string),
+    width: Number(rawFormData.width as string),
+    categoryId: categoryId === 0 ? null : categoryId,
+    isToSell: rawFormData.isToSell === "on",
+    price: price ? Number(price) : null,
+    sold: rawFormData.sold === "on",
+    isOut: rawFormData.isOut === "on",
+    outInformation: rawFormData.outInformation as string,
+    ...file,
+  };
+};
+export const createPostData = (formData: FormData) => {
+  const rawFormData = Object.fromEntries(formData);
+  return {
+    title: rawFormData.title as string,
+    date: new Date(rawFormData.date as string),
+    text: rawFormData.text as string,
+  };
+};
+export const createCategoryData = (formData: FormData) => {
+  const rawFormData = Object.fromEntries(formData);
+  const value = rawFormData.value as string;
+
+  return {
+    key: transformValueToKey(value),
+    value,
+    title: rawFormData.title as string,
+    text: rawFormData.text as string,
+    imageFilename: rawFormData.filename as string,
+  };
+};
+export const createWorkObject = (
+  data: Painting | Drawing,
+  type: TYPE.PAINTING | TYPE.DRAWING,
+): Work => {
+  return {
+    id: data.id,
+    type,
+    title: data.title,
+    date: new Date(data.date),
+    technique: data.technique,
+    description: data.description,
+    height: data.height,
+    width: data.width,
+    length: 0,
+    isToSell: data.isToSell,
+    price: data.price,
+    sold: data.sold,
+    isOut: data.isOut,
+    outInformation: data.outInformation,
+    categoryId: data.categoryId,
+    images: [
+      {
+        id: 0,
+        filename: data.imageFilename,
+        width: data.imageWidth,
+        height: data.imageHeight,
+        isMain: true,
+      },
+    ],
+  };
+};
+export const createAdminCategoryObjects = (
+  categories: Category[],
+  items: Work[],
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING,
+): AdminCategory[] => {
+  const categoryMap = new Map();
+  categories.forEach((category) => {
+    categoryMap.set(category.id, {
+      ...category,
+      images: [],
+      count: 0,
+    });
+  });
+  categoryMap.set(0, {
+    ...getNoCategory(type),
+    images: [],
+    count: 0,
+  });
+  items.forEach((item) => {
+    const categoryId = item.categoryId === null ? 0 : item.categoryId;
+    const category = categoryMap.get(categoryId);
+    category.count += 1;
+    category.images = category.images.concat(item.images);
+    categoryMap.set(categoryId, category);
+  });
+  if (categoryMap.get(0).count === 0) categoryMap.delete(0);
+  return [...categoryMap.values()];
 };

@@ -2,7 +2,7 @@
 
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import { AdminPost, Type } from "@/lib/type.ts";
+import { Post, Type } from "@/lib/type.ts";
 import AddButton from "@/components/admin/common/button/addButton.tsx";
 import { getEmptyPost, getThumbnailSrc } from "@/lib/utils/commonUtils.ts";
 import { deleteItem } from "@/app/actions/item-post/admin.ts";
@@ -11,7 +11,7 @@ import SelectableListRow from "@/components/admin/common/selectableList/selectab
 import PostForm from "@/components/admin/item/form/postForm.tsx";
 
 interface Props {
-  posts: AdminPost[];
+  posts: Post[];
 }
 export default function PostManagement({ posts }: Props) {
   return (
@@ -27,7 +27,7 @@ export default function PostManagement({ posts }: Props) {
             deleteAction={() => deleteItem(post.id, Type.POST)}
           />
         )}
-        updateForm={(post, handleClose) => (
+        formToRender={(post, handleClose) => (
           <PostForm post={post} onClose={handleClose} />
         )}
       />
