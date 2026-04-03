@@ -7,7 +7,7 @@ import { ROUTES } from "@/constants/specific/routes";
 import Header from "./header.tsx";
 import Footer from "./footer";
 import s from "@/components/layout/layout.module.css";
-import { useTheme } from "@/app/context/themeProvider";
+import { useThemeContext } from "@/app/context/themeProvider";
 import { getHomeLayout } from "@/lib/utils/commonUtils";
 import AuthStatus from "@/components/auth/authStatus";
 import { useSession } from "@/app/context/sessionProvider";
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function Layout({ introduction, children }: Props) {
-  const theme = useTheme();
+  const theme = useThemeContext();
   const path = `/${usePathname().split("/")[1]}`;
   const session = useSession();
   const metas = useMetaContext();

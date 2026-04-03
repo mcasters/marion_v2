@@ -1,6 +1,6 @@
 import React from "react";
 import s from "./chatMessage.module.css";
-import { useTheme } from "@/app/context/themeProvider";
+import { useThemeContext } from "@/app/context/themeProvider";
 import { Message } from "@/lib/type";
 import MoreIcon from "@/components/icons/moreIcon";
 import useOnClickOutside from "@/components/hooks/useOnClickOutside.ts";
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default function ChatMessage({ message, editableMessage }: Props) {
-  const theme = useTheme();
+  const theme = useThemeContext();
   const { ref } = useOnClickOutside(
     editableMessage ? () => editableMessage.openMenu(false) : undefined,
   );

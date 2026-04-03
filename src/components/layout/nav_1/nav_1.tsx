@@ -2,7 +2,7 @@
 
 import { MENU_1_ITEMS } from "@/constants/specific/routes.ts";
 import s from "@/components/layout/nav_1/nav_1.module.css";
-import { useTheme } from "@/app/context/themeProvider.tsx";
+import { useThemeContext } from "@/app/context/themeProvider.tsx";
 
 import { getDarkerColor } from "@/lib/utils/themeUtils.ts";
 import { usePathname } from "next/navigation";
@@ -20,7 +20,7 @@ type Props = {
 export default function Nav_1({ fixed, themePage }: Props) {
   const metas = useMetaContext();
   const isPlainHomeLayout = getHomeLayout(metas) === HomeLayout.PLAIN;
-  const theme = useTheme();
+  const theme = useThemeContext();
   const path = `/${usePathname().split("/")[1]}`;
 
   return (

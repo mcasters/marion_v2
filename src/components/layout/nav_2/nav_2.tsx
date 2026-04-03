@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { MENU_2 } from "@/constants/specific/routes.ts";
 import s from "@/components/layout/nav_2/nav_2.module.css";
-import { useTheme } from "@/app/context/themeProvider.tsx";
+import { useThemeContext } from "@/app/context/themeProvider.tsx";
 import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import { KEY_META } from "@/constants/admin.ts";
 import React from "react";
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function Nav_2({ fixed, themePage }: Props) {
-  const theme = useTheme();
+  const theme = useThemeContext();
   const metas = useMetaContext();
   const owner = metas.get(KEY_META.OWNER);
 

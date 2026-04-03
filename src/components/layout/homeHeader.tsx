@@ -6,7 +6,7 @@ import Nav_2 from "@/components/layout/nav_2/nav_2.tsx";
 import s from "./layout.module.css";
 import React from "react";
 import useElementIsUpTo from "@/components/hooks/useElementIsUpTo.ts";
-import { useTheme } from "@/app/context/themeProvider.tsx";
+import { useThemeContext } from "@/app/context/themeProvider.tsx";
 
 type Props = {
   isPlainHomeLayout: boolean;
@@ -19,7 +19,7 @@ export default function HomeHeader({
   title,
   introduction,
 }: Props) {
-  const theme = useTheme();
+  const theme = useThemeContext();
   const { isUpTo: titleGone, ref: titleRef } = useElementIsUpTo(L.LINE_HEIGHT);
   const { isUpTo: introGone, ref: introRef } = useElementIsUpTo(
     L.LINE_HEIGHT + L.NAV_1_HEIGHT,

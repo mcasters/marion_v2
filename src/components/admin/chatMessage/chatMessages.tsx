@@ -4,7 +4,7 @@ import React, { useActionState, useRef, useState } from "react";
 import style from "@/components/admin/admin.module.css";
 import s from "./chatMessage.module.css";
 import { useSession } from "@/app/context/sessionProvider";
-import { useTheme } from "@/app/context/themeProvider";
+import { useThemeContext } from "@/app/context/themeProvider";
 import { Message } from "@/lib/type";
 import ChatMessage from "@/components/admin/chatMessage/chatMessage";
 import { getEmptyMessage } from "@/lib/utils/commonUtils.ts";
@@ -18,7 +18,7 @@ type Props = {
 
 export default function ChatMessages({ dbMessages }: Props) {
   const session = useSession();
-  const theme = useTheme();
+  const theme = useThemeContext();
   const textAreaRef = useRef<HTMLTextAreaElement>(null!);
   const [editMessage, setEditMessage] = useState<Message>(getEmptyMessage());
   const { indexOpen, toggle } = useMenuManagement();

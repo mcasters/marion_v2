@@ -15,6 +15,6 @@ export function ThemeProvider({ theme, children }: Props) {
   );
 }
 
-export function useTheme() {
+export function useThemeContext() {
   return useContext(ThemeContext);
 }
