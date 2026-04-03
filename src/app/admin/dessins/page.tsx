@@ -1,6 +1,6 @@
 import s from "@/components/admin/admin.module.css";
 import React from "react";
-import ItemLayoutForm from "@/components/admin/item/form/itemLayoutForm.tsx";
+import WorkLayoutForm from "@/components/admin/item/form/workLayoutForm.tsx";
 import WorkManagement from "@/components/admin/item/workManagement.tsx";
 import {
   getDrawingAdminCategories,
@@ -17,7 +17,7 @@ export default async function Dessins() {
     <div className={s.container}>
       <h1 className={s.title1}>Les dessins</h1>
       <h2 className={s.title2}>Mise en page</h2>
-      <ItemLayoutForm type={type} />
+      <WorkLayoutForm type={type} />
       <div className="separate" />
       <h2
         className={s.title2}

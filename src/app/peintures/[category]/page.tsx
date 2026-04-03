@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils";
-import ItemPage from "@/components/item/itemPage.tsx";
+import WorkPage from "@/components/work/workPage.tsx";
 import { KEY_META } from "@/constants/admin";
 import { TYPE } from "@/db/schema.ts";
 import {
@@ -47,7 +47,7 @@ export default async function Page({ params }: Props) {
   return (
     <>
       {category && (
-        <ItemPage
+        <WorkPage
           tag={category.value}
           category={category}
           works={works}

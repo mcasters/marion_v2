@@ -1,6 +1,6 @@
 "use client";
 
-import s from "./itemLayout.module.css";
+import s from "./workLayout.module.css";
 import { Layout, Work } from "@/lib/type.ts";
 import React, { useMemo, useState } from "react";
 import { getItemPhotoTab } from "@/lib/utils/imageUtils.ts";
@@ -13,21 +13,21 @@ import { DEVICE, IMAGE_INFO } from "@/constants/image.ts";
 import useWindowRect from "@/components/hooks/useWindowRect.ts";
 
 interface Props {
-  item: Work;
+  work: Work;
   layout: Layout.MONO | Layout.DOUBLE | Layout.SCULPTURE;
   priority: boolean;
 }
-export default function ItemLayout({ item, layout, priority }: Props) {
+export default function WorkLayout({ work, layout, priority }: Props) {
   const metas = useMetaContext();
   const isSmall = useWindowRect().innerWidth < DEVICE.SMALL;
   const [index, setIndex] = useState(-1);
   const photoTab = useMemo(
     () =>
       getItemPhotoTab(
-        item,
-        `${item.title} - ${item.type} de ${metas.get(KEY_META.OWNER)}`,
+        work,
+        `${work.title} - ${work.type} de ${metas.get(KEY_META.OWNER)}`,
       ),
-    [item],
+    [work],
   );
   const photos = isSmall ? photoTab.sm : photoTab.md;
   const _width = isSmall
@@ -84,7 +84,7 @@ export default function ItemLayout({ item, layout, priority }: Props) {
         />
       </figure>
       <figcaption>
-        <ImageInfos item={item} isMono={layout === Layout.MONO} />
+        <ImageInfos work={work} isMono={layout === Layout.MONO} />
       </figcaption>
     </article>
   );

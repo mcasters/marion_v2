@@ -13,7 +13,7 @@ type Props = {
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 };
 
-export default function ItemLayoutForm({ type }: Props) {
+export default function WorkLayoutForm({ type }: Props) {
   const metas = useMetaContext();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const [layout, setLayout] = useState<string>(itemLayout.toString());

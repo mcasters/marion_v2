@@ -2,10 +2,10 @@
 
 import { Category, ItemDarkBackground, Layout, Work } from "@/lib/type";
 import React from "react";
-import s from "@/components/item/itemsPage.module.css";
+import s from "@/components/work/workPage.module.css";
 import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
-import ItemLayout from "@/components/item/itemLayout.tsx";
+import WorkLayout from "@/components/work/workLayout.tsx";
 import { getPhotoTabEnhanced } from "@/lib/utils/imageUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
 import Gallery from "@/components/image/gallery/gallery.tsx";
@@ -17,7 +17,7 @@ interface Props {
   category?: Category;
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 }
-export default function ItemPage({ tag, works, category, type }: Props) {
+export default function WorkPage({ tag, works, category, type }: Props) {
   const metas = useMetaContext();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const photosEnhanced =
@@ -43,13 +43,13 @@ export default function ItemPage({ tag, works, category, type }: Props) {
       <div
         className={`${s.content} ${itemLayout === Layout.DOUBLE ? s.doubleContent : undefined} ${itemDarkBackground === ItemDarkBackground.TRUE ? s.darkBackground : ""}`}
       >
-        {photosEnhanced && <Gallery photos={photosEnhanced} />}
+        {itemLayout === Layout.MULTIPLE && <Gallery works={works} />}
         {itemLayout !== Layout.MULTIPLE &&
           works.map((item, i) => (
-            <ItemLayout
+            <WorkLayout
               key={i}
               layout={itemLayout}
-              item={item}
+              work={item}
               priority={i < 2}
             />
           ))}

@@ -1,4 +1,4 @@
-import ItemPage from "@/components/item/itemPage.tsx";
+import WorkPage from "@/components/work/workPage.tsx";
 import { getMetaMap } from "@/lib/utils/commonUtils";
 import { Metadata } from "next";
 import { KEY_META } from "@/constants/admin";
@@ -35,5 +35,5 @@ export default async function Page({ params }: Props) {
   const { year } = await params;
   const works = await getPaintingWorksByYear(year);
 
-  return <ItemPage tag={year} works={works} type={TYPE.PAINTING} />;
+  return <WorkPage tag={year} works={works} type={TYPE.PAINTING} />;
 }

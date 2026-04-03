@@ -1,4 +1,4 @@
-import ItemHome from "@/components/item/itemHome.tsx";
+import WorkHome from "@/components/work/workHome.tsx";
 import { Metadata } from "next";
 import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
@@ -34,7 +34,7 @@ export default async function Page() {
   return (
     <>
       <h1 className="hidden">Les peintures</h1>
-      <ItemHome type={TYPE.PAINTING} categories={categories} years={years} />
+      <WorkHome type={TYPE.PAINTING} categories={categories} years={years} />
     </>
   );
 }

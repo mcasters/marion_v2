@@ -1,18 +1,17 @@
 "use client";
 
 import { Photo, Work } from "@/lib/type";
-import { Fragment } from "react";
 import { getSizeText } from "@/lib/utils/commonUtils.ts";
 
 interface Props {
-  item: Work | undefined;
+  work: Work | undefined;
   photo?: Photo;
   isForLightbox?: boolean;
   isMono?: boolean;
 }
 
 export default function ImageInfos({
-  item,
+  work,
   photo = undefined,
   isForLightbox = false,
   isMono = false,
@@ -20,20 +19,81 @@ export default function ImageInfos({
   return (
     <figcaption>
       {photo && (
-        <ShortInfo
+        <InfoLightbox
           title={photo.title}
           year={new Date(photo.date).getFullYear()}
         />
       )}
-      {item && !isForLightbox && !isMono && <LongInfo item={item} />}
-      {item && !isForLightbox && isMono && <LongInfoMono item={item} />}
-      {item && isForLightbox && <LongInfoLightbox item={item} />}
+      {work && !isForLightbox && !isMono && <Info work={work} />}
+      {work && !isForLightbox && isMono && <InfoMono work={work} />}
+      {work && isForLightbox && <LongInfoLightbox work={work} />}
     </figcaption>
   );
 }
 
-// For lightbox of post and item (except gallery layout)
-const ShortInfo = ({ title, year }: { title: string; year: number }) => (
+// For double and sculpture layout
+const Info = ({ work }: { work: Work }) => {
+  return (
+    <>
+      <h2>{work.title}</h2>
+      <p>
+        {`${work.technique} - ${getSizeText(work)} - `}
+        <time>{new Date(work.date).getFullYear()}</time>
+      </p>
+      {work.description !== "" && (
+        <p>
+          <br />
+          {work.description}
+        </p>
+      )}
+      {work.isToSell && (
+        <p>
+          <br />
+          {work.price ? `Prix : ${work.price} euros` : "À vendre"}
+        </p>
+      )}
+      {work.sold && (
+        <p>
+          <br />
+          {work.price ? `Prix : ${work.price} euros - Vendu` : "Vendu"}
+        </p>
+      )}
+    </>
+  );
+};
+
+// For mono layout
+const InfoMono = ({ work }: { work: Work }) => (
+  <>
+    <h2>{work.title}</h2>
+    <p>{work.technique}</p>
+    <p>{getSizeText(work)}</p>
+    <p>
+      <time>{new Date(work.date).getFullYear()}</time>
+    </p>
+    {work.description !== "" && (
+      <p>
+        <br />
+        {work.description}
+      </p>
+    )}
+    {work.isToSell && (
+      <p>
+        <br />
+        {work.price ? `Prix : ${work.price} euros` : "À vendre"}
+      </p>
+    )}
+    {work.sold && (
+      <p>
+        <br />
+        {work.price ? `Prix : ${work.price} euros - Vendu` : "Vendu"}
+      </p>
+    )}
+  </>
+);
+
+// For lightbox (except gallery layout)
+const InfoLightbox = ({ title, year }: { title: string; year: number }) => (
   <p>
     <span>
       <strong>{title}</strong>
@@ -42,88 +102,27 @@ const ShortInfo = ({ title, year }: { title: string; year: number }) => (
   </p>
 );
 
-// For item in double and sculpture layout
-const LongInfo = ({ item }: { item: Work }) => {
-  return (
-    <>
-      <h2>{item.title}</h2>
-      <p>
-        {`${item.technique} - ${getSizeText(item)} - `}
-        <time>{new Date(item.date).getFullYear()}</time>
-      </p>
-      {item.description !== "" && (
-        <p>
-          <br />
-          {item.description}
-        </p>
-      )}
-      {item.isToSell && (
-        <p>
-          <br />
-          {item.price ? `Prix : ${item.price} euros` : "À vendre"}
-        </p>
-      )}
-      {item.sold && (
-        <p>
-          <br />
-          {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
-        </p>
-      )}
-    </>
-  );
-};
-
-// For lightbox of item in gallery layout
-const LongInfoLightbox = ({ item }: { item: Work }) => (
+// For gallery Lightbox
+const LongInfoLightbox = ({ work }: { work: Work }) => (
   <>
     <p>
       <span>
-        <strong>{item.title}</strong>
+        <strong>{work.title}</strong>
       </span>
-      {` - ${item.technique} - ${getSizeText(item)} - `}
-      <time>{new Date(item.date).getFullYear()}</time>
+      {` - ${work.technique} - ${getSizeText(work)} - `}
+      <time>{new Date(work.date).getFullYear()}</time>
     </p>
     <p>
-      {item.description !== "" && <span>{item.description}</span>}
-      {(item.isToSell || item.sold) && <span>{" - "}</span>}
-      {item.isToSell && (
-        <span>{item.price ? `Prix : ${item.price} euros` : "À vendre"}</span>
+      {work.description !== "" && <span>{work.description}</span>}
+      {(work.isToSell || work.sold) && <span>{" - "}</span>}
+      {work.isToSell && (
+        <span>{work.price ? `Prix : ${work.price} euros` : "À vendre"}</span>
       )}
-      {item.sold && (
+      {work.sold && (
         <span>
-          {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
+          {work.price ? `Prix : ${work.price} euros - Vendu` : "Vendu"}
         </span>
       )}
     </p>
-  </>
-);
-
-// For item in mono layout
-const LongInfoMono = ({ item }: { item: Work }) => (
-  <>
-    <h2>{item.title}</h2>
-    <p>{item.technique}</p>
-    <p>{getSizeText(item)}</p>
-    <p>
-      <time>{new Date(item.date).getFullYear()}</time>
-    </p>
-    {item.description !== "" && (
-      <p>
-        <br />
-        {item.description}
-      </p>
-    )}
-    {item.isToSell && (
-      <p>
-        <br />
-        {item.price ? `Prix : ${item.price} euros` : "À vendre"}
-      </p>
-    )}
-    {item.sold && (
-      <p>
-        <br />
-        {item.price ? `Prix : ${item.price} euros - Vendu` : "Vendu"}
-      </p>
-    )}
   </>
 );

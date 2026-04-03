@@ -2,7 +2,7 @@
 
 import { Category } from "@/lib/type";
 import React from "react";
-import s from "@/components/item/itemHome.module.css";
+import s from "@/components/work/workHome.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { TYPE } from "@/db/schema.ts";
@@ -12,7 +12,7 @@ interface Props {
   categories: Category[];
   years: number[];
 }
-export default function ItemHome({ categories, type, years }: Props) {
+export default function WorkHome({ categories, type, years }: Props) {
   return (
     <>
       <p className={`${s.tagTitle}`}>Par séries :</p>
