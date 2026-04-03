@@ -133,7 +133,7 @@ export const getEmptyPost = (): Post => {
     date: new Date(),
     createdAt: new Date(),
     text: "",
-    images: [{ ...getEmptyImage(), postId: 0 }],
+    images: [{ ...getEmptyImage() }],
     published: false,
     viewCount: 0,
   };
@@ -141,7 +141,6 @@ export const getEmptyPost = (): Post => {
 
 export const getEmptyImage = (): Image => {
   return {
-    id: 0,
     filename: "",
     width: 0,
     height: 0,

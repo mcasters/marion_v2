@@ -12,7 +12,6 @@ import {
   painting,
   paintingCategory,
   post,
-  postImage,
   presetColor,
   sculpture,
   sculptureCategory,
@@ -32,7 +31,7 @@ export type Sculpture = typeof sculpture.$inferSelect & {
 };
 export type Drawing = typeof drawing.$inferSelect;
 export type Post = typeof post.$inferSelect & {
-  images: (typeof postImage.$inferSelect)[];
+  images: Image[];
 };
 
 export type PaintingCategory = typeof paintingCategory.$inferSelect;
@@ -60,7 +59,6 @@ export type AdminCategory = Category & {
 };
 
 export interface Image {
-  id: number;
   filename: string;
   width: number;
   height: number;
