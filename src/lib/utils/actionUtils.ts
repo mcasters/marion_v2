@@ -207,7 +207,6 @@ export const createWorkObject = (
     categoryId: data.categoryId,
     images: [
       {
-        id: 0,
         filename: data.imageFilename,
         width: data.imageWidth,
         height: data.imageHeight,

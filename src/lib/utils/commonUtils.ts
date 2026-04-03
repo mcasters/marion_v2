@@ -131,19 +131,22 @@ export const getEmptyPost = (): Post => {
     type: TYPE.POST,
     title: "",
     date: new Date(),
-    createdAt: new Date(),
     text: "",
-    images: [{ ...getEmptyImage() }],
-    published: false,
-    viewCount: 0,
+    images: [{ ...getEmptyPostImage() }],
   };
 };
 
-export const getEmptyImage = (): Image => {
+export const getEmptyImage = () => {
   return {
     filename: "",
     width: 0,
     height: 0,
+  };
+};
+
+export const getEmptyPostImage = () => {
+  return {
+    ...getEmptyImage(),
     isMain: false,
   };
 };

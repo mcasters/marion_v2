@@ -104,7 +104,19 @@ export async function deletePost(id: number) {
 
 export const getPosts = async (): Promise<Post[]> => {
   return await db.query.post.findMany({
-    with: { images: true },
+    columns: {
+      createdAt: false,
+      published: false,
+      viewCount: false,
+    },
+    with: {
+      images: {
+        columns: {
+          id: false,
+          postId: false,
+        },
+      },
+    },
     orderBy: { date: "desc" },
   });
 };

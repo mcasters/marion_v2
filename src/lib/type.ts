@@ -11,7 +11,6 @@ import {
   meta,
   painting,
   paintingCategory,
-  post,
   presetColor,
   sculpture,
   sculptureCategory,
@@ -30,8 +29,19 @@ export type Sculpture = typeof sculpture.$inferSelect & {
   images: (typeof sculptureImage.$inferSelect)[];
 };
 export type Drawing = typeof drawing.$inferSelect;
-export type Post = typeof post.$inferSelect & {
-  images: Image[];
+
+export type Post = {
+  id: number;
+  type: TYPE.POST;
+  title: string;
+  date: Date;
+  text: string;
+  images: {
+    filename: string;
+    width: number;
+    height: number;
+    isMain: boolean;
+  }[];
 };
 
 export type PaintingCategory = typeof paintingCategory.$inferSelect;
