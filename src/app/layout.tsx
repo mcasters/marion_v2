@@ -8,11 +8,11 @@ import React from "react";
 import StyledJsxRegistry from "./registry";
 import { Cormorant_SC, EB_Garamond } from "next/font/google";
 import { KEY_META } from "@/constants/admin";
-import { getStructHexaTheme } from "@/lib/utils/serverUtils";
 import { getMetas } from "@/app/admin/meta/action.ts";
 import { getActiveTheme, getPresetColors } from "@/app/admin/themeAction.ts";
 import { getContentsFull } from "@/app/admin/contentAction.ts";
 import { getSession } from "@/app/admin/authAction.ts";
+import { getStructHexaTheme } from "@/lib/utils/themeUtils.ts";
 
 const garamond = EB_Garamond({
   subsets: ["latin"],

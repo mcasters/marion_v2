@@ -1,11 +1,7 @@
 "use server";
 
-import { NewTheme, OnlyString, PresetColor, Theme } from "@/lib/type.ts";
+import { OnlyString, PresetColor, Theme } from "@/lib/type.ts";
 import { db } from "@/db";
-import {
-  presetColor as presetColorTable,
-  theme as themeTable,
-} from "@/db/schema.ts";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { THEME } from "@/constants/admin.ts";
@@ -13,15 +9,13 @@ import {
   getBasePresetColorData,
   getBaseThemeData,
 } from "@/lib/utils/themeUtils.ts";
+import { presetColor, theme } from "@/db/schema.ts";
 
-export async function createTheme(newTheme: NewTheme) {
+export async function createTheme(newTheme: Theme) {
   try {
-    const existant = (
-      await db
-        .select()
-        .from(themeTable)
-        .where(eq(themeTable.name, newTheme.name))
-    )[0];
+    const existant = await db.query.theme.findFirst({
+      where: { name: newTheme.name },
+    });
 
     if (existant)
       return {
@@ -30,14 +24,10 @@ export async function createTheme(newTheme: NewTheme) {
         theme: undefined,
       };
 
-    await db.insert(themeTable).values(newTheme);
-
-    const savedTheme = (
-      await db
-        .select()
-        .from(themeTable)
-        .where(eq(themeTable.name, newTheme.name))
-    )[0];
+    const newId = await db.insert(theme).values(newTheme).$returningId();
+    const savedTheme = await db.query.theme.findFirst({
+      where: { id: newId[0].id },
+    });
 
     revalidatePath("/*");
     return { message: "Thème ajouté", isError: false, theme: savedTheme };
@@ -50,17 +40,15 @@ export async function createTheme(newTheme: NewTheme) {
   }
 }
 
-export async function updateTheme(theme: Theme) {
+export async function updateTheme(themeToUpdate: Theme) {
   try {
-    const { id, ...rest } = theme;
-
     await db
-      .update(themeTable)
-      .set({ ...rest })
-      .where(eq(themeTable.id, id));
+      .update(theme)
+      .set(themeToUpdate)
+      .where(eq(theme.id, themeToUpdate.id));
 
     revalidatePath("/*");
-    return { message: `Theme "${theme.name}" modifié`, isError: false };
+    return { message: `Theme "${themeToUpdate.name}" modifié`, isError: false };
   } catch (e) {
     return { message: "Erreur à l'enregistrement", isError: true };
   }
@@ -72,9 +60,7 @@ export async function deleteTheme(id: number): Promise<{
   updatedThemes: Theme[] | null;
 }> {
   try {
-    const themeToDelete = (
-      await db.select().from(themeTable).where(eq(themeTable.id, id))
-    )[0];
+    const themeToDelete = await db.query.theme.findFirst({ where: { id } });
 
     if (themeToDelete) {
       if (themeToDelete.name === THEME.BASE_THEME_NAME) {
@@ -86,13 +72,13 @@ export async function deleteTheme(id: number): Promise<{
       }
       if (themeToDelete.isActive)
         await db
-          .update(themeTable)
+          .update(theme)
           .set({ isActive: true })
-          .where(eq(themeTable.name, THEME.BASE_THEME_NAME));
+          .where(eq(theme.name, THEME.BASE_THEME_NAME));
 
-      await db.delete(themeTable).where(eq(themeTable.id, id));
+      await db.delete(theme).where(eq(theme.id, id));
     }
-    const updatedThemes = await db.select().from(themeTable);
+    const updatedThemes = await db.query.theme.findMany();
 
     revalidatePath("/*");
     return { message: "Thème supprimé", isError: false, updatedThemes };
@@ -107,12 +93,8 @@ export async function deleteTheme(id: number): Promise<{
 
 export async function activateTheme(id: number) {
   try {
-    await db.update(themeTable).set({ isActive: false });
-
-    await db
-      .update(themeTable)
-      .set({ isActive: true })
-      .where(eq(themeTable.id, id));
+    await db.update(theme).set({ isActive: false });
+    await db.update(theme).set({ isActive: true }).where(eq(theme.id, id));
 
     revalidatePath("/*");
     return { message: `Thème activé`, isError: false };
@@ -125,17 +107,10 @@ export async function createPresetColor(
   name: string,
   color: string,
   displayOrder: number,
-): Promise<{
-  message: string;
-  isError: boolean;
-  newPresetColor: PresetColor | null;
-}> {
+) {
   try {
     const alreadyExist = (
-      await db
-        .select()
-        .from(presetColorTable)
-        .where(eq(presetColorTable.name, name))
+      await db.select().from(presetColor).where(eq(presetColor.name, name))
     )[0];
     if (alreadyExist)
       return {
@@ -144,38 +119,42 @@ export async function createPresetColor(
         newPresetColor: null,
       };
 
-    await db.insert(presetColorTable).values({
-      name,
-      color,
-      displayOrder,
+    const newId = await db
+      .insert(presetColor)
+      .values({
+        name,
+        color,
+        displayOrder,
+      })
+      .$returningId();
+
+    const newPresetColor = await db.query.presetColor.findFirst({
+      where: { id: newId[0].id },
     });
 
-    const newPresetColor = (
-      await db
-        .select()
-        .from(presetColorTable)
-        .where(eq(presetColorTable.name, name))
-    )[0];
-
     revalidatePath("/*");
-    return { message: "Couleur perso ajoutée", isError: false, newPresetColor };
+    return {
+      message: "Couleur perso ajoutée",
+      isError: false,
+      newPresetColor: newPresetColor,
+    };
   } catch (e) {
     return {
-      message: `Erreur à la création de la couleur perso : ${e}`,
+      message: `Erreur à la création de la couleur perso`,
       isError: true,
       newPresetColor: null,
     };
   }
 }
 
-export async function updatePresetColor(presetColor: PresetColor) {
+export async function updatePresetColor(presetColorToUpdate: PresetColor) {
   try {
     await db
-      .update(presetColorTable)
+      .update(presetColor)
       .set({
-        color: presetColor.color,
+        color: presetColorToUpdate.color,
       })
-      .where(eq(presetColorTable.id, presetColor.id));
+      .where(eq(presetColor.id, presetColorToUpdate.id));
 
     revalidatePath("/*");
     return { message: "Couleur perso modifiée", isError: false };
@@ -189,16 +168,16 @@ export async function updatePresetColor(presetColor: PresetColor) {
 
 export async function updatePresetColorsOrder(map: Map<number, number>) {
   try {
-    const presetColors = await db.select().from(presetColorTable);
+    const presetColors = await db.query.presetColor.findMany();
     for await (const p of presetColors) {
       await db
-        .update(presetColorTable)
+        .update(presetColor)
         .set({
           displayOrder: map.get(p.id),
         })
-        .where(eq(presetColorTable.id, p.id));
+        .where(eq(presetColor.id, p.id));
     }
-    const updatedPresetColors = await db.select().from(presetColorTable);
+    const updatedPresetColors = await db.query.presetColor.findMany();
 
     revalidatePath("/*");
     return {
@@ -222,12 +201,9 @@ export async function deletePresetColor(id: number): Promise<{
   updatedThemes: Theme[] | null;
 }> {
   try {
-    const presetColorToDelete = (
-      await db
-        .select()
-        .from(presetColorTable)
-        .where(eq(presetColorTable.id, id))
-    )[0];
+    const presetColorToDelete = await db.query.presetColor.findFirst({
+      where: { id },
+    });
 
     if (!presetColorToDelete)
       return {
@@ -237,11 +213,11 @@ export async function deletePresetColor(id: number): Promise<{
         updatedThemes: null,
       };
     else {
-      const themes: Theme[] = await db.select().from(themeTable);
-      for await (const theme of themes) {
-        const updatedTheme = theme;
+      const themes: Theme[] = await db.query.theme.findMany();
+      for await (const t of themes) {
+        const updatedTheme = t;
         let isModified = false;
-        for await (const [key, value] of Object.entries(theme)) {
+        for await (const [key, value] of Object.entries(t)) {
           if (
             value === presetColorToDelete.name &&
             key !== "name" &&
@@ -253,27 +229,26 @@ export async function deletePresetColor(id: number): Promise<{
           }
         }
         if (isModified) {
-          const { id, ...rest } = updatedTheme;
           await db
-            .update(themeTable)
-            .set({ ...rest })
-            .where(eq(themeTable.id, id));
+            .update(theme)
+            .set(updatedTheme)
+            .where(eq(theme.id, updatedTheme.id));
         }
       }
 
-      await db.delete(presetColorTable).where(eq(presetColorTable.id, id));
+      await db.delete(presetColor).where(eq(presetColor.id, id));
 
-      const presetColors = await db.select().from(presetColorTable);
+      const presetColors = await db.query.presetColor.findMany();
       for await (const p of presetColors) {
         if (p.displayOrder > presetColorToDelete.displayOrder)
           await db
-            .update(presetColorTable)
+            .update(presetColor)
             .set({ displayOrder: p.displayOrder - 1 })
-            .where(eq(presetColorTable.id, p.id));
+            .where(eq(presetColor.id, p.id));
       }
 
-      const updatedThemes = await db.select().from(themeTable);
-      const updatedPresetColors = await db.select().from(presetColorTable);
+      const updatedThemes = await db.query.theme.findMany();
+      const updatedPresetColors = await db.query.presetColor.findMany();
       revalidatePath("/*");
       return {
         message: "Couleur perso supprimée",
@@ -290,50 +265,51 @@ export async function deletePresetColor(id: number): Promise<{
       updatedThemes: null,
     };
   }
-} // For admin
+}
+
 export const getActiveTheme = async (): Promise<Theme> => {
-  let theme = (
-    await db.select().from(themeTable).where(eq(themeTable.isActive, true))
-  )[0];
+  let activeTheme = await db.query.theme.findFirst({
+    where: { isActive: true },
+  });
 
-  if (!theme) {
-    theme = (
-      await db
-        .select()
-        .from(themeTable)
-        .where(eq(themeTable.name, THEME.BASE_THEME_NAME))
-    )[0];
+  if (!activeTheme) {
+    let themeToActivate = await db.query.theme.findFirst({
+      where: { name: THEME.BASE_THEME_NAME },
+    });
 
-    if (!theme) {
-      await db.insert(themeTable).values({ ...getBaseThemeData() });
-      theme = (
-        await db
-          .select()
-          .from(themeTable)
-          .where(eq(themeTable.name, THEME.BASE_THEME_NAME))
-      )[0];
+    if (!themeToActivate) {
+      const newId = await db
+        .insert(theme)
+        .values({ ...getBaseThemeData() })
+        .$returningId();
+      themeToActivate = await db.query.theme.findFirst({
+        where: { id: newId[0].id },
+      });
     }
-  }
 
-  if (!theme.isActive) {
     await db
-      .update(themeTable)
+      .update(theme)
       .set({ isActive: true })
-      .where(eq(themeTable.name, THEME.BASE_THEME_NAME));
-    theme = (
-      await db.select().from(themeTable).where(eq(themeTable.isActive, true))
-    )[0];
+      .where(eq(theme.id, themeToActivate!.id));
+    activeTheme = await db.query.theme.findFirst({ where: { isActive: true } });
   }
-  return theme;
+  return activeTheme!;
 };
+
 export const getPresetColors = async (): Promise<PresetColor[]> => {
-  const presetColors = await db.select().from(presetColorTable);
+  const presetColors = await db.query.presetColor.findMany();
+
   if (presetColors.length === 0) {
-    await db.insert(presetColorTable).values({ ...getBasePresetColorData() });
-    const defaultPresetColor = (await db.select().from(presetColorTable))[0];
-    presetColors.push(defaultPresetColor);
+    const newId = await db
+      .insert(presetColor)
+      .values({ ...getBasePresetColorData() })
+      .$returningId();
+    const defaultPresetColor = await db.query.presetColor.findFirst({
+      where: { id: newId[0].id },
+    });
+    presetColors.push(defaultPresetColor!);
   }
   return presetColors;
 };
 export const getThemes = async (): Promise<Theme[]> =>
-  await db.select().from(themeTable);
+  await db.query.theme.findMany();
