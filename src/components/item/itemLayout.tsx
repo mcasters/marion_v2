@@ -4,7 +4,7 @@ import s from "./itemLayout.module.css";
 import { Layout, Work } from "@/lib/type.ts";
 import React, { useMemo, useState } from "react";
 import { getItemPhotoTab } from "@/lib/utils/imageUtils.ts";
-import { useMetas } from "@/app/context/metaProvider.tsx";
+import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import ImageInfos from "@/components/image/common/imageInfos.tsx";
 import Lightbox from "@/components/image/lightbox/lightbox.tsx";
 import { KEY_META } from "@/constants/admin.ts";
@@ -18,7 +18,7 @@ interface Props {
   priority: boolean;
 }
 export default function ItemLayout({ item, layout, priority }: Props) {
-  const metas = useMetas();
+  const metas = useMetaContext();
   const isSmall = useWindowRect().innerWidth < DEVICE.SMALL;
   const [index, setIndex] = useState(-1);
   const photoTab = useMemo(

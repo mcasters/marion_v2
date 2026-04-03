@@ -3,14 +3,14 @@
 import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import Image from "next/image";
-import { useMetas } from "@/app/context/metaProvider.tsx";
+import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import { getHomeLayout } from "@/lib/utils/commonUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
 import useActionResult from "@/components/hooks/useActionResult.ts";
 import { updateMeta } from "@/app/admin/meta/action.ts";
 
 export default function HomeLayoutForm() {
-  const metas = useMetas();
+  const metas = useMetaContext();
   const [value, setValue] = useState<string>(getHomeLayout(metas).toString());
   const [state, action] = useActionState(updateMeta, null);
   useActionResult(state);

@@ -3,7 +3,7 @@
 import { Category, ItemDarkBackground, Layout, Work } from "@/lib/type";
 import React from "react";
 import s from "@/components/item/itemsPage.module.css";
-import { useMetas } from "@/app/context/metaProvider.tsx";
+import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import ItemLayout from "@/components/item/itemLayout.tsx";
 import { getPhotoTabEnhanced } from "@/lib/utils/imageUtils.ts";
@@ -18,7 +18,7 @@ interface Props {
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
 }
 export default function ItemPage({ tag, works, category, type }: Props) {
-  const metas = useMetas();
+  const metas = useMetaContext();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const photosEnhanced =
     itemLayout === Layout.MULTIPLE

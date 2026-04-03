@@ -5,7 +5,7 @@ import { ROUTES } from "@/constants/specific/routes";
 import { useSession } from "@/app/context/sessionProvider";
 import Link from "next/link";
 import { useTheme } from "@/app/context/themeProvider";
-import { useMetas } from "@/app/context/metaProvider";
+import { useMetaContext } from "@/app/context/metaProvider";
 import { KEY_META } from "@/constants/admin";
 import React from "react";
 
@@ -15,7 +15,7 @@ type Props = {
 
 export default function Footer({ themePage }: Props) {
   const session = useSession();
-  const metas = useMetas();
+  const metas = useMetaContext();
   const theme = useTheme();
 
   return (

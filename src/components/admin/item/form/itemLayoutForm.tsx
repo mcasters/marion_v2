@@ -4,7 +4,7 @@ import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
 import Image from "next/image";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
-import { useMetas } from "@/app/context/metaProvider.tsx";
+import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import useActionResult from "@/components/hooks/useActionResult.ts";
 import { TYPE } from "@/db/schema.ts";
 import { updateMeta } from "@/app/admin/meta/action.ts";
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function ItemLayoutForm({ type }: Props) {
-  const metas = useMetas();
+  const metas = useMetaContext();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
   const [layout, setLayout] = useState<string>(itemLayout.toString());
   const [darkBackground, setDarkBackground] = useState<boolean>(

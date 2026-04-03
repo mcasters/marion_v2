@@ -12,7 +12,7 @@ import { getHomeLayout } from "@/lib/utils/commonUtils";
 import AuthStatus from "@/components/auth/authStatus";
 import { useSession } from "@/app/context/sessionProvider";
 import AdminNav from "@/components/layout/admin/adminNav";
-import { useMetas } from "@/app/context/metaProvider";
+import { useMetaContext } from "@/app/context/metaProvider";
 import { HomeLayout } from "@/lib/type";
 import { hexToRgb } from "@/lib/utils/themeUtils";
 import { KEY_META } from "@/constants/admin.ts";
@@ -27,7 +27,7 @@ export default function Layout({ introduction, children }: Props) {
   const theme = useTheme();
   const path = `/${usePathname().split("/")[1]}`;
   const session = useSession();
-  const metas = useMetas();
+  const metas = useMetaContext();
   const isPlainHomeLayout = getHomeLayout(metas) === HomeLayout.PLAIN;
   const isHome = path === ROUTES.HOME;
   const isWork =

@@ -14,6 +14,6 @@ export function MetaProvider({ metaMap, children }: Props) {
   );
 }
 
-export function useMetas() {
+export function useMetaContext() {
   return useContext(MetaContext);
 }
