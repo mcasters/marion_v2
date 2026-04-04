@@ -133,7 +133,7 @@ export interface Message {
   date: Date;
   dateUpdated: Date | null;
   text: string;
-  author: User;
+  author: { email: string } | null;
 }
 
 export enum Layout {

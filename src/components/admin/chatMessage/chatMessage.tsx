@@ -32,7 +32,7 @@ export default function ChatMessage({ message, editableMessage }: Props) {
             : theme.other.main.link,
         }}
       >
-        {`${message.author.email} - ${new Date(message.date).toLocaleDateString("fr-FR")}${
+        {`${message.author?.email} - ${new Date(message.date).toLocaleDateString("fr-FR")}${
           message.dateUpdated
             ? " -" +
               ` Mis à jour le ${new Date(message.dateUpdated).toLocaleDateString("fr-FR")}`

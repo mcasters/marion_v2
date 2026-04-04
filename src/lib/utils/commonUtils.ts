@@ -8,7 +8,6 @@ import {
   ItemDarkBackground,
   Layout,
   Message,
-  Meta,
   Post,
   Work,
 } from "@/lib/type.ts";
@@ -36,12 +35,6 @@ export const createNestedObject = (obj, key, ...keys) => {
     ? // @ts-expect-error: A spread argument must either have a tuple type or be passed to a rest parameter.
       createNestedObject(obj[key] || (obj[key] = {}), ...keys)
     : obj;
-};
-
-export const getMetaMap = (metas: Meta[]): Map<string, string> => {
-  const map = new Map();
-  metas.forEach((meta) => map.set(meta.key, meta.text));
-  return map;
 };
 
 export const getThumbnailSrc = (item: AdminCategory | Work | Post) => {
@@ -156,9 +149,7 @@ export const getEmptyMessage = (): Message => {
     dateUpdated: null,
     text: "",
     author: {
-      id: 0,
       email: "",
-      isAdmin: false,
     },
   };
 };

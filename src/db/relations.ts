@@ -20,6 +20,12 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.message.userId,
     }),
   },
+  message: {
+    author: r.one.user({
+      from: r.message.userId,
+      to: r.user.id,
+    }),
+  },
   paintingCategory: {
     paintings: r.many.painting({
       from: r.paintingCategory.id,
