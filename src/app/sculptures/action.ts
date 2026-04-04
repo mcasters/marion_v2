@@ -40,6 +40,9 @@ export const getSculptureCategories = async (): Promise<
 
 export async function getSculptureWorksByYear(year: string): Promise<Work[]> {
   return await db.query.sculpture.findMany({
+    columns: {
+      createdAt: false,
+    },
     with: { images: true },
     where: {
       date: {
@@ -69,6 +72,9 @@ export async function getSculptureWorksByCategory(
   if (categoryKey === "no-category") {
     const category = getNoCategory(TYPE.SCULPTURE) as SculptureCategory;
     const works = await db.query.sculpture.findMany({
+      columns: {
+        createdAt: false,
+      },
       with: { images: true },
       where: { categoryId: { isNull: true } },
       orderBy: { date: "desc" },
@@ -79,6 +85,9 @@ export async function getSculptureWorksByCategory(
       where: { key: categoryKey },
       with: {
         sculptures: {
+          columns: {
+            createdAt: false,
+          },
           with: { images: true },
           orderBy: { date: "desc" },
         },

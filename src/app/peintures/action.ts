@@ -39,6 +39,9 @@ export const getPaintingCategories = async (): Promise<PaintingCategory[]> => {
 
 export async function getPaintingWorksByYear(year: string): Promise<Work[]> {
   const dbData = await db.query.painting.findMany({
+    columns: {
+      createdAt: false,
+    },
     where: {
       date: {
         gte: new Date(`${year}-01-01`),
@@ -48,7 +51,7 @@ export async function getPaintingWorksByYear(year: string): Promise<Work[]> {
     orderBy: { date: "desc" },
   });
 
-  return dbData.map((data) => createWorkObject(data, TYPE.PAINTING));
+  return dbData.map((data) => createWorkObject(data));
 }
 
 export async function getPaintingCategory(
@@ -69,18 +72,22 @@ export async function getPaintingWorksByCategory(
   if (categoryKey === "no-category") {
     const category = getNoCategory(TYPE.PAINTING) as PaintingCategory;
     const paintings = await db.query.painting.findMany({
+      columns: {
+        createdAt: false,
+      },
       where: { categoryId: { isNull: true } },
       orderBy: { date: "desc" },
     });
-    const works = paintings.map((data) =>
-      createWorkObject(data, TYPE.PAINTING),
-    );
+    const works = paintings.map((data) => createWorkObject(data));
     return { category, works };
   } else {
     const result = await db.query.paintingCategory.findFirst({
       where: { key: categoryKey },
       with: {
         paintings: {
+          columns: {
+            createdAt: false,
+          },
           orderBy: { date: "desc" },
         },
       },
@@ -89,7 +96,7 @@ export async function getPaintingWorksByCategory(
       const { paintings, ...rest } = result;
       return {
         category: rest,
-        works: paintings.map((data) => createWorkObject(data, TYPE.PAINTING)),
+        works: paintings.map((data) => createWorkObject(data)),
       };
     }
   }

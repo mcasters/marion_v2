@@ -5,16 +5,11 @@ import { JSX } from "react";
 import { KEY_META } from "@/constants/admin.ts";
 import {
   content,
-  contentImage,
-  drawing,
   drawingCategory,
   meta,
-  painting,
   paintingCategory,
   presetColor,
-  sculpture,
   sculptureCategory,
-  sculptureImage,
   theme,
   TYPE,
 } from "@/db/schema.ts";
@@ -24,11 +19,64 @@ type StringKeys<T> = {
 }[keyof T];
 export type OnlyString<T> = { [k in StringKeys<T>]: boolean };
 
-export type Painting = typeof painting.$inferSelect;
-export type Sculpture = typeof sculpture.$inferSelect & {
-  images: (typeof sculptureImage.$inferSelect)[];
+type Common = {
+  id: number;
+  title: string;
+  date: Date;
+  technique: string;
+  description: string;
+  height: number;
+  width: number;
+  isToSell: boolean;
+  price: number | null;
+  sold: boolean;
+  categoryId: number | null;
+  isOut: boolean;
+  outInformation: string;
 };
-export type Drawing = typeof drawing.$inferSelect;
+
+export type dbPainting = Common & {
+  type: TYPE.PAINTING;
+  imageFilename: string;
+  imageWidth: number;
+  imageHeight: number;
+};
+export type dbDrawing = Common & {
+  type: TYPE.DRAWING;
+  imageFilename: string;
+  imageWidth: number;
+  imageHeight: number;
+};
+
+export type WorkImage = {
+  filename: string;
+  width: number;
+  height: number;
+};
+
+export type Work = Common & {
+  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
+  length: number;
+  images: WorkImage[];
+};
+
+export interface Image {
+  filename: string;
+  width: number;
+  height: number;
+  isMain?: boolean;
+}
+
+export type EnhancedImage = {
+  work?: Work;
+  littleScr?: string;
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  title?: string;
+  year?: number;
+};
 
 export type Post = {
   id: number;
@@ -36,12 +84,7 @@ export type Post = {
   title: string;
   date: Date;
   text: string;
-  images: {
-    filename: string;
-    width: number;
-    height: number;
-    isMain: boolean;
-  }[];
+  images: Image[];
 };
 
 export type PaintingCategory = typeof paintingCategory.$inferSelect;
@@ -53,7 +96,7 @@ export type Theme = typeof theme.$inferSelect;
 export type PresetColor = typeof presetColor.$inferSelect;
 
 export type Content = typeof content.$inferSelect & {
-  images: (typeof contentImage.$inferSelect)[];
+  images?: Image[];
 };
 
 export type Meta = typeof meta.$inferSelect;
@@ -68,38 +111,12 @@ export type AdminCategory = Category & {
   count: number;
 };
 
-export interface Image {
-  filename: string;
-  width: number;
-  height: number;
-  isMain: boolean;
-}
-
 export type FileInfo = {
   filename: string;
   width: number;
   height: number;
   isMain: boolean;
 };
-
-export interface Work {
-  id: number;
-  type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING;
-  title: string;
-  date: Date;
-  technique: string;
-  description: string;
-  height: number;
-  width: number;
-  length: number;
-  isToSell: boolean;
-  price: number | null;
-  sold: boolean;
-  images: Image[];
-  categoryId: number | null;
-  isOut: boolean;
-  outInformation: string;
-}
 
 export interface User {
   id: number;
@@ -137,32 +154,6 @@ export enum HomeLayout {
 }
 
 export type KeyMeta = (typeof KEY_META)[keyof typeof KEY_META];
-
-export interface Photo {
-  src: string;
-  width: number;
-  height: number;
-  alt: string;
-  title: string;
-  date: Date;
-  isMain: boolean;
-}
-
-export type PhotoTab = {
-  sm: Photo[];
-  md: Photo[];
-  lg: Photo[];
-};
-
-export interface PhotoEnhanced extends Photo {
-  item: Work;
-}
-
-export type PhotoTabEnhanced = {
-  sm: PhotoEnhanced[];
-  md: PhotoEnhanced[];
-  lg: PhotoEnhanced[];
-};
 
 export type ThemeTarget = {
   background: string;
