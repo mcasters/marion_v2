@@ -101,24 +101,6 @@ export async function deleteDrawing(id: number) {
   }
 }
 
-export const getDrawingWorks = async (): Promise<Work[]> => {
-  const drawings = await db.query.drawing.findMany({
-    orderBy: { date: "desc" },
-  });
-  return drawings.map((drawing) => {
-    return { ...createWorkObject(drawing, TYPE.DRAWING) };
-  });
-};
-
-export const getDrawingAdminCategories = async (
-  works: Work[],
-): Promise<AdminCategory[]> => {
-  const categories = await db.query.drawingCategory.findMany({
-    orderBy: { value: "desc" },
-  });
-  return createAdminCategoryObjects(categories, works, TYPE.DRAWING);
-};
-
 export async function createDrawingCategory(formData: FormData) {
   const value = formData.get("value") as string;
   const data = createCategoryData(formData);
@@ -181,3 +163,24 @@ export async function deleteDrawingCategory(id: number) {
     return { message: `Erreur à la suppression : ${e}`, isError: true };
   }
 }
+
+export const getDrawingWorks = async (): Promise<Work[]> => {
+  const drawings = await db.query.drawing.findMany({
+    columns: {
+      createdAt: false,
+    },
+    orderBy: { date: "desc" },
+  });
+  return drawings.map((drawing) => {
+    return { ...createWorkObject(drawing) };
+  });
+};
+
+export const getDrawingAdminCategories = async (
+  works: Work[],
+): Promise<AdminCategory[]> => {
+  const categories = await db.query.drawingCategory.findMany({
+    orderBy: { value: "desc" },
+  });
+  return createAdminCategoryObjects(categories, works, TYPE.DRAWING);
+};

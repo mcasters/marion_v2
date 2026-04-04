@@ -124,22 +124,6 @@ export async function deleteSculpture(id: number) {
   }
 }
 
-export const getSculptureWorks = async (): Promise<Work[]> => {
-  return await db.query.sculpture.findMany({
-    with: { images: true },
-    orderBy: { date: "desc" },
-  });
-};
-
-export const getSculptureCategories = async (
-  works: Work[],
-): Promise<AdminCategory[]> => {
-  const categories = await db.query.sculptureCategory.findMany({
-    orderBy: { value: "desc" },
-  });
-  return createAdminCategoryObjects(categories, works, TYPE.SCULPTURE);
-};
-
 export async function createSculptureCategory(formData: FormData) {
   const value = formData.get("value") as string;
   const data = createCategoryData(formData);
@@ -202,3 +186,22 @@ export async function deleteSculptureCategory(id: number) {
     return { message: `Erreur à la suppression : ${e}`, isError: true };
   }
 }
+
+export const getSculptureWorks = async (): Promise<Work[]> => {
+  return await db.query.sculpture.findMany({
+    columns: {
+      createdAt: false,
+    },
+    with: { images: true },
+    orderBy: { date: "desc" },
+  });
+};
+
+export const getSculptureCategories = async (
+  works: Work[],
+): Promise<AdminCategory[]> => {
+  const categories = await db.query.sculptureCategory.findMany({
+    orderBy: { value: "desc" },
+  });
+  return createAdminCategoryObjects(categories, works, TYPE.SCULPTURE);
+};
