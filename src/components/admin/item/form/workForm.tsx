@@ -2,7 +2,7 @@
 
 import React, { useActionState, useState } from "react";
 import s from "@/components/admin/admin.module.css";
-import { Category, Image, Work } from "@/lib/type.ts";
+import { Category, Work, WorkImage } from "@/lib/type.ts";
 import SubmitButton from "@/components/admin/common/button/submitButton.tsx";
 import CancelButton from "@/components/admin/common/button/cancelButton.tsx";
 import ImageInput from "@/components/admin/common/image/imageInput.tsx";
@@ -247,7 +247,7 @@ export default function WorkForm({ work, onClose, categories }: Props) {
       </div>
       <ImageInput
         filesPath={workItem.images.map(
-          (i: Image) => `/images/${work.type}/sm/${i.filename}`,
+          (i: WorkImage) => `/images/${work.type}/sm/${i.filename}`,
         )}
         isMultiple={isSculpture}
         smallImageOption={true}

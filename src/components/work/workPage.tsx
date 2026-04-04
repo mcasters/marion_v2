@@ -6,8 +6,6 @@ import s from "@/components/work/workPage.module.css";
 import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import { getWorkLayout } from "@/lib/utils/commonUtils.ts";
 import WorkLayout from "@/components/work/workLayout.tsx";
-import { getPhotoTabEnhanced } from "@/lib/utils/imageUtils.ts";
-import { KEY_META } from "@/constants/admin.ts";
 import Gallery from "@/components/image/gallery/gallery.tsx";
 import { TYPE } from "@/db/schema.ts";
 
@@ -20,13 +18,6 @@ interface Props {
 export default function WorkPage({ tag, works, category, type }: Props) {
   const metas = useMetaContext();
   const [itemLayout, itemDarkBackground] = getWorkLayout(metas, type);
-  const photosEnhanced =
-    itemLayout === Layout.MULTIPLE
-      ? getPhotoTabEnhanced(
-          works,
-          `${works[0].title} - ${type} de ${metas.get(KEY_META.OWNER)}`,
-        )
-      : undefined;
 
   return (
     <>
@@ -43,7 +34,7 @@ export default function WorkPage({ tag, works, category, type }: Props) {
       <div
         className={`${s.content} ${itemLayout === Layout.DOUBLE ? s.doubleContent : undefined} ${itemDarkBackground === ItemDarkBackground.TRUE ? s.darkBackground : ""}`}
       >
-        {itemLayout === Layout.MULTIPLE && <Gallery works={works} />}
+        {itemLayout === Layout.MULTIPLE && <Gallery items={works} />}
         {itemLayout !== Layout.MULTIPLE &&
           works.map((item, i) => (
             <WorkLayout

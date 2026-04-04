@@ -1,9 +1,8 @@
 "use client";
 
 import s from "./workLayout.module.css";
-import { Layout, Work } from "@/lib/type.ts";
+import { EnhancedImage, Layout, Work } from "@/lib/type.ts";
 import React, { useMemo, useState } from "react";
-import { getItemPhotoTab } from "@/lib/utils/imageUtils.ts";
 import { useMetaContext } from "@/app/context/metaProvider.tsx";
 import ImageInfos from "@/components/image/common/imageInfos.tsx";
 import Lightbox from "@/components/image/lightbox/lightbox.tsx";
@@ -21,21 +20,28 @@ export default function WorkLayout({ work, layout, priority }: Props) {
   const metas = useMetaContext();
   const isSmall = useWindowRect().innerWidth < DEVICE.SMALL;
   const [index, setIndex] = useState(-1);
-  const photoTab = useMemo(
-    () =>
-      getItemPhotoTab(
-        work,
-        `${work.title} - ${work.type} de ${metas.get(KEY_META.OWNER)}`,
-      ),
-    [work],
-  );
-  const photos = isSmall ? photoTab.sm : photoTab.md;
   const _width = isSmall
     ? IMAGE_INFO[layout].WIDTH.small
     : IMAGE_INFO[layout].WIDTH.large;
   const _height = isSmall
     ? IMAGE_INFO[layout].HEIGHT.small
     : IMAGE_INFO[layout].HEIGHT.large;
+
+  const enhancedImages: EnhancedImage[] = useMemo(() => {
+    const tab: EnhancedImage[] = [];
+    work.images.forEach((image) => {
+      tab.push({
+        littleScr: `/images/${work.type}/${isSmall ? "sm/" : "md/"}${image.filename}`,
+        src: `/images/${work.type}/${isSmall ? "md/" : ""}${image.filename}`,
+        width: image.width,
+        height: image.height,
+        alt: `${work.title} - ${work.type} de ${metas.get(KEY_META.OWNER)}`,
+        title: work.title,
+        year: new Date(work.date).getFullYear(),
+      });
+    });
+    return tab;
+  }, [work]);
 
   return (
     <article
@@ -48,21 +54,21 @@ export default function WorkLayout({ work, layout, priority }: Props) {
           layout === Layout.SCULPTURE ? s.sculptureContainer : undefined
         }
       >
-        {photos.map((p, index) => {
-          const isLandscape = p.width / p.height >= 1.03;
+        {work.images.map((image, index) => {
+          const isLandscape = image.width / image.height >= 1.03;
           const onLeft = Layout.SCULPTURE && index % 2 === 0;
           return (
             <Image
               key={index}
-              src={p.src}
-              width={p.width}
-              height={p.height}
+              src={`/images/${work.type}/${isSmall ? "sm/" : "md/"}${image.filename}`}
+              width={image.width}
+              height={image.height}
               priority={priority}
               style={{
                 width: isLandscape ? `${_width}vw` : "auto",
                 height: !isLandscape ? `${_height}vh` : "auto",
               }}
-              alt={p.alt}
+              alt={`${work.title} - ${work.type} de ${metas.get(KEY_META.OWNER)}`}
               unoptimized
               onClick={() => setIndex(index)}
               className={
@@ -77,7 +83,7 @@ export default function WorkLayout({ work, layout, priority }: Props) {
           );
         })}
         <Lightbox
-          photos={isSmall ? photoTab.md : photoTab.lg}
+          enhancedImages={enhancedImages}
           index={index}
           onClose={() => setIndex(-1)}
           isSmall={isSmall}

@@ -31,9 +31,9 @@ import { TYPE } from "@/db/schema.ts";
 import {
   AdminCategory,
   Category,
-  Drawing,
+  dbDrawing,
+  dbPainting,
   FileInfo,
-  Painting,
   Work,
 } from "@/lib/type.ts";
 import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
@@ -185,33 +185,13 @@ export const createCategoryData = (formData: FormData) => {
     imageFilename: rawFormData.filename as string,
   };
 };
-export const createWorkObject = (
-  data: Painting | Drawing,
-  type: TYPE.PAINTING | TYPE.DRAWING,
-): Work => {
+export const createWorkObject = (data: dbPainting | dbDrawing): Work => {
+  const { imageFilename, imageHeight, imageWidth, ...rest } = data;
   return {
-    id: data.id,
-    type,
-    title: data.title,
-    date: new Date(data.date),
-    technique: data.technique,
-    description: data.description,
-    height: data.height,
-    width: data.width,
+    ...rest,
     length: 0,
-    isToSell: data.isToSell,
-    price: data.price,
-    sold: data.sold,
-    isOut: data.isOut,
-    outInformation: data.outInformation,
-    categoryId: data.categoryId,
     images: [
-      {
-        filename: data.imageFilename,
-        width: data.imageWidth,
-        height: data.imageHeight,
-        isMain: true,
-      },
+      { filename: imageFilename, width: imageWidth, height: imageHeight },
     ],
   };
 };

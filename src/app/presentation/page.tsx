@@ -3,15 +3,14 @@ import {
   getInspiration,
   getMetaMap,
   getPresentation,
-  getPresentationImage,
 } from "@/lib/utils/commonUtils";
 import { Metadata } from "next";
 import { KEY_META } from "@/constants/admin.ts";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
-import { getPhotoTabFromImages } from "@/lib/utils/imageUtils.ts";
 import s from "@/styles/page.module.css";
 import { getMetas } from "@/app/admin/meta/action.ts";
-import { getContentsFull } from "@/app/admin/contentAction.ts";
+import { getContentPresentation } from "@/app/admin/contentAction.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
@@ -32,22 +31,24 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
 }
 
 export default async function Presentation() {
-  const contents = await getContentsFull();
+  const contents = await getContentPresentation();
   const demarche = getDemarche(contents);
   const inspiration = getInspiration(contents);
+  const images =
+    contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
 
   return (
     <div className={`${s.limitedWidth} preLine`}>
       <h1 className="hidden">Présentation</h1>
       <FormattedPhoto
-        photoTab={getPhotoTabFromImages(
-          getPresentationImage(contents),
-          "miscellaneous",
-          `Photo de ${process.env.TITLE}`,
-        )}
+        folder="miscellaneous"
+        filename={images[0].filename}
+        width={images[0].width}
+        height={images[0].height}
+        alt={`Photo de ${process.env.TITLE}`}
         priority
-        width={{ small: 80, large: 35 }}
-        height={{ small: 40, large: 40 }}
+        displayWidth={{ small: 80, large: 35 }}
+        displayHeight={{ small: 40, large: 40 }}
       />
       <section className={s.section}>
         <p>{getPresentation(contents)}</p>
