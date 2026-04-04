@@ -16,8 +16,28 @@ export const getContentsFull = async (): Promise<Content[]> => {
   return await db.query.content.findMany();
 };
 
-export const getContentPresentation = async (): Promise<Content[]> => {
-  return await db.query.content.findMany({
+export const getContactContent = async (): Promise<
+  Map<LABEL.ADDRESS | LABEL.PHONE | LABEL.EMAIL | LABEL.TEXT_CONTACT, string>
+> => {
+  const contents = await db.query.content.findMany({
+    columns: { label: true, text: true },
+    where: {
+      label: {
+        OR: [LABEL.ADDRESS, LABEL.PHONE, LABEL.EMAIL, LABEL.TEXT_CONTACT],
+      },
+    },
+  });
+  const map = new Map();
+  contents.forEach((content) => map.set(content.label, content.text));
+  return map;
+};
+
+export const getPresentationContent = async (): Promise<{
+  text: Map<LABEL.PRESENTATION | LABEL.DEMARCHE | LABEL.INSPIRATION, string>;
+  image: Image | null;
+}> => {
+  const contents = await db.query.content.findMany({
+    columns: { label: true, text: true },
     with: {
       images: {
         columns: {
@@ -31,6 +51,13 @@ export const getContentPresentation = async (): Promise<Content[]> => {
       label: { OR: [LABEL.PRESENTATION, LABEL.DEMARCHE, LABEL.INSPIRATION] },
     },
   });
+  const map = new Map();
+  let image: Image | null = null;
+  contents.forEach((content) => {
+    map.set(content.label, content.text);
+    if (content.images.length) image = content.images[0];
+  });
+  return { text: map, image: image };
 };
 
 export const getHomeImages = async (): Promise<Image[]> => {

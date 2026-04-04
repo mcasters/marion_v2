@@ -1,17 +1,12 @@
 import Link from "next/link";
-import {
-  getAddress,
-  getContactText,
-  getEmail,
-  getMetaMap,
-  getPhone,
-} from "@/lib/utils/commonUtils";
+import { getMetaMap } from "@/lib/utils/commonUtils";
 import InstagramIcon from "@/components/icons/instagramIcon";
 import { KEY_META } from "@/constants/admin";
 import { Metadata } from "next";
 import s from "@/styles/page.module.css";
 import { getMetas } from "@/app/admin/meta/action.ts";
-import { getContentsFull } from "@/app/admin/contentAction.ts";
+import { getContactContent } from "@/app/admin/contentAction.ts";
+import { LABEL } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
   const metas = getMetaMap(await getMetas());
@@ -32,10 +27,11 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
 }
 
 export default async function Contact() {
-  const contents = await getContentsFull();
+  const contents = await getContactContent();
   const metas = getMetaMap(await getMetas());
-  const email = getEmail(contents);
-  const contactText = getContactText(contents);
+  const phone = contents.get(LABEL.PHONE);
+  const email = contents.get(LABEL.EMAIL);
+  const contactText = contents.get(LABEL.TEXT_CONTACT);
   const owner = metas.get(KEY_META.OWNER);
   const instagram = metas.get(KEY_META.INSTAGRAM);
 
@@ -44,12 +40,10 @@ export default async function Contact() {
       <h1 className="hidden">Contacter {owner}</h1>
       <address className={s.section}>
         <p>{owner}</p>
-        <p>{getAddress(contents)}</p>
+        <p>{contents.get(LABEL.ADDRESS)}</p>
         <br />
         <p>
-          <Link href={`tel:+33${getPhone(contents)}`}>
-            {getPhone(contents)}
-          </Link>
+          <Link href={`tel:+33${phone}`}>{phone}</Link>
         </p>
         <br />
         <p>
