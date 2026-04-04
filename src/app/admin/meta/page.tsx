@@ -1,13 +1,12 @@
 import React, { Fragment } from "react";
 import { KEY_META, SEO } from "@/constants/admin.ts";
-import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import InputForm from "@/components/admin/text/inputForm.tsx";
 import { KeyMeta } from "@/lib/type.ts";
-import { getMetas, updateMeta } from "@/app/admin/meta/action.ts";
+import { getMetasByKey, updateMeta } from "@/app/admin/meta/action.ts";
 
 export default async function Page() {
-  const metaMap = getMetaMap(await getMetas());
+  const metaMap = await getMetasByKey([KEY_META.OWNER]);
   const isM = metaMap.get(KEY_META.OWNER)?.startsWith("M");
 
   return (

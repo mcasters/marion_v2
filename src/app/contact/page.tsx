@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import InstagramIcon from "@/components/icons/instagramIcon";
 import { KEY_META } from "@/constants/admin";
 import { Metadata } from "next";
 import s from "@/styles/page.module.css";
-import { getMetas } from "@/app/admin/meta/action.ts";
+import { getMetas, getMetasByKey } from "@/app/admin/meta/action.ts";
 import { getContactContent } from "@/app/admin/contentAction.ts";
 import { LABEL } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: metas.get(KEY_META.DOCUMENT_TITLE_CONTACT),
@@ -28,12 +27,12 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
 
 export default async function Contact() {
   const contents = await getContactContent();
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetasByKey([KEY_META.OWNER, KEY_META.INSTAGRAM]);
+  const owner = metas.get(KEY_META.OWNER);
+  const instagram = metas.get(KEY_META.INSTAGRAM);
   const phone = contents.get(LABEL.PHONE);
   const email = contents.get(LABEL.EMAIL);
   const contactText = contents.get(LABEL.TEXT_CONTACT);
-  const owner = metas.get(KEY_META.OWNER);
-  const instagram = metas.get(KEY_META.INSTAGRAM);
 
   return (
     <>

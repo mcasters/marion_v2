@@ -1,5 +1,4 @@
 import WorkPage from "@/components/work/workPage.tsx";
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import { Metadata } from "next";
 import { KEY_META } from "@/constants/admin";
 import { getPaintingWorksByYear } from "@/app/peintures/action.ts";
@@ -14,7 +13,7 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata | undefined> {
   const year = await params;
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: `${metas.get(KEY_META.DOCUMENT_TITLE_PAINTING)} - Année ${year}`,

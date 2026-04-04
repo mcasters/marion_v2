@@ -3,7 +3,6 @@ import { Metadata } from "next";
 import Layout from "@/components/layout/layout";
 import Providers from "./context/providers";
 import "@/styles/globals-specific.css";
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import React from "react";
 import StyledJsxRegistry from "./registry";
 import { Cormorant_SC, EB_Garamond } from "next/font/google";
@@ -34,7 +33,7 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: metas.get(KEY_META.DOCUMENT_TITLE_HOME),
@@ -67,11 +66,7 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={`${garamond.variable} ${cormorantSC.variable}`}>
       <body>
-        <Providers
-          session={session}
-          theme={structuredTheme}
-          metaMap={getMetaMap(metas)}
-        >
+        <Providers session={session} theme={structuredTheme} metaMap={metas}>
           <StyledJsxRegistry>
             <Layout introduction={intro ?? ""}>{children}</Layout>
           </StyledJsxRegistry>

@@ -1,6 +1,5 @@
 import WorkPage from "@/components/work/workPage.tsx";
 import { Metadata } from "next";
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import { KEY_META } from "@/constants/admin";
 import { getSculptureWorksByYear } from "@/app/sculptures/action.ts";
 import { TYPE } from "@/db/schema.ts";
@@ -14,7 +13,7 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata | undefined> {
   const { year } = await params;
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: `${metas.get(KEY_META.DOCUMENT_TITLE_SCULPTURE)} - Année ${year}`,

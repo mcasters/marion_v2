@@ -1,6 +1,5 @@
 import WorkHome from "@/components/work/workHome.tsx";
 import { Metadata } from "next";
-import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
 import {
   getPaintingCategories,
@@ -10,7 +9,7 @@ import { TYPE } from "@/db/schema.ts";
 import { getMetas } from "@/app/admin/meta/action.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: metas.get(KEY_META.DOCUMENT_TITLE_PAINTING_HOME),

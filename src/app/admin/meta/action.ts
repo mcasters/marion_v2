@@ -6,8 +6,28 @@ import { meta } from "@/db/schema.ts";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export const getMetas = async (): Promise<(typeof meta.$inferSelect)[]> =>
-  await db.select().from(meta);
+export const getMetas = async (): Promise<Map<string, string>> => {
+  const metas = await db.query.meta.findMany({
+    columns: { id: false },
+  });
+  const map = new Map();
+  metas.forEach((meta) => map.set(meta.key, meta.text));
+  return map;
+};
+
+export const getMetasByKey = async (
+  keyMeta: string[],
+): Promise<Map<string, string>> => {
+  const metas = await db.query.meta.findMany({
+    columns: { id: false },
+    where: {
+      key: { OR: [...keyMeta] },
+    },
+  });
+  const map = new Map();
+  metas.forEach((meta) => map.set(meta.key, meta.text));
+  return map;
+};
 
 export async function updateMeta(
   initialState: any,
@@ -27,9 +47,11 @@ export async function updateMeta(
       text = `${layout},${darkBackground}`;
     } else text = formData.get("text") as string;
 
-    const metaFind = await db.select().from(meta).where(eq(meta.key, key));
+    const metaFound = await db.query.meta.findFirst({
+      where: { key },
+    });
 
-    if (!metaFind) {
+    if (!metaFound) {
       await db.insert(meta).values({
         key,
         text,

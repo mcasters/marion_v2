@@ -1,6 +1,5 @@
 import WorkPage from "@/components/work/workPage.tsx";
 import { Metadata } from "next";
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import { KEY_META } from "@/constants/admin";
 import {
   getDrawingCategory,
@@ -16,7 +15,7 @@ type Props = {
 export async function generateMetadata({
   params,
 }: Props): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   const categoryKey = (await params).category;
   const category = await getDrawingCategory(categoryKey);
 

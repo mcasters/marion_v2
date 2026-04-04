@@ -1,4 +1,3 @@
-import { getMetaMap } from "@/lib/utils/commonUtils";
 import { Metadata } from "next";
 import { KEY_META } from "@/constants/admin.ts";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
@@ -8,7 +7,7 @@ import { getPresentationContent } from "@/app/admin/contentAction.ts";
 import { LABEL } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: metas.get(KEY_META.DOCUMENT_TITLE_PRESENTATION),

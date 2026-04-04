@@ -4,10 +4,9 @@ import style from "@/components/admin/admin.module.css";
 import AdminTheme from "@/components/admin/theme/adminTheme.tsx";
 import ChatMessages from "@/components/admin/chatMessage/chatMessages.tsx";
 import React from "react";
-import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
 import InputForm from "@/components/admin/text/inputForm.tsx";
-import { getMetas, updateMeta } from "@/app/admin/meta/action.ts";
+import { getMetasByKey, updateMeta } from "@/app/admin/meta/action.ts";
 import { getMessages } from "@/app/admin/messageAction.ts";
 
 export const metadata: Metadata = {
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function AdminHome() {
   const messages = await getMessages();
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetasByKey([KEY_META.FOOTER]);
 
   return (
     <>

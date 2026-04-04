@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import { Post } from "@/lib/type";
 
 import { Metadata } from "next";
-import { getMetaMap } from "@/lib/utils/commonUtils.ts";
 import { KEY_META } from "@/constants/admin.ts";
 import s from "@/styles/page.module.css";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
@@ -12,7 +11,7 @@ import { getMetas } from "@/app/admin/meta/action.ts";
 import { TYPE } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
-  const metas = getMetaMap(await getMetas());
+  const metas = await getMetas();
   if (metas) {
     return {
       title: metas.get(KEY_META.DOCUMENT_TITLE_POST),
