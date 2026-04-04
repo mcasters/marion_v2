@@ -3,10 +3,10 @@ import { KEY_META, SEO } from "@/constants/admin.ts";
 import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import InputForm from "@/components/admin/text/inputForm.tsx";
 import { KeyMeta } from "@/lib/type.ts";
-import { getMetasByKey, updateMeta } from "@/app/admin/meta/action.ts";
+import { getMetas, updateMeta } from "@/app/admin/meta/action.ts";
 
 export default async function Page() {
-  const metaMap = await getMetasByKey([KEY_META.OWNER]);
+  const metaMap = await getMetas();
   const isM = metaMap.get(KEY_META.OWNER)?.startsWith("M");
 
   return (

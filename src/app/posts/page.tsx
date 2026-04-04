@@ -35,26 +35,24 @@ export default async function Posts() {
     <>
       <h1 className="hidden">Posts</h1>
       {posts.map((post: Post) => {
-        const mainTab = post.images.filter((image) => image.isMain);
-        const mainImage = mainTab[0];
-        const hasImageForGallery = post.images.length > mainTab.length;
+        const mainImage = post.images.filter((image) => image.isMain);
+        const hasImageForGallery = post.images.length > mainImage.length;
         return (
           <Fragment key={post.id}>
             <article className={s.postContainer}>
-              <>
+              {mainImage.length > 0 && (
                 <FormattedPhoto
                   folder={TYPE.POST}
-                  filename={mainImage.filename}
-                  width={mainImage.width}
-                  height={mainImage.height}
+                  filename={mainImage[0].filename}
+                  width={mainImage[0].width}
+                  height={mainImage[0].height}
                   alt={`Photo du post "${post.title}" de ${process.env.TITLE}`}
                   priority={true}
                   displayWidth={{ small: 65, large: 30 }}
                   displayHeight={{ small: 35, large: 50 }}
                   withLightbox={true}
                 />
-              </>
-
+              )}
               <div className={s.postInfo}>
                 <h2>{post.title}</h2>
                 <time>{new Date(post.date).getFullYear()}</time>

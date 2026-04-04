@@ -13,8 +13,8 @@ export const getEnhancedImages = (
   items.forEach((item) => {
     item.images.forEach((image) => {
       let obj = {
-        littleScr: `/images/${item.type}/${isSmall ? "sms/" : "md/"}${image.filename}`,
-        src: `/images/${item.type}/${isSmall ? "mds/" : ""}${image.filename}`,
+        littleScr: `/images/${item.type}/${isSmall ? "sm/" : "md/"}${image.filename}`,
+        src: `/images/${item.type}/${isSmall ? "md/" : ""}${image.filename}`,
         width: image.width,
         height: image.height,
         alt:

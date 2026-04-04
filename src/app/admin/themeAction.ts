@@ -23,8 +23,8 @@ export async function createTheme(newTheme: Theme) {
         isError: true,
         theme: undefined,
       };
-
-    const newId = await db.insert(theme).values(newTheme).$returningId();
+    const { id, ...rest } = newTheme;
+    const newId = await db.insert(theme).values(rest).$returningId();
     const savedTheme = await db.query.theme.findFirst({
       where: { id: newId[0].id },
     });

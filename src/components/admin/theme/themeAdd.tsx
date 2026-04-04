@@ -26,7 +26,7 @@ export default function ThemeAdd() {
         setIsSaved(true);
         setThemeName("");
       }
-      alert(message, isError);
+      alert(message, isError, 50000);
     }
   };
 
