@@ -1,18 +1,18 @@
-import { getIntroText } from "@/lib/utils/commonUtils";
 import s from "@/components/admin/admin.module.css";
 import React from "react";
 import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
-import {
-  getSliderLandscapeImages,
-  getSliderPortraitImages,
-} from "@/lib/utils/imageUtils";
 import HomeLayoutForm from "@/components/admin/home/homeLayoutForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm.tsx";
 import { LABEL } from "@/db/schema.ts";
-import { getContentsFull, updateContent } from "@/app/admin/contentAction.ts";
+import {
+  getHomeImages,
+  getHomeText,
+  updateContent,
+} from "@/app/admin/contentAction.ts";
 
 export default async function Home() {
-  const contents = await getContentsFull();
+  const text = await getHomeText();
+  const images = await getHomeImages();
 
   return (
     <div className={s.container}>
@@ -22,8 +22,8 @@ export default async function Home() {
       <div className="separate" />
       <h2 className={s.title2}>{`Texte d'accueil (facultatif)`}</h2>
       <TextAreaForm
-        text={getIntroText(contents)}
         dbKey={LABEL.INTRO}
+        text={text ?? ""}
         updateAction={updateContent}
       />
       <div className="separate" />
@@ -34,7 +34,7 @@ export default async function Home() {
         {`(Une ou plusieurs images possible. Format portrait mieux adapté)`}
       </p>
       <ImagesForm
-        images={getSliderPortraitImages(contents)}
+        images={images.filter((i) => i.isMain)}
         isMultiple={true}
         label={LABEL.SLIDER}
         acceptSmallImage={false}
@@ -48,7 +48,7 @@ export default async function Home() {
         {`(Une ou plusieurs images possible. Format paysage ou carré mieux adapté)`}
       </p>
       <ImagesForm
-        images={getSliderLandscapeImages(contents)}
+        images={images.filter((i) => !i.isMain)}
         isMultiple={true}
         label={LABEL.SLIDER}
         acceptSmallImage={false}

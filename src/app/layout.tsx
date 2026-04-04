@@ -3,14 +3,14 @@ import { Metadata } from "next";
 import Layout from "@/components/layout/layout";
 import Providers from "./context/providers";
 import "@/styles/globals-specific.css";
-import { getIntroText, getMetaMap } from "@/lib/utils/commonUtils";
+import { getMetaMap } from "@/lib/utils/commonUtils";
 import React from "react";
 import StyledJsxRegistry from "./registry";
 import { Cormorant_SC, EB_Garamond } from "next/font/google";
 import { KEY_META } from "@/constants/admin";
 import { getMetas } from "@/app/admin/meta/action.ts";
 import { getActiveTheme, getPresetColors } from "@/app/admin/themeAction.ts";
-import { getContentsFull } from "@/app/admin/contentAction.ts";
+import { getHomeText } from "@/app/admin/contentAction.ts";
 import { getSession } from "@/app/admin/authAction.ts";
 import { getStructHexaTheme } from "@/lib/utils/themeUtils.ts";
 
@@ -62,7 +62,7 @@ export default async function RootLayout({
   const pColors = await getPresetColors();
   const structuredTheme = getStructHexaTheme(theme, pColors);
   const metas = await getMetas();
-  const contents = await getContentsFull();
+  const intro = await getHomeText();
 
   return (
     <html lang="fr" className={`${garamond.variable} ${cormorantSC.variable}`}>
@@ -73,7 +73,7 @@ export default async function RootLayout({
           metaMap={getMetaMap(metas)}
         >
           <StyledJsxRegistry>
-            <Layout introduction={getIntroText(contents)}>{children}</Layout>
+            <Layout introduction={intro ?? ""}>{children}</Layout>
           </StyledJsxRegistry>
         </Providers>
       </body>

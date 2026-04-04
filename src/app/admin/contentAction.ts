@@ -1,6 +1,6 @@
 "use server";
 
-import { Content, Image } from "@/lib/type.ts";
+import { Image } from "@/lib/type.ts";
 import { revalidatePath } from "next/cache";
 import { AdminRouteLabel, RouteLabel } from "@/constants/specific/routes.ts";
 import { db } from "@/db";
@@ -12,8 +12,28 @@ import {
   resizeAndSaveImage,
 } from "@/lib/utils/serverUtils.ts";
 
-export const getContentsFull = async (): Promise<Content[]> => {
-  return await db.query.content.findMany();
+export const getHomeText = async (): Promise<string | undefined> => {
+  const content = await db.query.content.findFirst({
+    columns: { text: true },
+    where: { label: LABEL.INTRO },
+  });
+  return content?.text;
+};
+
+export const getHomeImages = async (): Promise<Image[]> => {
+  const res = await db.query.content.findFirst({
+    columns: {},
+    with: {
+      images: {
+        columns: {
+          id: false,
+          contentId: false,
+        },
+      },
+    },
+    where: { label: LABEL.SLIDER },
+  });
+  return res?.images ?? [];
 };
 
 export const getContactContent = async (): Promise<
@@ -58,22 +78,6 @@ export const getPresentationContent = async (): Promise<{
     if (content.images.length) image = content.images[0];
   });
   return { text: map, image: image };
-};
-
-export const getHomeImages = async (): Promise<Image[]> => {
-  const res = await db.query.content.findFirst({
-    columns: {},
-    with: {
-      images: {
-        columns: {
-          id: false,
-          contentId: false,
-        },
-      },
-    },
-    where: { label: LABEL.SLIDER },
-  });
-  return res?.images ?? [];
 };
 
 export async function updateContent(

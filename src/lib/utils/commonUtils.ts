@@ -1,7 +1,6 @@
 import {
   AdminCategory,
   Category,
-  Content,
   DragListElement,
   Filter,
   HomeLayout,
@@ -14,7 +13,7 @@ import {
   Work,
 } from "@/lib/type.ts";
 import { KEY_META } from "@/constants/admin.ts";
-import { LABEL, TYPE } from "@/db/schema.ts";
+import { TYPE } from "@/db/schema.ts";
 
 export const transformValueToKey = (value: string): string =>
   value
@@ -38,18 +37,6 @@ export const createNestedObject = (obj, key, ...keys) => {
       createNestedObject(obj[key] || (obj[key] = {}), ...keys)
     : obj;
 };
-
-export const getIntroText = (contents: Content[]): string =>
-  contents?.filter((c) => c.label === LABEL.INTRO)[0]?.text || "";
-
-export const getSliders = (
-  contents: Content[],
-): {
-  filename: string;
-  width: number;
-  height: number;
-  isMain?: boolean;
-}[] => contents?.filter((c) => c.label === LABEL.SLIDER)[0]?.images || [];
 
 export const getMetaMap = (metas: Meta[]): Map<string, string> => {
   const map = new Map();

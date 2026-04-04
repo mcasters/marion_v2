@@ -1,19 +1,8 @@
-import { Content, EnhancedImage, Image, Post, Work } from "@/lib/type.ts";
+import { EnhancedImage, Post, Work } from "@/lib/type.ts";
 import { FILE_TYPES } from "@/constants/image.ts";
-import { getSliders } from "@/lib/utils/commonUtils.ts";
 import { MESSAGE } from "@/constants/admin.ts";
 import Resizer from "react-image-file-resizer";
 import { TYPE } from "@/db/schema.ts";
-
-export const getSliderLandscapeImages = (contents: Content[]): Image[] => {
-  const images: Image[] = getSliders(contents);
-  return images.filter((i) => !i.isMain);
-};
-
-export const getSliderPortraitImages = (contents: Content[]): Image[] => {
-  const images: Image[] = getSliders(contents);
-  return images.filter((i) => i.isMain);
-};
 
 export const getEnhancedImages = (
   items: Work[] | Post[],
