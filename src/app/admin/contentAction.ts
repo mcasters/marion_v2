@@ -13,7 +13,24 @@ import {
 } from "@/lib/utils/serverUtils.ts";
 
 export const getContentsFull = async (): Promise<Content[]> => {
-  return await db.query.content.findMany({ with: { images: true } });
+  return await db.query.content.findMany();
+};
+
+export const getContentPresentation = async (): Promise<Content[]> => {
+  return await db.query.content.findMany({
+    with: {
+      images: {
+        columns: {
+          id: false,
+          contentId: false,
+          isMain: false,
+        },
+      },
+    },
+    where: {
+      label: { OR: [LABEL.PRESENTATION, LABEL.DEMARCHE, LABEL.INSPIRATION] },
+    },
+  });
 };
 
 export const getHomeImages = async (): Promise<Image[]> => {

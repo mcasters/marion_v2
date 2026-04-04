@@ -39,14 +39,16 @@ export const createNestedObject = (obj, key, ...keys) => {
     : obj;
 };
 
-export const getSliderContent = (contents: Content[]): Content | null =>
-  contents?.filter((c) => c.label === LABEL.SLIDER)[0] || null;
-
 export const getPresentation = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.text || "";
 
-export const getPresentationImage = (contents: Content[]): Image[] =>
-  contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
+export const getPresentationImage = (
+  contents: Content[],
+): {
+  filename: string;
+  width: number;
+  height: number;
+}[] => contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
 
 export const getDemarche = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.DEMARCHE)[0]?.text || "";
@@ -57,8 +59,14 @@ export const getInspiration = (contents: Content[]): string =>
 export const getIntroText = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.INTRO)[0]?.text || "";
 
-export const getSliders = (contents: Content[]): Image[] | [] =>
-  contents?.filter((c) => c.label === LABEL.SLIDER)[0]?.images || [];
+export const getSliders = (
+  contents: Content[],
+): {
+  filename: string;
+  width: number;
+  height: number;
+  isMain?: boolean;
+}[] => contents?.filter((c) => c.label === LABEL.SLIDER)[0]?.images || [];
 
 export const getAddress = (contents: Content[]): string =>
   contents?.filter((c) => c.label === LABEL.ADDRESS)[0]?.text || "";

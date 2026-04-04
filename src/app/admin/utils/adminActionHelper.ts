@@ -53,7 +53,6 @@ export const handleRemoveFiles = async (
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING | TYPE.POST,
   filenamesToDelete: string[],
 ) => {
-  console.log(">>>> ", filenamesToDelete);
   for await (const filename of filenamesToDelete) {
     if (filename !== "") {
       deleteFile(getDir(type), filename);

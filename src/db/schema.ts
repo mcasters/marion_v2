@@ -37,7 +37,7 @@ export const content = mysqlTable(
   {
     id: int().autoincrement().primaryKey(),
     text: longtext().notNull(),
-    label: mysqlEnum(LABEL),
+    label: mysqlEnum(LABEL).notNull(),
     title: varchar({ length: 191 }),
   },
   (table) => [unique("Content_label_key").on(table.label)],

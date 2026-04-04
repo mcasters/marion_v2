@@ -10,10 +10,13 @@ import TextAreaForm from "@/components/admin/text/textAreaForm.tsx";
 import ImagesForm from "@/components/admin/common/image/imagesForm";
 
 import { LABEL } from "@/db/schema.ts";
-import { getContentsFull, updateContent } from "@/app/admin/contentAction.ts";
+import {
+  getContentPresentation,
+  updateContent,
+} from "@/app/admin/contentAction.ts";
 
 export default async function Presentation() {
-  const contents = await getContentsFull();
+  const contents = await getContentPresentation();
 
   return (
     <div className={s.container}>
