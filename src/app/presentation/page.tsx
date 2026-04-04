@@ -1,15 +1,10 @@
-import {
-  getDemarche,
-  getInspiration,
-  getMetaMap,
-  getPresentation,
-} from "@/lib/utils/commonUtils";
+import { getMetaMap } from "@/lib/utils/commonUtils";
 import { Metadata } from "next";
 import { KEY_META } from "@/constants/admin.ts";
 import FormattedPhoto from "@/components/image/formattedPhoto.tsx";
 import s from "@/styles/page.module.css";
 import { getMetas } from "@/app/admin/meta/action.ts";
-import { getContentPresentation } from "@/app/admin/contentAction.ts";
+import { getPresentationContent } from "@/app/admin/contentAction.ts";
 import { LABEL } from "@/db/schema.ts";
 
 export async function generateMetadata(): Promise<Metadata | undefined> {
@@ -31,35 +26,37 @@ export async function generateMetadata(): Promise<Metadata | undefined> {
 }
 
 export default async function Presentation() {
-  const contents = await getContentPresentation();
-  const demarche = getDemarche(contents);
-  const inspiration = getInspiration(contents);
-  const images =
-    contents?.filter((c) => c.label === LABEL.PRESENTATION)[0]?.images || [];
+  const contents = await getPresentationContent();
+  const image = contents.image;
+  const demarche = contents.text.get(LABEL.DEMARCHE);
+  const presentation = contents.text.get(LABEL.PRESENTATION);
+  const inspiration = contents.text.get(LABEL.INSPIRATION);
 
   return (
     <div className={`${s.limitedWidth} preLine`}>
       <h1 className="hidden">Présentation</h1>
-      <FormattedPhoto
-        folder="miscellaneous"
-        filename={images[0].filename}
-        width={images[0].width}
-        height={images[0].height}
-        alt={`Photo de ${process.env.TITLE}`}
-        priority
-        displayWidth={{ small: 80, large: 35 }}
-        displayHeight={{ small: 40, large: 40 }}
-      />
+      {image && (
+        <FormattedPhoto
+          folder="miscellaneous"
+          filename={image.filename}
+          width={image.width}
+          height={image.height}
+          alt={`Photo de ${process.env.TITLE}`}
+          priority
+          displayWidth={{ small: 80, large: 35 }}
+          displayHeight={{ small: 40, large: 40 }}
+        />
+      )}
       <section className={s.section}>
-        <p>{getPresentation(contents)}</p>
+        <p>{presentation}</p>
       </section>
-      {demarche !== "" && (
+      {demarche && (
         <section className={s.section}>
           <h2>Démarche artistique</h2>
           <p>{demarche}</p>
         </section>
       )}
-      {inspiration !== "" && (
+      {inspiration && (
         <section className={s.section}>
           <h2>Inspirations</h2>
           <p>{inspiration}</p>
