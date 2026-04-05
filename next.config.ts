@@ -9,5 +9,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "30mb",
     },
   },
+  /*turbopack: {
+    root: path.join(__dirname, ".."),
+  },*/
 };
-module.exports = nextConfig;
+
+export default nextConfig;
