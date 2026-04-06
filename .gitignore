@@ -25,7 +25,7 @@ node_modules/
 *.tgz
 
 # dotenv environment variables file
-.env
+.env.local
 .env.test
 .env
 .env.production

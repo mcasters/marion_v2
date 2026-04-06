@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "NODE_ENV=development node server.js --webpack",
     "build": "next build --webpack",
-    "start": "cross-env NODE_ENV=production node server.js",
+    "start": "cross-env NODE_ENV=production node server.js --webpack",
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
