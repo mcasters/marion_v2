@@ -6,33 +6,17 @@ import {
   getDir,
   resizeAndSaveImage,
 } from "@/lib/utils/serverUtils.ts";
-import { db } from "@/db";
-import {
-  paintingCategory,
-  postImage,
-  sculptureImage,
-  TYPE,
-} from "@/db/schema.ts";
-import { eq } from "drizzle-orm";
+import { TYPE } from "@/db/schema.ts";
 
-export const handleAddAndRemoveFiles = async (
+export const handleAddFiles = async (
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING | TYPE.POST,
   formData: FormData,
 ): Promise<FileInfo[] | null> => {
-  let filenamesToDelete: string[] = [];
-  const mainToDelete = formData.get("mainFilenameToDelete") as string;
-  const toDelete = formData.get("filenamesToDelete") as string;
-  filenamesToDelete = filenamesToDelete
-    .concat(mainToDelete.split(","))
-    .concat(toDelete.split(","));
-  await handleRemoveFiles(type, filenamesToDelete);
-
   const fileInfos: FileInfo[] = [];
   const dir = getDir(type);
   const title = formData.get("title") as string;
   const mainFileToAdd = formData.get("mainFileToAdd") as File;
   const filesToAdd = formData.getAll("filesToAdd") as File[];
-
   if (type === TYPE.POST && mainFileToAdd.size > 0)
     fileInfos.push(
       <FileInfo>await resizeAndSaveImage(mainFileToAdd, title, dir, true),
@@ -51,25 +35,25 @@ export const handleAddAndRemoveFiles = async (
 
 export const handleRemoveFiles = async (
   type: TYPE.PAINTING | TYPE.SCULPTURE | TYPE.DRAWING | TYPE.POST,
-  filenamesToDelete: string[],
-) => {
-  for await (const filename of filenamesToDelete) {
+  formData?: FormData,
+  filenamesToDelete?: string[],
+): Promise<string[] | null> => {
+  let _filenamesToDelete: string[] = filenamesToDelete ?? [];
+
+  if (formData) {
+    const mainToDelete = formData.get("mainFilenameToDelete") as string;
+    const toDelete = formData.get("filenamesToDelete") as string;
+
+    if (mainToDelete) _filenamesToDelete.push(...mainToDelete.split(","));
+    if (toDelete) _filenamesToDelete.push(...toDelete.split(","));
+  }
+
+  let filenamesDeleted: string[] = [];
+  for (const filename of _filenamesToDelete) {
     if (filename !== "") {
       deleteFile(getDir(type), filename);
-
-      if (type === TYPE.POST) {
-        await db.delete(postImage).where(eq(postImage.filename, filename));
-      } else {
-        await db
-          .update(paintingCategory)
-          .set({ imageFilename: "" })
-          .where(eq(paintingCategory.imageFilename, filename));
-        if (type === TYPE.SCULPTURE) {
-          await db
-            .delete(sculptureImage)
-            .where(eq(sculptureImage.filename, filename));
-        }
-      }
+      filenamesDeleted.push(filename);
     }
   }
+  return filenamesDeleted.length > 0 ? filenamesDeleted : null;
 };

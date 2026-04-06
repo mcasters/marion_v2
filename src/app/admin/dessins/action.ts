@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { drawing, drawingCategory, TYPE } from "@/db/schema.ts";
 import {
-  handleAddAndRemoveFiles,
+  handleAddFiles,
   handleRemoveFiles,
 } from "@/app/admin/utils/adminActionHelper.ts";
 import {
@@ -27,7 +27,7 @@ export async function createDrawing(initialState: any, formData: FormData) {
         isError: true,
       };
 
-    const fileInfos = await handleAddAndRemoveFiles(type, formData);
+    const fileInfos = await handleAddFiles(type, formData);
     const data = createDrawingData(formData, fileInfos);
     await db.insert(drawing).values(data);
 
@@ -68,9 +68,18 @@ export async function updateDrawing(initialState: any, formData: FormData) {
         })
         .where(eq(drawingCategory.imageFilename, itemToUpdate.imageFilename));
 
-    const fileInfos = await handleAddAndRemoveFiles(type, formData);
+    const fileInfos = await handleAddFiles(type, formData);
     const data = createDrawingData(formData, fileInfos);
     await db.update(drawing).set(data).where(eq(drawing.id, id));
+
+    const filenamesDeleted = await handleRemoveFiles(type, formData);
+    if (filenamesDeleted) {
+      for (const filename of filenamesDeleted)
+        await db
+          .update(drawingCategory)
+          .set({ imageFilename: "" })
+          .where(eq(drawingCategory.imageFilename, filename));
+    }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
@@ -91,7 +100,7 @@ export async function deleteDrawing(id: number) {
     if (!itemToDelete) return { message: `Dessin introuvable`, isError: true };
 
     await db.delete(drawing).where(eq(drawing.id, id));
-    await handleRemoveFiles(type, [itemToDelete.imageFilename]);
+    await handleRemoveFiles(type, undefined, [itemToDelete.imageFilename]);
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);

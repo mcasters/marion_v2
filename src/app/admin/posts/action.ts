@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { post, postImage, TYPE } from "@/db/schema.ts";
 import {
-  handleAddAndRemoveFiles,
+  handleAddFiles,
   handleRemoveFiles,
 } from "@/app/admin/utils/adminActionHelper.ts";
 import { createPostData } from "@/lib/utils/actionUtils.ts";
@@ -24,7 +24,7 @@ export async function createPost(initialState: any, formData: FormData) {
     const data = createPostData(formData);
     const newId = await db.insert(post).values(data).$returningId();
 
-    const fileInfos = await handleAddAndRemoveFiles(type, formData);
+    const fileInfos = await handleAddFiles(type, formData);
     if (fileInfos) {
       const images = fileInfos.map((fileInfo) => {
         return { ...fileInfo, postId: newId[0].id };
@@ -65,9 +65,24 @@ export async function updatePost(initialState: any, formData: FormData) {
         };
     }
 
-    await handleAddAndRemoveFiles(type, formData);
     const data = createPostData(formData);
     await db.update(post).set(data).where(eq(post.id, id));
+
+    const fileInfos = await handleAddFiles(type, formData);
+    if (fileInfos) {
+      const images = fileInfos.map((fileInfo) => {
+        return { ...fileInfo, postId: id };
+      });
+      await db.insert(postImage).values(images);
+    }
+
+    const filenamesDeleted = await handleRemoveFiles(type, formData);
+    console.log(filenamesDeleted);
+    if (filenamesDeleted) {
+      for (const filename of filenamesDeleted) {
+        await db.delete(postImage).where(eq(postImage.filename, filename));
+      }
+    }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
@@ -91,6 +106,7 @@ export async function deletePost(id: number) {
     await db.delete(post).where(eq(post.id, id));
     await handleRemoveFiles(
       type,
+      undefined,
       postToDelete.images.map((image) => image.filename),
     );
 

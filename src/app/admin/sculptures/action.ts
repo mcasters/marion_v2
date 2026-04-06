@@ -11,7 +11,7 @@ import {
   TYPE,
 } from "@/db/schema.ts";
 import {
-  handleAddAndRemoveFiles,
+  handleAddFiles,
   handleRemoveFiles,
 } from "@/app/admin/utils/adminActionHelper.ts";
 import {
@@ -34,7 +34,7 @@ export async function createSculpture(initialState: any, formData: FormData) {
     const data = createSculptureData(formData);
     const newId = await db.insert(sculpture).values(data).$returningId();
 
-    const fileInfos = await handleAddAndRemoveFiles(type, formData);
+    const fileInfos = await handleAddFiles(type, formData);
     if (fileInfos) {
       const images = fileInfos.map((fileInfo) => {
         return { ...fileInfo, sculptureId: newId[0].id };
@@ -57,15 +57,15 @@ export async function updateSculpture(initialState: any, formData: FormData) {
   const title = rawFormData.title as string;
 
   try {
-    const itemToUpdate = await db.query.sculpture.findFirst({
+    const sculptureToUpdate = await db.query.sculpture.findFirst({
       where: { id },
       with: { images: true },
     });
 
-    if (!itemToUpdate)
+    if (!sculptureToUpdate)
       return { message: `Sculpture introuvable`, isError: true };
 
-    if (itemToUpdate.title !== title) {
+    if (sculptureToUpdate.title !== title) {
       const titleAlreadyExists = await db.query.sculpture.findFirst({
         where: { title },
       });
@@ -77,7 +77,7 @@ export async function updateSculpture(initialState: any, formData: FormData) {
     }
 
     if (!!formData.get("oldCategoryId"))
-      for await (const image of itemToUpdate.images) {
+      for await (const image of sculptureToUpdate.images) {
         await db
           .update(sculptureCategory)
           .set({
@@ -86,9 +86,29 @@ export async function updateSculpture(initialState: any, formData: FormData) {
           .where(eq(sculptureCategory.imageFilename, image.filename));
       }
 
-    await handleAddAndRemoveFiles(type, formData);
     const data = createSculptureData(formData);
     await db.update(sculpture).set(data).where(eq(sculpture.id, id));
+
+    const fileInfos = await handleAddFiles(type, formData);
+    if (fileInfos) {
+      const images = fileInfos.map((fileInfo) => {
+        return { ...fileInfo, sculptureId: id };
+      });
+      await db.insert(sculptureImage).values(images);
+    }
+
+    const filenamesDeleted = await handleRemoveFiles(type, formData);
+    if (filenamesDeleted) {
+      for (const filename of filenamesDeleted) {
+        await db
+          .update(sculptureCategory)
+          .set({ imageFilename: "" })
+          .where(eq(sculptureCategory.imageFilename, filename));
+        await db
+          .delete(sculptureImage)
+          .where(eq(sculptureImage.filename, filename));
+      }
+    }
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);
@@ -111,10 +131,11 @@ export async function deleteSculpture(id: number) {
       return { message: `Sculpture introuvable`, isError: true };
 
     await db.delete(sculpture).where(eq(sculpture.id, id));
-    await handleRemoveFiles(
-      type,
-      sculptureToDelete.images.map((image) => image.filename),
+
+    const filenamesToDelete = sculptureToDelete.images.map(
+      (image) => image.filename,
     );
+    await handleRemoveFiles(type, undefined, filenamesToDelete);
 
     revalidatePath(`/admin/${type}s`);
     revalidatePath(`/${type}s`);

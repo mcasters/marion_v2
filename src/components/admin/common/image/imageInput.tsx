@@ -93,14 +93,9 @@ export default function ImageInput({
   return (
     <div className="inputContainer">
       <input
-        name={"mainFilenameToDelete"}
+        name={isMain ? "mainFilenameToDelete" : "filenamesToDelete"}
         type="hidden"
-        value={isMain ? filenamesToDelete : ""}
-      />
-      <input
-        name={"filenamesToDelete"}
-        type="hidden"
-        value={isMain ? "" : filenamesToDelete}
+        value={filenamesToDelete}
       />
       {title && <p className="label">{title}</p>}
       <div className={s.dropZone}>

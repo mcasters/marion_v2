@@ -56,6 +56,7 @@ export default function PostForm({ post, onClose }: Props) {
         placeholder="Texte (facultatif)"
       />
       <ImageInput
+        key="main"
         filesPath={workPost.images
           .filter((i) => i.isMain)
           .map((i: Image) => `/images/${TYPE.POST}/sm/${i.filename}`)}
@@ -64,11 +65,13 @@ export default function PostForm({ post, onClose }: Props) {
         isMain={true}
       />
       <ImageInput
+        key="album"
         filesPath={workPost.images
           .filter((i) => !i.isMain)
           .map((i: Image) => `/images/${TYPE.POST}/sm/${i.filename}`)}
         isMultiple={true}
         smallImageOption={true}
+        isMain={false}
         title="Album d'images (facultatif)"
       />
       <div className={s.buttonSection}>

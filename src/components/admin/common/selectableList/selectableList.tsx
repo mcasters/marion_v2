@@ -36,7 +36,7 @@ export default function SelectableList<T extends Admin>({
 
   useEffect(() => {
     if (!renderFilter) setItemsToDisplay(items);
-  }, [items]);
+  }, []);
 
   return (
     <div className="inputContainer">
@@ -74,15 +74,13 @@ export default function SelectableList<T extends Admin>({
         </ul>
       </div>
       {isCategory && <h5>{MESSAGE.category}</h5>}
-      {editedItem && (
-        <Modal
-          isOpen={true}
-          title="Modification"
-          width={isCategory ? 700 : 900}
-        >
-          {formToRender(editedItem, () => setEditedItem(null))}
-        </Modal>
-      )}
+      <Modal
+        isOpen={!!editedItem}
+        title="Modification"
+        width={isCategory ? 700 : 900}
+      >
+        {editedItem && formToRender(editedItem, () => setEditedItem(null))}
+      </Modal>
     </div>
   );
 }
