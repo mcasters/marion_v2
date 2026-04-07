@@ -91,22 +91,7 @@ export const getEmptyPost = (): Post => {
     title: "",
     date: new Date(),
     text: "",
-    images: [{ ...getEmptyPostImage() }],
-  };
-};
-
-export const getEmptyImage = () => {
-  return {
-    filename: "",
-    width: 0,
-    height: 0,
-  };
-};
-
-export const getEmptyPostImage = () => {
-  return {
-    ...getEmptyImage(),
-    isMain: false,
+    images: [],
   };
 };
 

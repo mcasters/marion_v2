@@ -32,12 +32,6 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.painting.categoryId,
     }),
   },
-  postImage: {
-    post: r.one.post({
-      from: r.postImage.postId,
-      to: r.post.id,
-    }),
-  },
   post: {
     images: r.many.postImage({
       from: r.post.id,

@@ -77,7 +77,6 @@ export async function updatePost(initialState: any, formData: FormData) {
     }
 
     const filenamesDeleted = await handleRemoveFiles(type, formData);
-    console.log(filenamesDeleted);
     if (filenamesDeleted) {
       for (const filename of filenamesDeleted) {
         await db.delete(postImage).where(eq(postImage.filename, filename));
