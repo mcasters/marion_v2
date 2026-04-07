@@ -4,5 +4,5 @@ import { relations } from "./relations";
 
 export const db = drizzle(process.env.DATABASE_URL!, {
   relations,
-  mode: "default",
+  logger: true,
 });
