@@ -3,22 +3,25 @@ import * as schema from "./schema";
 
 export const relations = defineRelations(schema, (r) => ({
   content: {
-    images: r.many.contentImage({
-      from: r.content.id,
-      to: r.contentImage.contentId,
+    images: r.many.contentImage(),
+  },
+  contentImage: {
+    content: r.one.content({
+      from: r.contentImage.contentId,
+      to: r.content.id,
+    }),
+  },
+  drawing: {
+    category: r.one.drawingCategory({
+      from: r.drawing.categoryId,
+      to: r.drawingCategory.id,
     }),
   },
   drawingCategory: {
-    drawings: r.many.drawing({
-      from: r.drawingCategory.id,
-      to: r.drawing.categoryId,
-    }),
+    drawings: r.many.drawing(),
   },
   user: {
-    messages: r.many.message({
-      from: r.user.id,
-      to: r.message.userId,
-    }),
+    messages: r.many.message(),
   },
   message: {
     author: r.one.user({
@@ -26,28 +29,38 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.user.id,
     }),
   },
-  paintingCategory: {
-    paintings: r.many.painting({
-      from: r.paintingCategory.id,
-      to: r.painting.categoryId,
+  painting: {
+    category: r.one.paintingCategory({
+      from: r.painting.categoryId,
+      to: r.paintingCategory.id,
     }),
   },
+  paintingCategory: {
+    paintings: r.many.painting(),
+  },
   post: {
-    images: r.many.postImage({
-      from: r.post.id,
-      to: r.postImage.postId,
+    images: r.many.postImage(),
+  },
+  postImage: {
+    post: r.one.post({
+      from: r.postImage.postId,
+      to: r.post.id,
     }),
   },
   sculpture: {
-    images: r.many.sculptureImage({
-      from: r.sculpture.id,
-      to: r.sculptureImage.sculptureId,
+    images: r.many.sculptureImage(),
+    category: r.one.sculptureCategory({
+      from: r.sculpture.categoryId,
+      to: r.sculptureCategory.id,
+    }),
+  },
+  sculptureImage: {
+    sculpture: r.one.sculpture({
+      from: r.sculptureImage.sculptureId,
+      to: r.sculpture.id,
     }),
   },
   sculptureCategory: {
-    sculptures: r.many.sculpture({
-      from: r.sculptureCategory.id,
-      to: r.sculpture.categoryId,
-    }),
+    sculptures: r.many.sculpture(),
   },
 }));

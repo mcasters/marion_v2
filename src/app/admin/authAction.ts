@@ -26,7 +26,7 @@ export async function loginAction(
 
   try {
     const user = await db.query.user.findFirst({
-      where: { email },
+      where: { email: email },
     });
     if (!user) return { error: "Erreur d'authentification" };
 
