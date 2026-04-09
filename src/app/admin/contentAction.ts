@@ -21,8 +21,19 @@ export const getHomeText = async (): Promise<string | undefined> => {
 };
 
 export const getHomeImages = async (): Promise<Image[]> => {
-  const res = await db.query.content.findFirst({
-    columns: {},
+  const res = await db
+    .select({
+      filename: contentImage.filename,
+      width: contentImage.width,
+      height: contentImage.height,
+      isMain: contentImage.isMain,
+    })
+    .from(content)
+    .where(eq(content.label, LABEL.SLIDER))
+    .innerJoin(contentImage, eq(contentImage.contentId, content.id));
+
+  /*await db.query.content.findFirst({
+    columns: { label: true },
     with: {
       images: {
         columns: {
@@ -32,8 +43,8 @@ export const getHomeImages = async (): Promise<Image[]> => {
       },
     },
     where: { label: LABEL.SLIDER },
-  });
-  return res?.images ?? [];
+  });*/
+  return res;
 };
 
 export const getContactContent = async (): Promise<

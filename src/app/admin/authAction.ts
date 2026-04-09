@@ -25,15 +25,20 @@ export async function loginAction(
   const password = formData.get("password") as string;
 
   try {
-    const user = await db.query.user.findFirst({
+    const userLogin = await db.query.user.findFirst({
       where: { email: email },
     });
-    if (!user) return { error: "Erreur d'authentification" };
+    console.log("userLogin //// ", userLogin);
+    if (!userLogin) return { error: "Erreur d'authentification" };
 
-    const res = await bcrypt.compare(password, user.password);
+    const res = await bcrypt.compare(password, userLogin.password);
     if (!res) return { error: "Erreur d'authentification" };
 
-    await setCookie({ id: user.id, email: user.email, isAdmin: user.isAdmin });
+    await setCookie({
+      id: userLogin.id,
+      email: userLogin.email,
+      isAdmin: userLogin.isAdmin,
+    });
   } catch (e) {
     return { error: `Erreur d'authentification` };
   }
