@@ -2,7 +2,7 @@
 
 import { AdminCategory, Work } from "@/lib/type.ts";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   sculpture,
@@ -15,9 +15,11 @@ import {
   handleRemoveFiles,
 } from "@/app/admin/utils/adminActionHelper.ts";
 import {
+  aggregateSculptureRows,
   createAdminCategoryObjects,
   createCategoryData,
   createSculptureData,
+  createSculptureWorkObject,
 } from "@/lib/utils/actionUtils.ts";
 
 export async function createSculpture(initialState: any, formData: FormData) {
@@ -59,11 +61,13 @@ export async function updateSculpture(initialState: any, formData: FormData) {
   try {
     const sculptureToUpdate = await db.query.sculpture.findFirst({
       where: { id },
-      with: { images: true },
     });
-
     if (!sculptureToUpdate)
       return { message: `Sculpture introuvable`, isError: true };
+
+    const images = await db.query.sculptureImage.findMany({
+      where: { sculptureId: sculptureToUpdate.id },
+    });
 
     if (sculptureToUpdate.title !== title) {
       const titleAlreadyExists = await db.query.sculpture.findFirst({
@@ -77,7 +81,7 @@ export async function updateSculpture(initialState: any, formData: FormData) {
     }
 
     if (!!formData.get("oldCategoryId"))
-      for await (const image of sculptureToUpdate.images) {
+      for await (const image of images) {
         await db
           .update(sculptureCategory)
           .set({
@@ -124,17 +128,18 @@ export async function deleteSculpture(id: number) {
   try {
     const sculptureToDelete = await db.query.sculpture.findFirst({
       where: { id },
-      with: { images: true },
     });
 
     if (!sculptureToDelete)
       return { message: `Sculpture introuvable`, isError: true };
 
+    const images = await db.query.sculptureImage.findMany({
+      where: { sculptureId: sculptureToDelete.id },
+    });
+
     await db.delete(sculpture).where(eq(sculpture.id, id));
 
-    const filenamesToDelete = sculptureToDelete.images.map(
-      (image) => image.filename,
-    );
+    const filenamesToDelete = images.map((image) => image.filename);
     await handleRemoveFiles(type, undefined, filenamesToDelete);
 
     revalidatePath(`/admin/${type}s`);
@@ -209,16 +214,20 @@ export async function deleteSculptureCategory(id: number) {
 }
 
 export const getSculptureWorks = async (): Promise<Work[]> => {
-  return await db.query.sculpture.findMany({
-    columns: {
-      createdAt: false,
-    },
-    with: { images: true },
-    orderBy: { date: "desc" },
-  });
+  const rows = await db
+    .select({
+      sculpture: sculpture,
+      sculptureImage: sculptureImage,
+    })
+    .from(sculpture)
+    .innerJoin(sculptureImage, eq(sculptureImage.sculptureId, sculpture.id))
+    .orderBy(asc(sculpture.date));
+
+  const result = aggregateSculptureRows(rows);
+  return createSculptureWorkObject(result);
 };
 
-export const getSculptureCategories = async (
+export const getAdminSculptureCategories = async (
   works: Work[],
 ): Promise<AdminCategory[]> => {
   const categories = await db.query.sculptureCategory.findMany({

@@ -8,8 +8,12 @@ import {
   drawingCategory,
   meta,
   paintingCategory,
+  post,
+  postImage,
   presetColor,
+  sculpture,
   sculptureCategory,
+  sculptureImage,
   theme,
   TYPE,
 } from "@/db/schema.ts";
@@ -35,18 +39,25 @@ type Common = {
   outInformation: string;
 };
 
-export type dbPainting = Common & {
+export type DbPainting = Common & {
   type: TYPE.PAINTING;
   imageFilename: string;
   imageWidth: number;
   imageHeight: number;
 };
-export type dbDrawing = Common & {
+
+export type DbDrawing = Common & {
   type: TYPE.DRAWING;
   imageFilename: string;
   imageWidth: number;
   imageHeight: number;
 };
+
+export type DbSculpture = typeof sculpture.$inferSelect;
+export type DbSculptureImage = typeof sculptureImage.$inferSelect;
+
+export type DbPost = typeof post.$inferSelect;
+export type DbPostImage = typeof postImage.$inferSelect;
 
 export type WorkImage = {
   filename: string;
@@ -128,13 +139,13 @@ export type Session = {
   user: User;
 };
 
-export interface Message {
+export type Message = {
   id: number;
   date: Date;
   dateUpdated: Date | null;
   text: string;
-  author: { email: string } | null;
-}
+  author: { email: string };
+};
 
 export enum Layout {
   MONO,

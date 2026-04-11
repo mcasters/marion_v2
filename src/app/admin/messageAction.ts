@@ -2,16 +2,23 @@
 
 import { Message } from "@/lib/type.ts";
 import { db } from "@/db";
-import { message } from "@/db/schema.ts";
-import { eq } from "drizzle-orm";
+import { message, user } from "@/db/schema.ts";
+import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export const getMessages = async (): Promise<Message[]> =>
-  await db.query.message.findMany({
-    columns: { userId: false },
-    with: { author: { columns: { email: true } } },
-    orderBy: { date: "desc" },
-  });
+export const getMessages = async (): Promise<Message[]> => {
+  return db
+    .select({
+      id: message.id,
+      date: message.date,
+      dateUpdated: message.dateUpdated,
+      text: message.text,
+      author: { email: user.email },
+    })
+    .from(message)
+    .innerJoin(user, eq(message.userId, user.id))
+    .orderBy(desc(message.date));
+};
 
 export const addMessage = async (initialState: any, formData: FormData) => {
   const rawFormData = Object.fromEntries(formData);

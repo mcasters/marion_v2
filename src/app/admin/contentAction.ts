@@ -21,7 +21,7 @@ export const getHomeText = async (): Promise<string | undefined> => {
 };
 
 export const getHomeImages = async (): Promise<Image[]> => {
-  const res = await db
+  return db
     .select({
       filename: contentImage.filename,
       width: contentImage.width,
@@ -31,20 +31,6 @@ export const getHomeImages = async (): Promise<Image[]> => {
     .from(content)
     .where(eq(content.label, LABEL.SLIDER))
     .innerJoin(contentImage, eq(contentImage.contentId, content.id));
-
-  /*await db.query.content.findFirst({
-    columns: { label: true },
-    with: {
-      images: {
-        columns: {
-          id: false,
-          contentId: false,
-        },
-      },
-    },
-    where: { label: LABEL.SLIDER },
-  });*/
-  return res;
 };
 
 export const getContactContent = async (): Promise<
@@ -69,26 +55,38 @@ export const getPresentationContent = async (): Promise<{
 }> => {
   const contents = await db.query.content.findMany({
     columns: { label: true, text: true },
-    with: {
-      images: {
-        columns: {
-          id: false,
-          contentId: false,
-          isMain: false,
-        },
-      },
-    },
     where: {
-      label: { OR: [LABEL.PRESENTATION, LABEL.DEMARCHE, LABEL.INSPIRATION] },
+      label: { OR: [LABEL.DEMARCHE, LABEL.INSPIRATION] },
     },
   });
+
+  const presentationRow = await db
+    .select({
+      label: content.label,
+      text: content.text,
+      filename: contentImage.filename,
+      width: contentImage.width,
+      height: contentImage.height,
+    })
+    .from(content)
+    .where(eq(content.label, LABEL.PRESENTATION))
+    .innerJoin(contentImage, eq(contentImage.contentId, content.id))
+    .limit(1);
+
   const map = new Map();
-  let image: Image | null = null;
   contents.forEach((content) => {
     map.set(content.label, content.text);
-    if (content.images.length) image = content.images[0];
   });
-  return { text: map, image: image };
+  const presentation = presentationRow[0];
+  map.set(presentation.label, presentation.text);
+  return {
+    text: map,
+    image: {
+      filename: presentation.filename,
+      width: presentation.width,
+      height: presentation.height,
+    },
+  };
 };
 
 export async function updateContent(

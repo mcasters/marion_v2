@@ -56,21 +56,26 @@ export async function getPaintingWorksByYear(year: string): Promise<Work[]> {
 
 export async function getPaintingCategory(
   categoryKey: string,
-): Promise<PaintingCategory | null> {
-  if (categoryKey === "no-category")
-    return getNoCategory(TYPE.PAINTING) as PaintingCategory;
+): Promise<PaintingCategory> {
+  let category: PaintingCategory | undefined;
 
-  const category = await db.query.paintingCategory.findFirst({
-    where: { key: categoryKey },
-  });
-  return !category ? notFound() : category;
+  if (categoryKey === "no-category")
+    category = getNoCategory(TYPE.PAINTING) as PaintingCategory;
+  else
+    category = await db.query.paintingCategory.findFirst({
+      where: { key: categoryKey },
+    });
+  return category ? category : notFound();
 }
 
 export async function getPaintingWorksByCategory(
   categoryKey: string,
 ): Promise<{ category: PaintingCategory; works: Work[] }> {
+  let category: PaintingCategory | undefined;
+  let works: Work[] = [];
+
   if (categoryKey === "no-category") {
-    const category = getNoCategory(TYPE.PAINTING) as PaintingCategory;
+    category = getNoCategory(TYPE.PAINTING) as PaintingCategory;
     const paintings = await db.query.painting.findMany({
       columns: {
         createdAt: false,
@@ -78,27 +83,21 @@ export async function getPaintingWorksByCategory(
       where: { categoryId: { isNull: true } },
       orderBy: { date: "desc" },
     });
-    const works = paintings.map((data) => createWorkObject(data));
-    return { category, works };
+    works = paintings.map((data) => createWorkObject(data));
   } else {
-    const result = await db.query.paintingCategory.findFirst({
+    category = await db.query.paintingCategory.findFirst({
       where: { key: categoryKey },
-      with: {
-        paintings: {
-          columns: {
-            createdAt: false,
-          },
-          orderBy: { date: "desc" },
-        },
-      },
     });
-    if (result) {
-      const { paintings, ...rest } = result;
-      return {
-        category: rest,
-        works: paintings.map((data) => createWorkObject(data)),
-      };
+    if (category) {
+      const paintings = await db.query.painting.findMany({
+        columns: {
+          createdAt: false,
+        },
+        where: { categoryId: category.id },
+        orderBy: { date: "desc" },
+      });
+      works = paintings.map((d) => createWorkObject(d));
     }
   }
-  return notFound();
+  return category ? { category, works } : notFound();
 }

@@ -31,10 +31,16 @@ import { TYPE } from "@/db/schema.ts";
 import {
   AdminCategory,
   Category,
-  dbDrawing,
-  dbPainting,
+  DbDrawing,
+  DbPainting,
+  DbPost,
+  DbPostImage,
+  DbSculpture,
+  DbSculptureImage,
   FileInfo,
+  Post,
   Work,
+  WorkImage,
 } from "@/lib/type.ts";
 import { getNoCategory, transformValueToKey } from "@/lib/utils/commonUtils.ts";
 
@@ -185,7 +191,7 @@ export const createCategoryData = (formData: FormData) => {
     imageFilename: rawFormData.filename as string,
   };
 };
-export const createWorkObject = (data: dbPainting | dbDrawing): Work => {
+export const createWorkObject = (data: DbPainting | DbDrawing): Work => {
   const { imageFilename, imageHeight, imageWidth, ...rest } = data;
   return {
     ...rest,
@@ -195,6 +201,81 @@ export const createWorkObject = (data: dbPainting | dbDrawing): Work => {
     ],
   };
 };
+
+export const aggregateSculptureRows = (
+  rows: { sculpture: DbSculpture; sculptureImage: DbSculptureImage }[],
+): Record<number, { sculpture: DbSculpture; images: DbSculptureImage[] }> => {
+  return rows.reduce<
+    Record<number, { sculpture: DbSculpture; images: DbSculptureImage[] }>
+  >((acc, row) => {
+    const sculpture = row.sculpture;
+    const image = row.sculptureImage;
+
+    if (!acc[sculpture.id]) {
+      acc[sculpture.id] = { sculpture: sculpture, images: [] };
+    }
+    if (image) {
+      acc[sculpture.id].images.push(image);
+    }
+    return acc;
+  }, {});
+};
+
+export const createSculptureWorkObject = (
+  dbSculptures: Record<
+    number,
+    { sculpture: DbSculpture; images: DbSculptureImage[] }
+  >,
+): Work[] => {
+  const works: Work[] = [];
+  Object.entries(dbSculptures).forEach(([n, data]) => {
+    const { createdAt, ...rest } = data.sculpture;
+    const images: WorkImage[] = [];
+    data.images.forEach((image) => {
+      const { id, isMain, sculptureId, ...restImage } = image;
+      images.push({ ...restImage });
+    });
+    works.push({ ...rest, images });
+  });
+  return works;
+};
+
+export const aggregatePostRows = (
+  rows: { post: DbPost; postImage: DbPostImage }[],
+): Record<number, { post: DbPost; images: DbPostImage[] }> => {
+  return rows.reduce<Record<number, { post: DbPost; images: DbPostImage[] }>>(
+    (acc, row) => {
+      const post = row.post;
+      const image = row.postImage;
+
+      if (!acc[post.id]) {
+        acc[post.id] = { post: post, images: [] };
+      }
+      if (image) {
+        acc[post.id].images.push(image);
+      }
+      return acc;
+    },
+    {},
+  );
+};
+
+export const createPostObject = (
+  dbPost: Record<number, { post: DbPost; images: DbPostImage[] }>,
+): Post[] => {
+  const posts: Post[] = [];
+  Object.entries(dbPost).forEach(([n, data]) => {
+    const { createdAt, published, viewCount, ...rest } = data.post;
+    const images: WorkImage[] = [];
+    data.images.forEach((image) => {
+      const { id, postId, ...restImage } = image;
+      images.push({ ...restImage });
+    });
+    posts.push({ ...rest, images });
+  });
+  return posts;
+};
+
 export const createAdminCategoryObjects = (
   categories: Category[],
   items: Work[],

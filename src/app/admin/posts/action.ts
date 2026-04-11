@@ -2,14 +2,18 @@
 
 import { Post } from "@/lib/type.ts";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { post, postImage, TYPE } from "@/db/schema.ts";
 import {
   handleAddFiles,
   handleRemoveFiles,
 } from "@/app/admin/utils/adminActionHelper.ts";
-import { createPostData } from "@/lib/utils/actionUtils.ts";
+import {
+  aggregatePostRows,
+  createPostData,
+  createPostObject,
+} from "@/lib/utils/actionUtils.ts";
 
 export async function createPost(initialState: any, formData: FormData) {
   const title = formData.get("title") as string;
@@ -49,9 +53,7 @@ export async function updatePost(initialState: any, formData: FormData) {
   try {
     const postToUpdate = await db.query.post.findFirst({
       where: { id },
-      with: { images: true },
     });
-
     if (!postToUpdate) return { message: `Post introuvable`, isError: true };
 
     if (postToUpdate.title !== title) {
@@ -97,16 +99,18 @@ export async function deletePost(id: number) {
   try {
     const postToDelete = await db.query.post.findFirst({
       where: { id },
-      with: { images: true },
     });
-
     if (!postToDelete) return { message: `Post introuvable`, isError: true };
+
+    const images = await db.query.postImage.findMany({
+      where: { postId: postToDelete.id },
+    });
 
     await db.delete(post).where(eq(post.id, id));
     await handleRemoveFiles(
       type,
       undefined,
-      postToDelete.images.map((image) => image.filename),
+      images.map((image) => image.filename),
     );
 
     revalidatePath(`/admin/${type}s`);
@@ -118,20 +122,15 @@ export async function deletePost(id: number) {
 }
 
 export const getPosts = async (): Promise<Post[]> => {
-  return await db.query.post.findMany({
-    columns: {
-      createdAt: false,
-      published: false,
-      viewCount: false,
-    },
-    with: {
-      images: {
-        columns: {
-          id: false,
-          postId: false,
-        },
-      },
-    },
-    orderBy: { date: "desc" },
-  });
+  const rows = await db
+    .select({
+      post: post,
+      postImage: postImage,
+    })
+    .from(post)
+    .innerJoin(postImage, eq(postImage.postId, post.id))
+    .orderBy(asc(post.date));
+
+  const result = aggregatePostRows(rows);
+  return createPostObject(result);
 };

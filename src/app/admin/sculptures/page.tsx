@@ -3,7 +3,7 @@ import React from "react";
 import WorkLayoutForm from "@/components/admin/item/form/workLayoutForm.tsx";
 import WorkManagement from "@/components/admin/item/workManagement.tsx";
 import {
-  getSculptureCategories,
+  getAdminSculptureCategories,
   getSculptureWorks,
 } from "@/app/admin/sculptures/action.ts";
 import { TYPE } from "@/db/schema.ts";
@@ -11,7 +11,7 @@ import { TYPE } from "@/db/schema.ts";
 export default async function Sculptures() {
   const type = TYPE.SCULPTURE;
   const works = await getSculptureWorks();
-  const categories = await getSculptureCategories(works);
+  const categories = await getAdminSculptureCategories(works);
 
   return (
     <div className={s.container}>

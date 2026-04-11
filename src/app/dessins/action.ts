@@ -27,7 +27,6 @@ export const getDrawingCategories = async (): Promise<DrawingCategory[]> => {
     where: { drawings: true },
     orderBy: { value: "desc" },
   });
-
   const drawingWithNoCategory = await db.query.drawing.findFirst({
     where: { categoryId: { isNull: true } },
   });
@@ -56,21 +55,26 @@ export async function getDrawingWorksByYear(year: string): Promise<Work[]> {
 
 export async function getDrawingCategory(
   categoryKey: string,
-): Promise<DrawingCategory | null> {
-  if (categoryKey === "no-category")
-    return getNoCategory(TYPE.DRAWING) as DrawingCategory;
+): Promise<DrawingCategory> {
+  let category: DrawingCategory | undefined;
 
-  const category = await db.query.drawingCategory.findFirst({
-    where: { key: categoryKey },
-  });
-  return !category ? notFound() : category;
+  if (categoryKey === "no-category")
+    category = getNoCategory(TYPE.DRAWING) as DrawingCategory;
+  else
+    category = await db.query.drawingCategory.findFirst({
+      where: { key: categoryKey },
+    });
+  return category ? category : notFound();
 }
 
 export async function getDrawingWorksByCategory(
   categoryKey: string,
 ): Promise<{ category: DrawingCategory; works: Work[] }> {
+  let category: DrawingCategory | undefined;
+  let works: Work[] = [];
+
   if (categoryKey === "no-category") {
-    const category = getNoCategory(TYPE.DRAWING) as DrawingCategory;
+    category = getNoCategory(TYPE.DRAWING) as DrawingCategory;
     const drawings = await db.query.drawing.findMany({
       columns: {
         createdAt: false,
@@ -78,27 +82,21 @@ export async function getDrawingWorksByCategory(
       where: { categoryId: { isNull: true } },
       orderBy: { date: "desc" },
     });
-    const works = drawings.map((data) => createWorkObject(data));
-    return { category, works };
+    works = drawings.map((data) => createWorkObject(data));
   } else {
-    const result = await db.query.drawingCategory.findFirst({
+    category = await db.query.drawingCategory.findFirst({
       where: { key: categoryKey },
-      with: {
-        drawings: {
-          columns: {
-            createdAt: false,
-          },
-          orderBy: { date: "desc" },
-        },
-      },
     });
-    if (result) {
-      const { drawings, ...rest } = result;
-      return {
-        category: rest,
-        works: drawings.map((data) => createWorkObject(data)),
-      };
+    if (category) {
+      const drawings = await db.query.drawing.findMany({
+        columns: {
+          createdAt: false,
+        },
+        where: { categoryId: category.id },
+        orderBy: { date: "desc" },
+      });
+      works = drawings.map((d) => createWorkObject(d));
     }
   }
-  return notFound();
+  return category ? { category, works } : notFound();
 }

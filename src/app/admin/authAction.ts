@@ -28,7 +28,6 @@ export async function loginAction(
     const userLogin = await db.query.user.findFirst({
       where: { email: email },
     });
-    console.log("userLogin //// ", userLogin);
     if (!userLogin) return { error: "Erreur d'authentification" };
 
     const res = await bcrypt.compare(password, userLogin.password);
